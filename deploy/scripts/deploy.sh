@@ -4,7 +4,7 @@ set -euo pipefail
 APP_NAME="clouddroid"
 APP_DIR="/var/www/clouddroid"
 BRANCH="main"
-PM2_ECOSYSTEM="$APP_DIR/deploy/ecosystem.config.js"
+PM2_ECOSYSTEM="$APP_DIR/deploy/ecosystem.config.cjs"
 
 echo "=== Deploying $APP_NAME ==="
 

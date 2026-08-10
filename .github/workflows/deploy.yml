@@ -35,7 +35,7 @@ jobs:
             mkdir -p .data
 
             echo "[5] Restarting app..."
-            pm2 reload deploy/ecosystem.config.js --update-env || pm2 start deploy/ecosystem.config.js
+            pm2 reload deploy/ecosystem.config.cjs --update-env || pm2 start deploy/ecosystem.config.cjs
             pm2 save
 
             echo "=== Deployment complete ==="
