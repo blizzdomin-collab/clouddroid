@@ -284,4 +284,4 @@ Showcasing a robust backend builds trust.
 35. ~~Add error pages (`404.astro`, `500.astro`)~~ ✅ Completed
 36. ~~Store Dodo Payments customer ID in user records~~ ✅ Completed
 37. ~~Add "Manage Subscription" button on billing page~~ ✅ Completed
-38. ~~Update `.env` with production domain (`clouddroid.eu`)~~ ✅ Completed
+38. ~~Update `.env` with production domain (`clouddroid.eu`)~~ ✅ Completeds
