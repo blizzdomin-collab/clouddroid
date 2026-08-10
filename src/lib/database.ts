@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dbPath = path.join(__dirname, '..', '..', '.data', 'clouddroid.json');
+const dbPath = path.join(process.cwd(), '.data', 'clouddroid.json');
 
 interface Instance {
   id: string;
