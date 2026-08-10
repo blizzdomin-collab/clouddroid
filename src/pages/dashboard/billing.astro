@@ -1,0 +1,167 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+
+const sessionCookie = Astro.cookies.get('session');
+let currentUser: { email: string; name: string; role: string } | null = null;
+let subscription: any = null;
+let invoices: any[] = [];
+
+if (sessionCookie) {
+  try {
+    const session = JSON.parse(sessionCookie.value);
+    if (session.authenticated === true && session.email) {
+      currentUser = { email: session.email, name: session.name || 'User', role: session.role || 'user' };
+      const cookieHeader = `session=${encodeURIComponent(sessionCookie.value)}`;
+      const subRes = await fetch(`${Astro.url.origin}/api/billing/subscription`, {
+        headers: { Cookie: cookieHeader },
+      });
+      if (subRes.ok) {
+        const data = await subRes.json();
+        subscription = data.subscription;
+      }
+      const invRes = await fetch(`${Astro.url.origin}/api/billing/invoices`, {
+        headers: { Cookie: cookieHeader },
+      });
+      if (invRes.ok) {
+        const data = await invRes.json();
+        invoices = data.invoices || [];
+      }
+    }
+  } catch {
+    currentUser = null;
+  }
+}
+---
+
+<DashboardLayout title="Billing - CloudDroid">
+  <div class="p-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-navy mb-2">Billing & Subscription</h1>
+      <p class="text-slate">Manage your subscription and payment methods</p>
+    </div>
+
+    {subscription ? (
+      <div class="max-w-2xl space-y-6">
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-navy">Current Plan</h2>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <div class="text-2xl font-bold text-navy">{subscription.plan}</div>
+                <div class="text-sm text-slate">${subscription.amount}/{subscription.currency === 'USD' ? 'month' : 'month'}</div>
+              </div>
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-green-700 bg-green-100">
+                {subscription.status}
+              </span>
+            </div>
+            <div class="space-y-2 text-sm text-slate">
+              <div class="flex items-center justify-between">
+                <span>Current period</span>
+                <span class="text-navy font-medium">{new Date(subscription.current_period_start).toLocaleDateString()} - {new Date(subscription.current_period_end).toLocaleDateString()}</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span>Auto-renew</span>
+                <span class="text-navy font-medium">{subscription.cancel_at_period_end ? 'No' : 'Yes'}</span>
+              </div>
+              <div class="pt-4">
+                <button id="portalBtn" class="inline-flex items-center gap-2 bg-navy text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-navy-light transition-colors">
+                  Manage Subscription
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-navy">Payment Method</h2>
+          </div>
+          <div class="p-6">
+            <p class="text-sm text-slate mb-4">Payment is processed securely by Dodo Payments.</p>
+            <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+              <div class="w-12 h-8 bg-navy/5 rounded flex items-center justify-center">
+                <span class="text-xs font-medium text-navy">VISA</span>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-navy">Visa ending in 4242</div>
+                <div class="text-xs text-slate">Expires 12/2027</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-navy">Billing History</h2>
+          </div>
+          <div class="p-6">
+            {invoices.length > 0 ? (
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="border-b border-slate-200">
+                      <th class="text-left py-3 px-4 font-medium text-slate">Invoice</th>
+                      <th class="text-left py-3 px-4 font-medium text-slate">Date</th>
+                      <th class="text-left py-3 px-4 font-medium text-slate">Amount</th>
+                      <th class="text-left py-3 px-4 font-medium text-slate">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {invoices.map((invoice) => (
+                      <tr class="border-b border-slate-100 last:border-0">
+                        <td class="py-3 px-4 text-navy font-medium">{invoice.id}</td>
+                        <td class="py-3 px-4 text-slate">{new Date(invoice.created_at).toLocaleDateString()}</td>
+                        <td class="py-3 px-4 text-navy">${invoice.amount} {invoice.currency}</td>
+                        <td class="py-3 px-4">
+                          <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${invoice.status === 'paid' ? 'text-green-700 bg-green-100' : invoice.status === 'pending' ? 'text-yellow-700 bg-yellow-100' : 'text-red-700 bg-red-100'}`}>
+                            {invoice.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p class="text-sm text-slate">No billing history available yet.</p>
+            )}
+          </div>
+        </div>
+      </div>
+    ) : (
+      <div class="max-w-2xl">
+        <div class="bg-white rounded-xl border border-slate-200 p-8 text-center">
+          <div class="w-16 h-16 bg-navy/5 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-navy mb-2">No Active Subscription</h3>
+          <p class="text-sm text-slate mb-6">You don't have an active subscription. Choose a plan to get started.</p>
+          <a href="/#pricing" class="inline-flex items-center gap-2 bg-navy text-white px-6 py-3 rounded-lg font-medium hover:bg-navy-light transition-colors">
+            View Plans
+          </a>
+        </div>
+      </div>
+    )}
+  </div>
+  {subscription && (
+    <script>
+      document.getElementById('portalBtn')?.addEventListener('click', async () => {
+        try {
+          const res = await fetch('/api/customer-portal');
+          const data = await res.json();
+          if (data.url) {
+            window.location.href = data.url;
+          } else {
+            alert(data.error || 'Failed to open customer portal');
+          }
+        } catch {
+          alert('Failed to open customer portal');
+        }
+      });
+    </script>
+  )}
+</DashboardLayout>

@@ -1,0 +1,207 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+
+const instancesRes = await fetch(`${Astro.url.origin}/api/monitoring/instances`);
+const instancesData = await instancesRes.json();
+const instances = instancesData.instances || [];
+const summary = instancesData.summary || {};
+const anomalies = instancesData.anomalies || [];
+
+const metricsPromises = instances.map((inst: any) =>
+  fetch(`${Astro.url.origin}/api/monitoring/metrics?instance_id=${inst.id}&limit=20`).then((r) => r.json()).catch(() => ({ metrics: [] }))
+);
+const metricsData = await Promise.all(metricsPromises);
+const metricsMap = new Map(instances.map((inst: any, i: number) => [inst.id, metricsData[i]?.metrics || []]));
+
+const serializedMetrics = JSON.stringify(Array.from(metricsMap.entries()));
+---
+
+<DashboardLayout title="Monitoring - CloudDroid">
+  <div class="p-8">
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-2">
+        <h1 class="text-3xl font-bold text-navy mb-2">Monitoring</h1>
+        <div class="flex items-center gap-3">
+          <span id="last-updated" class="text-xs text-slate">Last updated: Just now</span>
+          <button id="refresh-btn" class="text-sm text-navy hover:text-navy-light font-medium flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+      <p class="text-slate">Real-time instance health and performance metrics</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="text-sm text-slate mb-1">Total Instances</div>
+        <div class="text-3xl font-bold text-navy">{summary.total || 0}</div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="text-sm text-slate mb-1">Running</div>
+        <div class="text-3xl font-bold text-green-600">{summary.running || 0}</div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="text-sm text-slate mb-1">Warnings</div>
+        <div class="text-3xl font-bold text-yellow-600">{summary.warnings || 0}</div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="text-sm text-slate mb-1">Anomalies</div>
+        <div class="text-3xl font-bold text-red-600">{summary.anomalies || 0}</div>
+      </div>
+    </div>
+
+    {instances.map((inst: any) => {
+      const instMetrics = metricsMap.get(inst.id) || [];
+      const instAnomalies = anomalies.filter((a: any) => a.id === inst.id);
+      const hasAnomaly = instAnomalies.length > 0;
+      return (
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden mb-8">
+          <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-semibold text-navy">{inst.name}</h2>
+              <p class="text-xs text-slate">{inst.id} • Last checked: Just now</p>
+            </div>
+            <span class="inline-flex items-center gap-1.5 text-xs text-green-600 bg-green-50 px-3 py-1 rounded-full">
+              <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+              {inst.status}
+            </span>
+          </div>
+          <div class="p-6">
+            <div class="grid grid-cols-4 gap-4 mb-6">
+              <div class="bg-slate-50 rounded-lg p-3">
+                <div class="text-xs text-slate mb-1">CPU</div>
+                <div class="text-lg font-semibold text-navy">{inst.cpu}%</div>
+              </div>
+              <div class="bg-slate-50 rounded-lg p-3">
+                <div class="text-xs text-slate mb-1">Memory</div>
+                <div class="text-lg font-semibold text-navy">{inst.memory}%</div>
+              </div>
+              <div class="bg-slate-50 rounded-lg p-3">
+                <div class="text-xs text-slate mb-1">Network In</div>
+                <div class="text-lg font-semibold text-navy">{inst.network_in} Mbps</div>
+              </div>
+              <div class="bg-slate-50 rounded-lg p-3">
+                <div class="text-xs text-slate mb-1">Network Out</div>
+                <div class="text-lg font-semibold text-navy">{inst.network_out} Mbps</div>
+              </div>
+            </div>
+            <div class="mb-4">
+              <h3 class="text-sm font-medium text-navy mb-3">CPU & Memory History</h3>
+              <div class="relative h-64">
+                <canvas id={`chart-${inst.id}`} class="w-full h-full"></canvas>
+              </div>
+            </div>
+            {hasAnomaly && (
+              <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div class="flex items-start gap-2">
+                  <svg class="w-4 h-4 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div class="text-sm text-red-800">
+                    <strong>Anomalies detected:</strong>
+                    <ul class="mt-1 list-disc list-inside">
+                      {instAnomalies.flatMap((a: any) => a.alerts).map((alert: string) => (
+                        <li>{alert}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    })}
+  </div>
+
+  <script>
+    window.__instanceMetrics__ = {serializedMetrics};
+  </script>
+  <script>
+    const refreshBtn = document.getElementById('refresh-btn');
+    const lastUpdated = document.getElementById('last-updated');
+
+    function updateTimestamp() {
+      if (lastUpdated) {
+        lastUpdated.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+      }
+    }
+
+    refreshBtn?.addEventListener('click', () => {
+      window.location.reload();
+    });
+
+    updateTimestamp();
+    setInterval(() => {
+      fetch('/api/monitoring/collect', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).catch(() => {});
+    }, 30000);
+    setInterval(() => {
+      window.location.reload();
+    }, 30000);
+
+    const serverMetrics = {
+      'inst_001': { labels: [], cpu: [], memory: [] },
+      'inst_002': { labels: [], cpu: [], memory: [] },
+      'inst_003': { labels: [], cpu: [], memory: [] },
+    };
+
+    const instanceMetrics = new Map(window.__instanceMetrics__ || []);
+    instanceMetrics.forEach((metrics, instanceId) => {
+      serverMetrics[instanceId] = {
+        labels: metrics.map((m: any) => new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })),
+        cpu: metrics.map((m: any) => m.cpu),
+        memory: metrics.map((m: any) => m.memory),
+      };
+    });
+
+    Object.keys(serverMetrics).forEach((instanceId) => {
+      const data = serverMetrics[instanceId];
+      const ctx = document.getElementById(`chart-${instanceId}`) as HTMLCanvasElement | null;
+      if (!ctx) return;
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.labels,
+          datasets: [
+            {
+              label: 'CPU %',
+              data: data.cpu,
+              borderColor: '#0f172a',
+              backgroundColor: 'rgba(15, 23, 42, 0.1)',
+              tension: 0.4,
+              fill: true,
+            },
+            {
+              label: 'Memory %',
+              data: data.memory,
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              tension: 0.4,
+              fill: true,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+            },
+          },
+        },
+      });
+    });
+  </script>
+</DashboardLayout>
+

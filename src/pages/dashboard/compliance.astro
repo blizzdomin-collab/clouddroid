@@ -1,0 +1,252 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+
+const logsRes = await fetch(`${Astro.url.origin}/api/audit/logs?limit=10&offset=0`);
+const logsData = await logsRes.json();
+const logs = logsData.logs || [];
+const summary = logsData.summary || {};
+const pagination = logsData.pagination || {};
+---
+
+<DashboardLayout title="Compliance - CloudDroid">
+  <div class="p-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-navy mb-2">Compliance</h1>
+      <p class="text-slate">Audit logs, policy violations, and compliance reporting</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="text-sm text-slate mb-1">Total Events</div>
+        <div class="text-3xl font-bold text-navy">{summary.total || 0}</div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="text-sm text-slate mb-1">Critical</div>
+        <div class="text-3xl font-bold text-red-600">{summary.critical || 0}</div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="text-sm text-slate mb-1">Warnings</div>
+        <div class="text-3xl font-bold text-yellow-600">{summary.warnings || 0}</div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="text-sm text-slate mb-1">Info</div>
+        <div class="text-3xl font-bold text-blue-600">{summary.info || 0}</div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden mb-8">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-navy">Audit Log</h2>
+        <button id="export-csv" class="text-sm text-navy hover:text-navy-light font-medium">Export CSV</button>
+      </div>
+      <div class="p-4 border-b border-slate-200 bg-slate-50">
+        <div class="flex flex-wrap items-center gap-3">
+          <select id="filter-severity" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white">
+            <option value="">All Severities</option>
+            <option value="critical">Critical</option>
+            <option value="warning">Warning</option>
+            <option value="info">Info</option>
+          </select>
+          <input type="date" id="filter-start-date" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white" />
+          <input type="date" id="filter-end-date" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white" />
+          <input type="text" id="filter-search" placeholder="Search logs..." class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white" />
+          <button id="apply-filters" class="text-sm bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">Apply</button>
+          <button id="clear-filters" class="text-sm text-slate hover:text-navy font-medium">Clear</button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Timestamp</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Event</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Severity</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Action</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Details</th>
+            </tr>
+          </thead>
+          <tbody id="logs-table" class="divide-y divide-slate-200">
+            {logs.map((log) => (
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate">{new Date(log.timestamp).toLocaleString()}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy">{log.event}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-blue-800 bg-blue-100">{log.severity}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate">{log.action}</td>
+                <td class="px-6 py-4 text-sm text-slate">{log.details}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+        <button id="prev-page" {pagination.offset === 0 ? 'disabled' : ''} class="text-sm text-navy hover:text-navy-light font-medium disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
+        <span id="page-info" class="text-sm text-slate">Showing {pagination.offset + 1}-{Math.min(pagination.offset + pagination.limit, pagination.total)} of {pagination.total}</span>
+        <button id="next-page" {!pagination.hasMore ? 'disabled' : ''} class="text-sm text-navy hover:text-navy-light font-medium disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
+      </div>
+      <div id="pagination-data" data-offset="{pagination.offset || 0}" data-limit="{pagination.limit || 10}" data-total="{pagination.total || 0}" data-has-more="{pagination.hasMore ? 'true' : 'false'}" class="hidden"></div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-200">
+        <h2 class="text-lg font-semibold text-navy">Compliance Status</h2>
+      </div>
+      <div class="p-6">
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <div>
+                <div class="font-medium text-green-800">AUP Compliance</div>
+                <div class="text-sm text-green-600">All instances compliant with Acceptable Use Policy</div>
+              </div>
+            </div>
+            <span class="text-xs font-medium text-green-700 bg-green-100 px-3 py-1 rounded-full">Pass</span>
+          </div>
+          <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <div>
+                <div class="font-medium text-green-800">Data Isolation</div>
+                <div class="text-sm text-green-600">All instances strictly containerized with zero cross-talk</div>
+              </div>
+            </div>
+            <span class="text-xs font-medium text-green-700 bg-green-100 px-3 py-1 rounded-full">Pass</span>
+          </div>
+          <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <div>
+                <div class="font-medium text-green-800">Encryption</div>
+                <div class="text-sm text-green-600">TLS 1.3 for traffic, AES-256 for data at rest</div>
+              </div>
+            </div>
+            <span class="text-xs font-medium text-green-700 bg-green-100 px-3 py-1 rounded-full">Pass</span>
+          </div>
+          <div class="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <div class="font-medium text-yellow-800">Automated Suspensions</div>
+                <div class="text-sm text-yellow-600">Monitoring active; 1 instance under review</div>
+              </div>
+            </div>
+            <span class="text-xs font-medium text-yellow-700 bg-yellow-100 px-3 py-1 rounded-full">Review</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const prevBtn = document.getElementById('prev-page');
+    const nextBtn = document.getElementById('next-page');
+    const pageInfo = document.getElementById('page-info');
+    const logsTable = document.getElementById('logs-table');
+    const paginationData = document.getElementById('pagination-data');
+    const currentOffset = Number(paginationData?.getAttribute('data-offset') || 0);
+    const limit = Number(paginationData?.getAttribute('data-limit') || 10);
+    const total = Number(paginationData?.getAttribute('data-total') || 0);
+    const hasMore = paginationData?.getAttribute('data-has-more') === 'true';
+
+    prevBtn?.addEventListener('click', () => {
+      if (currentOffset > 0) {
+        const newOffset = currentOffset - limit;
+        loadLogs(newOffset);
+      }
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      if (hasMore) {
+        const newOffset = currentOffset + limit;
+        loadLogs(newOffset);
+      }
+    });
+
+    const exportBtn = document.getElementById('export-csv');
+    exportBtn?.addEventListener('click', async () => {
+      try {
+        const res = await fetch('/api/audit/export');
+        if (!res.ok) return;
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const contentDisposition = res.headers.get('Content-Disposition');
+        const filename = contentDisposition?.match(/filename="(.+)"/)?.[1] || 'audit-logs.csv';
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      } catch {
+        // ignore
+      }
+    });
+
+    const applyFiltersBtn = document.getElementById('apply-filters');
+    const clearFiltersBtn = document.getElementById('clear-filters');
+    const severitySelect = document.getElementById('filter-severity') as HTMLSelectElement | null;
+    const startDateInput = document.getElementById('filter-start-date') as HTMLInputElement | null;
+    const endDateInput = document.getElementById('filter-end-date') as HTMLInputElement | null;
+    const searchInput = document.getElementById('filter-search') as HTMLInputElement | null;
+
+    applyFiltersBtn?.addEventListener('click', () => {
+      const params = new URLSearchParams();
+      params.set('limit', String(limit));
+      params.set('offset', '0');
+      if (severitySelect?.value) params.set('severity', severitySelect.value);
+      if (startDateInput?.value) params.set('start_date', startDateInput.value);
+      if (endDateInput?.value) params.set('end_date', endDateInput.value);
+      if (searchInput?.value) params.set('search', searchInput.value);
+      loadLogs(0, params.toString());
+    });
+
+    clearFiltersBtn?.addEventListener('click', () => {
+      if (severitySelect) severitySelect.value = '';
+      if (startDateInput) startDateInput.value = '';
+      if (endDateInput) endDateInput.value = '';
+      if (searchInput) searchInput.value = '';
+      loadLogs(0, `limit=${limit}&offset=0`);
+    });
+
+    async function loadLogs(offset: number, queryString?: string) {
+      const qs = queryString || `limit=${limit}&offset=${offset}`;
+      const res = await fetch(`/api/audit/logs?${qs}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const logs = data.logs || [];
+      const pagination = data.pagination || {};
+
+      if (logsTable) {
+        logsTable.innerHTML = logs.map((log) => `
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate">${new Date(log.timestamp).toLocaleString()}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy">${log.event}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-blue-800 bg-blue-100">${log.severity}</span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate">${log.action}</td>
+            <td class="px-6 py-4 text-sm text-slate">${log.details}</td>
+          </tr>
+        `).join('');
+      }
+
+      if (pageInfo) {
+        pageInfo.textContent = `Showing ${pagination.offset + 1}-${Math.min(pagination.offset + pagination.limit, pagination.total)} of ${pagination.total}`;
+      }
+
+      if (prevBtn) prevBtn.disabled = pagination.offset === 0;
+      if (nextBtn) nextBtn.disabled = !pagination.hasMore;
+    }
+  </script>
+</DashboardLayout>

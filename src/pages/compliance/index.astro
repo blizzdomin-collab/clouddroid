@@ -1,0 +1,160 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Compliance Dashboard - CloudDroid" description="Audit logs and compliance reporting for CloudDroid">
+  <div class="min-h-screen bg-slate-light py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-navy mb-2">Compliance Dashboard</h1>
+        <p class="text-slate">Audit logs, policy violations, and compliance reporting</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+          <div class="text-sm text-slate mb-1">Total Events</div>
+          <div class="text-3xl font-bold text-navy" id="total-events">-</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+          <div class="text-sm text-slate mb-1">Critical</div>
+          <div class="text-3xl font-bold text-red-600" id="critical-events">-</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+          <div class="text-sm text-slate mb-1">Warnings</div>
+          <div class="text-3xl font-bold text-yellow-600" id="warning-events">-</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+          <div class="text-sm text-slate mb-1">Info</div>
+          <div class="text-3xl font-bold text-blue-600" id="info-events">-</div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-navy">Audit Log</h2>
+          <button class="text-sm text-navy hover:text-navy-light font-medium">Export CSV</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-slate-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Timestamp</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Event</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Severity</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Action</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Details</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200" id="audit-table">
+              <tr>
+                <td colspan="5" class="px-6 py-8 text-center text-slate">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200">
+          <h2 class="text-lg font-semibold text-navy">Compliance Status</h2>
+        </div>
+        <div class="p-6">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <div>
+                  <div class="font-medium text-green-800">AUP Compliance</div>
+                  <div class="text-sm text-green-600">All instances compliant with Acceptable Use Policy</div>
+                </div>
+              </div>
+              <span class="text-xs font-medium text-green-700 bg-green-100 px-3 py-1 rounded-full">Pass</span>
+            </div>
+            <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <div>
+                  <div class="font-medium text-green-800">Data Isolation</div>
+                  <div class="text-sm text-green-600">All instances strictly containerized with zero cross-talk</div>
+                </div>
+              </div>
+              <span class="text-xs font-medium text-green-700 bg-green-100 px-3 py-1 rounded-full">Pass</span>
+            </div>
+            <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <div>
+                  <div class="font-medium text-green-800">Encryption</div>
+                  <div class="text-sm text-green-600">TLS 1.3 for traffic, AES-256 for data at rest</div>
+                </div>
+              </div>
+              <span class="text-xs font-medium text-green-700 bg-green-100 px-3 py-1 rounded-full">Pass</span>
+            </div>
+            <div class="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div>
+                  <div class="font-medium text-yellow-800">Automated Suspensions</div>
+                  <div class="text-sm text-yellow-600">Monitoring active; 1 instance under review</div>
+                </div>
+              </div>
+              <span class="text-xs font-medium text-yellow-700 bg-yellow-100 px-3 py-1 rounded-full">Review</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const loadAuditLogs = async () => {
+      try {
+        const response = await fetch('/api/audit/logs');
+        const data = await response.json();
+
+        document.getElementById('total-events')!.textContent = String(data.summary.total);
+        document.getElementById('critical-events')!.textContent = String(data.summary.critical);
+        document.getElementById('warning-events')!.textContent = String(data.summary.warnings);
+        document.getElementById('info-events')!.textContent = String(data.summary.info);
+
+        const tableBody = document.getElementById('audit-table')!;
+        tableBody.innerHTML = data.logs
+          .map(
+            (log: any) => `
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate">${new Date(log.timestamp).toLocaleString()}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy">${log.event}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                log.severity === 'critical'
+                  ? 'text-red-800 bg-red-100'
+                  : log.severity === 'warning'
+                  ? 'text-yellow-800 bg-yellow-100'
+                  : 'text-blue-800 bg-blue-100'
+              }">
+                ${log.severity}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate">${log.action}</td>
+            <td class="px-6 py-4 text-sm text-slate">${log.details}</td>
+          </tr>
+        `
+          )
+          .join('');
+      } catch (error) {
+        console.error('Failed to fetch audit logs:', error);
+      }
+    };
+
+    loadAuditLogs();
+    setInterval(loadAuditLogs, 10000);
+  </script>
+</Layout>

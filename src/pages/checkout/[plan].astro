@@ -1,0 +1,153 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+export const prerender = false;
+
+interface Props {
+  plan: string;
+}
+
+const planConfig: Record<string, { name: string; price: number; interval: string; specs: string[] }> = {
+  developer: {
+    name: 'Developer',
+    price: 49,
+    interval: 'month',
+    specs: ['4 GB RAM', '32 GB Storage', '1 Concurrent Instance', 'Email Support'],
+  },
+  professional: {
+    name: 'Professional',
+    price: 149,
+    interval: 'month',
+    specs: ['8 GB RAM', '64 GB Storage', '4 Concurrent Instances', 'Priority Support', 'CI/CD Integrations'],
+  },
+  team: {
+    name: 'Team',
+    price: 399,
+    interval: 'month',
+    specs: ['16 GB RAM', '128 GB Storage', '12 Concurrent Instances', '24/7 Dedicated Support', '99.9% Uptime SLA'],
+  },
+};
+
+const { plan } = Astro.params;
+const selectedPlan = planConfig[plan];
+
+if (!selectedPlan) {
+  return Astro.redirect('/#pricing');
+}
+---
+
+<Layout title={`Checkout - ${selectedPlan.name} Plan`} description={`Subscribe to CloudDroid ${selectedPlan.name} plan`}>
+  <div class="min-h-screen bg-slate-light py-16">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+        <div class="bg-navy px-8 py-6">
+          <h1 class="text-2xl font-bold text-white">Complete Your Subscription</h1>
+          <p class="text-slate-300 mt-1">Secure checkout powered by Dodo Payments</p>
+        </div>
+        <div class="p-8">
+          <div class="mb-8">
+            <h2 class="text-lg font-semibold text-navy mb-2">{selectedPlan.name} Plan</h2>
+            <div class="flex items-baseline gap-2 mb-4">
+              <span class="text-3xl font-bold text-navy">${selectedPlan.price}</span>
+              <span class="text-slate">/{selectedPlan.interval}</span>
+            </div>
+            <ul class="space-y-2">
+              {selectedPlan.specs.map((spec) => (
+                <li class="flex items-center gap-2 text-sm text-slate">
+                  <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {spec}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <form id="checkout-form" data-plan={plan} class="space-y-6">
+            <div>
+              <label for="email" class="block text-sm font-medium text-navy mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none transition-all"
+                placeholder="you@company.com"
+              />
+              <p class="text-xs text-slate mt-1">We'll send your receipt and dashboard access to this email.</p>
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-navy text-white px-6 py-4 rounded-lg font-semibold hover:bg-navy-light transition-colors flex items-center justify-center gap-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              Proceed to Secure Checkout
+            </button>
+          </form>
+          <div class="mt-6 pt-6 border-t border-slate-200">
+            <div class="flex items-center justify-center gap-4 text-xs text-slate">
+              <div class="flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <span>SSL Encrypted</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <span>AES-256</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+                <span>Dodo Payments</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const form = document.getElementById('checkout-form');
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = (form as HTMLFormElement).email.value;
+      const button = form?.querySelector('button[type="submit"]');
+      if (button) {
+        button.disabled = true;
+        button.innerHTML = '<span class="inline-flex items-center gap-2"><svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Processing...</span>';
+      }
+      try {
+        const form = document.getElementById('checkout-form');
+        const planId = form?.getAttribute('data-plan');
+        const response = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ planId: planId || '', customerEmail: email }),
+        });
+        const data = await response.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert(data.error || 'Failed to initiate checkout. Please try again.');
+          if (button) {
+            button.disabled = false;
+            button.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>Proceed to Secure Checkout';
+          }
+        }
+      } catch {
+        alert('An error occurred. Please try again.');
+        if (button) {
+          button.disabled = false;
+          button.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>Proceed to Secure Checkout';
+        }
+      }
+    });
+  </script>
+</Layout>

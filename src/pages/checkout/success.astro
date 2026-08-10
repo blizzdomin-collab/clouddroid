@@ -1,0 +1,200 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCheckoutSessionBySessionId, getUserByEmail, createUser, createSubscription, createInvoice, createAuditLog, hashPassword, provisionInstancesForUser } from '../../lib/database';
+import crypto from 'crypto';
+
+export const prerender = false;
+
+const sessionId = Astro.url.searchParams.get('session_id');
+let userCreated = false;
+let userEmail = '';
+let tempPassword = '';
+let planName = '';
+let errorMessage = '';
+let paymentSuccess = false;
+
+if (sessionId) {
+  const checkoutSession = getCheckoutSessionBySessionId(sessionId);
+  if (checkoutSession && checkoutSession.status === 'pending') {
+    const dodoApiKey = import.meta.env.DODO_PAYMENTS_API_KEY;
+    if (dodoApiKey) {
+      try {
+        const sessionRes = await fetch(`https://api.dodopayments.com/v1/checkout-sessions/${sessionId}`, {
+          headers: {
+            'Authorization': `Bearer ${dodoApiKey}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (sessionRes.ok) {
+          const sessionData = await sessionRes.json();
+          const paymentStatus = sessionData.payment_status || sessionData.status;
+
+          if (paymentStatus === 'paid' || paymentStatus === 'complete') {
+            paymentSuccess = true;
+            const customerEmail = checkoutSession.email;
+            const plan = checkoutSession.plan;
+            const amount = sessionData.amount_total || sessionData.items?.[0]?.price_data?.unit_amount || 0;
+            tempPassword = checkoutSession.temp_password || '';
+
+            let user = getUserByEmail(customerEmail);
+            if (!user) {
+              const finalPassword = tempPassword || crypto.randomBytes(12).toString('hex');
+              user = createUser({
+                email: customerEmail,
+                password_hash: hashPassword(finalPassword),
+                name: customerEmail.split('@')[0],
+                role: 'user',
+                reset_token: null,
+                reset_token_expiry: null,
+                must_change_password: true,
+              });
+
+              const subscription = createSubscription({
+                user_id: user.id,
+                plan,
+                status: 'active',
+                amount: amount / 100,
+                currency: 'USD',
+                current_period_start: new Date().toISOString(),
+                current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                cancel_at_period_end: false,
+              });
+
+              createInvoice({
+                user_id: user.id,
+                subscription_id: subscription.id,
+                amount: amount / 100,
+                currency: 'USD',
+                status: 'paid',
+                due_date: new Date().toISOString(),
+                paid_at: new Date().toISOString(),
+              });
+
+              createAuditLog({
+                event: 'User Created via Checkout',
+                severity: 'info',
+                instance_id: null,
+                user_id: user.id,
+                details: `User account created for ${customerEmail} after successful ${plan} subscription`,
+                action: 'user_create',
+              });
+
+              provisionInstancesForUser(user.id, plan);
+
+              userCreated = true;
+              userEmail = customerEmail;
+              planName = plan;
+            } else {
+              userEmail = customerEmail;
+              planName = checkoutSession.plan;
+              userCreated = true;
+            }
+          }
+        }
+      } catch (e) {
+        errorMessage = 'Unable to verify payment status. Please contact support.';
+      }
+    }
+  } else if (checkoutSession && checkoutSession.status === 'completed') {
+    userEmail = checkoutSession.email;
+    planName = checkoutSession.plan;
+    tempPassword = checkoutSession.temp_password || '';
+    const user = getUserByEmail(userEmail);
+    if (user) {
+      userCreated = true;
+      paymentSuccess = true;
+    }
+  }
+}
+---
+
+<Layout title="Checkout Success - CloudDroid" description="Your CloudDroid subscription has been activated">
+  <div class="min-h-screen bg-slate-light flex items-center justify-center py-16">
+    <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
+        {paymentSuccess && userCreated ? (
+          <>
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-navy mb-4">Welcome to CloudDroid!</h1>
+            <p class="text-slate mb-6">
+              Your <span class="font-semibold text-navy">{planName}</span> subscription is now active. Your dashboard account has been created and your cloud Android workspaces are being provisioned.
+            </p>
+            <div class="bg-slate-50 rounded-lg p-4 mb-6 text-left">
+              <p class="text-sm font-medium text-navy mb-2">Your login credentials:</p>
+              <p class="text-sm text-slate mb-1"><span class="font-medium">Email:</span> {userEmail}</p>
+              {tempPassword && (
+                <p class="text-sm text-slate mb-1">
+                  <span class="font-medium">Temporary password:</span>{' '}
+                  <code class="bg-white px-2 py-1 rounded border border-slate-200">{tempPassword}</code>
+                </p>
+              )}
+              <p class="text-xs text-slate mt-2">Please save this password and change it after logging in.</p>
+            </div>
+            <a
+              href="/login"
+              class="inline-flex items-center justify-center bg-navy text-white px-6 py-3 rounded-lg font-semibold hover:bg-navy-light transition-colors"
+            >
+              Go to Dashboard
+            </a>
+          </>
+        ) : paymentSuccess && userEmail ? (
+          <>
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-navy mb-4">Subscription Active</h1>
+            <p class="text-slate mb-6">
+              Your <span class="font-semibold text-navy">{planName}</span> subscription is now active. You can log in with your existing account.
+            </p>
+            <div class="bg-slate-50 rounded-lg p-4 mb-6 text-left">
+              <p class="text-sm font-medium text-navy mb-2">Your account:</p>
+              <p class="text-sm text-slate mb-1"><span class="font-medium">Email:</span> {userEmail}</p>
+              {tempPassword && (
+                <p class="text-sm text-slate mb-1">
+                  <span class="font-medium">Temporary password:</span>{' '}
+                  <code class="bg-white px-2 py-1 rounded border border-slate-200">{tempPassword}</code>
+                </p>
+              )}
+              <p class="text-xs text-slate mt-2">Please save this password and change it after logging in.</p>
+            </div>
+            <a
+              href="/login"
+              class="inline-flex items-center justify-center bg-navy text-white px-6 py-3 rounded-lg font-semibold hover:bg-navy-light transition-colors"
+            >
+              Go to Dashboard
+            </a>
+          </>
+        ) : (
+          <>
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-navy mb-4">Subscription Initiated</h1>
+            <p class="text-slate mb-6">
+              Thank you for subscribing to CloudDroid. Your cloud Android workspace is being provisioned.
+            </p>
+            {errorMessage && <p class="text-sm text-red-600 mb-4">{errorMessage}</p>}
+            <p class="text-sm text-slate mb-8">
+              Securely processed by Dodo Payments.
+            </p>
+            <a
+              href="/"
+              class="inline-flex items-center justify-center bg-navy text-white px-6 py-3 rounded-lg font-semibold hover:bg-navy-light transition-colors"
+            >
+              Return to Home
+            </a>
+          </>
+        )}
+      </div>
+    </div>
+  </div>
+</Layout>

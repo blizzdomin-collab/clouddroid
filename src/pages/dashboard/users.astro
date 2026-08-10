@@ -1,0 +1,179 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+
+const sessionCookie = Astro.cookies.get('session');
+let isAdmin = false;
+let users: any[] = [];
+
+if (sessionCookie) {
+  try {
+    const session = JSON.parse(sessionCookie.value);
+    if (session.authenticated === true && session.role === 'admin') {
+      isAdmin = true;
+      const res = await fetch(`${Astro.url.origin}/api/admin/users`);
+      if (res.ok) {
+        const data = await res.json();
+        users = data.users || [];
+      }
+    }
+  } catch {
+    isAdmin = false;
+  }
+}
+---
+
+<DashboardLayout title="User Management - CloudDroid">
+  <div class="p-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-navy mb-2">User Management</h1>
+      <p class="text-slate">Manage user accounts and permissions</p>
+    </div>
+
+    {isAdmin ? (
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-navy">All Users</h2>
+          <button id="open-modal" class="text-sm bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">
+            Add User
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-slate-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Email</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Role</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Created</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+              {users.map((user) => (
+                <tr>
+                  <td class="px-6 py-4 text-sm font-medium text-navy">{user.name}</td>
+                  <td class="px-6 py-4 text-sm text-slate">{user.email}</td>
+                  <td class="px-6 py-4">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-navy bg-navy/10 capitalize">
+                      {user.role}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-slate">{new Date(user.created_at).toLocaleDateString()}</td>
+                  <td class="px-6 py-4">
+                    <button data-action="delete" data-id={user.id} class="text-xs bg-red-50 text-red-700 px-3 py-1.5 rounded hover:bg-red-100 transition-colors">
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    ) : (
+      <div class="bg-white rounded-xl border border-slate-200 p-8 text-center">
+        <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-navy mb-2">Access Denied</h3>
+        <p class="text-sm text-slate">You need admin privileges to view this page.</p>
+      </div>
+    )}
+  </div>
+
+  {isAdmin && (
+    <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+      <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-navy">Add User</h3>
+          <button id="close-modal" class="text-slate hover:text-navy">✕</button>
+        </div>
+        <form id="create-form" class="p-6 space-y-4">
+          <div>
+            <label for="name" class="block text-sm font-medium text-navy mb-1">Full Name</label>
+            <input type="text" id="name" name="name" required class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" />
+          </div>
+          <div>
+            <label for="email" class="block text-sm font-medium text-navy mb-1">Email</label>
+            <input type="email" id="email" name="email" required class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" />
+          </div>
+          <div>
+            <label for="password" class="block text-sm font-medium text-navy mb-1">Password</label>
+            <input type="password" id="password" name="password" required minlength="8" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" />
+          </div>
+          <div>
+            <label for="role" class="block text-sm font-medium text-navy mb-1">Role</label>
+            <select id="role" name="role" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="flex items-center justify-end gap-3 pt-2">
+            <button type="button" id="cancel-modal" class="px-4 py-2 text-sm text-slate hover:text-navy">Cancel</button>
+            <button type="submit" class="bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">Create User</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )}
+
+  <script>
+    const modal = document.getElementById('modal');
+    const openBtn = document.getElementById('open-modal');
+    const closeBtn = document.getElementById('close-modal');
+    const cancelBtn = document.getElementById('cancel-modal');
+    const form = document.getElementById('create-form');
+
+    openBtn?.addEventListener('click', () => {
+      modal?.classList.remove('hidden');
+      modal?.classList.add('flex');
+    });
+
+    const hideModal = () => {
+      modal?.classList.add('hidden');
+      modal?.classList.remove('flex');
+    };
+
+    closeBtn?.addEventListener('click', hideModal);
+    cancelBtn?.addEventListener('click', hideModal);
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form as HTMLFormElement);
+      const data = {
+        name: (formData.get('name') as string).trim(),
+        email: (formData.get('email') as string).trim(),
+        password: formData.get('password') as string,
+        role: formData.get('role') as string,
+      };
+
+      const res = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        alert('Failed to create user');
+      }
+    });
+
+    document.querySelectorAll('[data-action="delete"]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+        if (!id) return;
+        if (!confirm('Are you sure you want to delete this user?')) return;
+        const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          window.location.reload();
+        } else {
+          alert('Failed to delete user');
+        }
+      });
+    });
+  </script>
+</DashboardLayout>

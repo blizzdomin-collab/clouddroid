@@ -1,0 +1,146 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Monitoring Dashboard - CloudDroid" description="Real-time instance monitoring and compliance alerts">
+  <div class="min-h-screen bg-slate-light py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-navy mb-2">Monitoring Dashboard</h1>
+        <p class="text-slate">Real-time instance health and compliance monitoring</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+          <div class="text-sm text-slate mb-1">Total Instances</div>
+          <div class="text-3xl font-bold text-navy" id="total-instances">-</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+          <div class="text-sm text-slate mb-1">Running</div>
+          <div class="text-3xl font-bold text-green-600" id="running-instances">-</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+          <div class="text-sm text-slate mb-1">Warnings</div>
+          <div class="text-3xl font-bold text-yellow-600" id="warning-instances">-</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+          <div class="text-sm text-slate mb-1">Active Anomalies</div>
+          <div class="text-3xl font-bold text-red-600" id="active-anomalies">-</div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200">
+          <h2 class="text-lg font-semibold text-navy">Instance Health</h2>
+        </div>
+        <div class="divide-y divide-slate-200" id="instances-list">
+          <div class="p-6 text-center text-slate">Loading...</div>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200">
+          <h2 class="text-lg font-semibold text-navy">Active Alerts</h2>
+        </div>
+        <div class="divide-y divide-slate-200" id="alerts-list">
+          <div class="p-6 text-center text-slate">Loading...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const refreshData = async () => {
+      try {
+        const response = await fetch('/api/monitoring/instances');
+        const data = await response.json();
+
+        document.getElementById('total-instances')!.textContent = String(data.summary.total);
+        document.getElementById('running-instances')!.textContent = String(data.summary.running);
+        document.getElementById('warning-instances')!.textContent = String(data.summary.warnings);
+        document.getElementById('active-anomalies')!.textContent = String(data.summary.anomalies);
+
+        const instancesList = document.getElementById('instances-list')!;
+        instancesList.innerHTML = data.instances
+          .map(
+            (inst: any) => `
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="font-semibold text-navy">${inst.name}</h3>
+                <p class="text-xs text-slate">${inst.id} • Last checked: ${new Date(inst.lastChecked).toLocaleTimeString()}</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full ${
+                inst.status === 'running'
+                  ? 'text-green-600 bg-green-50'
+                  : inst.status === 'warning'
+                  ? 'text-yellow-600 bg-yellow-50'
+                  : 'text-red-600 bg-red-50'
+              }">
+                <span class="w-1.5 h-1.5 rounded-full ${
+                  inst.status === 'running'
+                    ? 'bg-green-500'
+                    : inst.status === 'warning'
+                    ? 'bg-yellow-500'
+                    : 'bg-red-500'
+                }"></span>
+                ${inst.status.charAt(0).toUpperCase() + inst.status.slice(1)}
+              </span>
+            </div>
+            <div class="grid grid-cols-4 gap-4">
+              <div class="bg-slate-50 rounded-lg p-3">
+                <div class="text-xs text-slate mb-1">CPU</div>
+                <div class="text-lg font-semibold ${inst.cpu > 80 ? 'text-red-600' : 'text-navy'}">${inst.cpu}%</div>
+              </div>
+              <div class="bg-slate-50 rounded-lg p-3">
+                <div class="text-xs text-slate mb-1">Memory</div>
+                <div class="text-lg font-semibold ${inst.memory > 80 ? 'text-red-600' : 'text-navy'}">${inst.memory}%</div>
+              </div>
+              <div class="bg-slate-50 rounded-lg p-3">
+                <div class="text-xs text-slate mb-1">Network In</div>
+                <div class="text-lg font-semibold text-navy">${inst.networkIn} Mbps</div>
+              </div>
+              <div class="bg-slate-50 rounded-lg p-3">
+                <div class="text-xs text-slate mb-1">Network Out</div>
+                <div class="text-lg font-semibold ${inst.networkOut > 1000 ? 'text-red-600' : 'text-navy'}">${inst.networkOut} Mbps</div>
+              </div>
+            </div>
+          </div>
+        `
+          )
+          .join('');
+
+        const alertsList = document.getElementById('alerts-list')!;
+        if (data.anomalies.length === 0) {
+          alertsList.innerHTML = '<div class="p-6 text-center text-slate">No active alerts</div>';
+        } else {
+          alertsList.innerHTML = data.anomalies
+            .map(
+              (anomaly: any) => `
+            <div class="p-6 bg-red-50 border-l-4 border-red-400">
+              <div class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div class="flex-1">
+                  <h4 class="font-semibold text-red-800">${anomaly.name}</h4>
+                  <ul class="mt-2 space-y-1">
+                    ${anomaly.alerts.map((alert: string) => `<li class="text-sm text-red-700">• ${alert}</li>`).join('')}
+                  </ul>
+                  <p class="text-xs text-red-600 mt-2">Instance ID: ${anomaly.id}</p>
+                </div>
+              </div>
+            </div>
+          `
+            )
+            .join('');
+        }
+      } catch (error) {
+        console.error('Failed to fetch monitoring data:', error);
+      }
+    };
+
+    refreshData();
+    setInterval(refreshData, 5000);
+  </script>
+</Layout>

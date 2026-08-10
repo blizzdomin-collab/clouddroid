@@ -1,0 +1,103 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const endpoints = [
+  { method: 'GET', path: '/api/health', description: 'Health check endpoint', auth: false },
+  { method: 'POST', path: '/api/auth/register', description: 'Register a new user', auth: false },
+  { method: 'POST', path: '/api/auth/login', description: 'Login with email and password', auth: false },
+  { method: 'POST', path: '/api/auth/logout', description: 'Logout current session', auth: true },
+  { method: 'POST', path: '/api/auth/forgot-password', description: 'Request password reset', auth: false },
+  { method: 'POST', path: '/api/auth/reset-password', description: 'Reset password with token', auth: false },
+  { method: 'POST', path: '/api/auth/change-password', description: 'Change password (authenticated)', auth: true },
+  { method: 'POST', path: '/api/auth/2fa/setup', description: 'Generate 2FA secret', auth: true },
+  { method: 'POST', path: '/api/auth/2fa/enable', description: 'Enable 2FA with verification code', auth: true },
+  { method: 'POST', path: '/api/auth/2fa/disable', description: 'Disable 2FA', auth: true },
+  { method: 'GET', path: '/api/instances', description: 'List all instances', auth: true },
+  { method: 'POST', path: '/api/instances', description: 'Create a new instance', auth: true },
+  { method: 'GET', path: '/api/instances/:id', description: 'Get instance by ID', auth: true },
+  { method: 'PATCH', path: '/api/instances/:id', description: 'Update instance', auth: true },
+  { method: 'DELETE', path: '/api/instances/:id', description: 'Delete instance', auth: true },
+  { method: 'POST', path: '/api/instances/:id/start', description: 'Start instance', auth: true },
+  { method: 'POST', path: '/api/instances/:id/stop', description: 'Stop instance', auth: true },
+  { method: 'POST', path: '/api/instances/:id/restart', description: 'Restart instance', auth: true },
+  { method: 'GET', path: '/api/monitoring/instances', description: 'Get monitoring data for all instances', auth: true },
+  { method: 'GET', path: '/api/monitoring/metrics', description: 'Get metrics history for an instance', auth: true },
+  { method: 'POST', path: '/api/monitoring/collect', description: 'Collect metrics for all instances', auth: true },
+  { method: 'GET', path: '/api/audit/logs', description: 'Get audit logs with pagination', auth: true },
+  { method: 'GET', path: '/api/audit/export', description: 'Export audit logs as CSV', auth: true },
+  { method: 'GET', path: '/api/alerts', description: 'Get alerts with pagination', auth: true },
+  { method: 'POST', path: '/api/alerts', description: 'Acknowledge an alert', auth: true },
+  { method: 'GET', path: '/api/alerts/stream', description: 'SSE stream for real-time alerts', auth: true },
+  { method: 'GET', path: '/api/billing/subscription', description: 'Get current subscription', auth: true },
+  { method: 'GET', path: '/api/billing/invoices', description: 'Get invoices for current user', auth: true },
+  { method: 'GET', path: '/api/admin/users', description: 'List all users (admin only)', auth: true },
+  { method: 'POST', path: '/api/admin/users', description: 'Create a new user (admin only)', auth: true },
+  { method: 'DELETE', path: '/api/admin/users/:id', description: 'Delete a user (admin only)', auth: true },
+  { method: 'GET', path: '/api/notifications/channels', description: 'List notification channels', auth: true },
+  { method: 'POST', path: '/api/notifications/channels', description: 'Create notification channel', auth: true },
+  { method: 'DELETE', path: '/api/notifications/channels', description: 'Delete notification channel', auth: true },
+  { method: 'POST', path: '/api/checkout', description: 'Create Dodo Payments checkout session', auth: false },
+  { method: 'POST', path: '/api/webhooks/dodopayments', description: 'Dodo Payments webhook', auth: false },
+];
+
+const methodColors: Record<string, string> = {
+  GET: 'bg-green-100 text-green-800',
+  POST: 'bg-blue-100 text-blue-800',
+  PATCH: 'bg-yellow-100 text-yellow-800',
+  DELETE: 'bg-red-100 text-red-800',
+};
+---
+
+<Layout title="API Documentation - CloudDroid" description="CloudDroid API documentation">
+  <div class="min-h-screen bg-slate-light py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-navy mb-2">API Documentation</h1>
+        <p class="text-slate">REST API endpoints for CloudDroid</p>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+          <h2 class="text-lg font-semibold text-navy">Endpoints</h2>
+        </div>
+        <div class="divide-y divide-slate-200">
+          {endpoints.map((endpoint) => (
+            <div class="p-4 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${methodColors[endpoint.method] || 'bg-slate-100 text-slate-800'}`}>
+                  {endpoint.method}
+                </span>
+                <code class="text-sm text-navy font-mono">{endpoint.path}</code>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-sm text-slate">{endpoint.description}</span>
+                <span class={`text-xs px-2 py-0.5 rounded ${endpoint.auth ? 'bg-orange-100 text-orange-800' : 'bg-slate-100 text-slate-600'}`}>
+                  {endpoint.auth ? 'Auth Required' : 'Public'}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="mt-8 bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+          <h2 class="text-lg font-semibold text-navy">Authentication</h2>
+        </div>
+        <div class="p-6">
+          <p class="text-sm text-slate mb-4">Authenticated endpoints require a session cookie obtained by logging in via <code class="bg-slate-100 px-1 rounded">/api/auth/login</code>.</p>
+          <p class="text-sm text-slate">The session cookie is HTTP-only and expires after 7 days of inactivity.</p>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+          <h2 class="text-lg font-semibold text-navy">Base URL</h2>
+        </div>
+        <div class="p-6">
+          <code class="text-sm text-navy font-mono">{Astro.url.origin}</code>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

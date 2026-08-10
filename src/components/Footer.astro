@@ -1,0 +1,70 @@
+---
+const legalLinks = [
+  { label: 'Terms of Service', href: '/legal/terms' },
+  { label: 'Privacy Policy', href: '/legal/privacy' },
+  { label: 'Acceptable Use Policy', href: '/legal/aup' },
+  { label: 'Refund Policy', href: '/legal/refund' },
+];
+---
+
+<footer class="bg-navy text-slate-300 py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+      <div class="col-span-1 md:col-span-2">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold text-sm">CD</span>
+          </div>
+          <span class="font-bold text-xl text-white">CloudDroid</span>
+        </div>
+        <p class="text-slate-400 text-sm max-w-md mb-6">
+          Enterprise-grade cloud Android workspaces for QA automation, app testing, and secure remote productivity.
+        </p>
+        <div class="text-sm text-slate-400 space-y-1">
+          <p>CloudDroid</p>
+          <p>Dominik Zachara</p>
+          <p>Horní 791/3</p>
+          <p>Ostrava, 700 30</p>
+          <p>Czech Republic</p>
+          <p>support@clouddroid.eu</p>
+        </div>
+      </div>
+      <div>
+        <h3 class="text-white font-semibold mb-4">Product</h3>
+        <ul class="space-y-2 text-sm">
+          <li><a href="#features" class="hover:text-white transition-colors">Features</a></li>
+          <li><a href="#use-cases" class="hover:text-white transition-colors">Use Cases</a></li>
+          <li><a href="#pricing" class="hover:text-white transition-colors">Pricing</a></li>
+          <li><a href="/api-docs" class="hover:text-white transition-colors">API Docs</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-white font-semibold mb-4">Developers</h3>
+        <ul class="space-y-2 text-sm">
+          <li><a href="/api-docs" class="hover:text-white transition-colors">API Reference</a></li>
+          <li><a href="/api/health" class="hover:text-white transition-colors">Status</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-white font-semibold mb-4">Legal</h3>
+        <ul class="space-y-2 text-sm">
+          {legalLinks.map((link) => (
+            <li>
+              <a href={link.href} class="hover:text-white transition-colors">
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-slate-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="text-sm text-slate-400">
+        &copy; {new Date().getFullYear()} CloudDroid. All rights reserved.
+      </p>
+      <p class="text-xs text-slate-500">
+        Payments securely processed by Dodo Payments. CloudDroid is not a financial institution.
+      </p>
+    </div>
+  </div>
+</footer>

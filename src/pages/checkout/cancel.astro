@@ -1,0 +1,27 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Checkout Canceled - CloudDroid" description="Your CloudDroid checkout was canceled">
+  <div class="min-h-screen bg-slate-light flex items-center justify-center py-16">
+    <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
+        <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <h1 class="text-2xl font-bold text-navy mb-4">Checkout Canceled</h1>
+        <p class="text-slate mb-8">
+          Your checkout was canceled. No charges were made. You can return to pricing to select a plan.
+        </p>
+        <a
+          href="/#pricing"
+          class="inline-flex items-center justify-center bg-navy text-white px-6 py-3 rounded-lg font-semibold hover:bg-navy-light transition-colors"
+        >
+          View Pricing
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>

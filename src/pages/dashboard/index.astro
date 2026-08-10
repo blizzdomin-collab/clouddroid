@@ -1,0 +1,259 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+
+const instancesRes = await fetch(`${Astro.url.origin}/api/monitoring/instances`).catch(() => null);
+const instancesData = instancesRes?.ok ? await instancesRes.json() : null;
+const instances = instancesData?.instances || [];
+const summary = instancesData?.summary || {};
+
+const alertsRes = await fetch(`${Astro.url.origin}/api/alerts`).catch(() => null);
+const alertsData = alertsRes?.ok ? await alertsRes.json() : null;
+const alerts = alertsData?.alerts || [];
+const alertsSummary = alertsData?.summary || {};
+
+const initialError = !instancesRes || !alertsRes;
+---
+
+<DashboardLayout title="Dashboard Overview - CloudDroid">
+  <div class="p-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-navy mb-2">Dashboard Overview</h1>
+      <p class="text-slate">Welcome back! Here's what's happening with your CloudDroid instances.</p>
+    </div>
+
+    <div id="error-banner" data-initial-error="{initialError ? 'true' : 'false'}" class="hidden mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-red-800">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span class="font-medium">Failed to load dashboard data</span>
+        </div>
+        <button id="retry-btn" class="text-sm bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700">Retry</button>
+      </div>
+    </div>
+
+    <div id="dashboard-content">
+      <div id="loading-overlay" class="hidden fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div class="flex items-center gap-3 text-navy">
+          <svg class="animate-spin h-8 w-8" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span class="font-medium">Loading dashboard data...</span>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-navy/5 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            </div>
+          </div>
+          <div class="text-sm text-slate mb-1">Active Instances</div>
+          <div id="total-instances" class="text-3xl font-bold text-navy">{summary.total || 0}</div>
+          <div class="text-xs text-green-600 mt-2">↑ {summary.running || 0} running</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+          </div>
+          <div class="text-sm text-slate mb-1">Avg CPU Usage</div>
+          <div id="avg-cpu" class="text-3xl font-bold text-navy">{instances.length > 0 ? Math.round(instances.reduce((a, b) => a + b.cpu, 0) / instances.length) : 0}%</div>
+          <div class="text-xs text-slate mt-2">Across all instances</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+          </div>
+          <div class="text-sm text-slate mb-1">Uptime</div>
+          <div class="text-3xl font-bold text-navy">99.9%</div>
+          <div class="text-xs text-green-600 mt-2">Last 30 days</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+          </div>
+          <div class="text-sm text-slate mb-1">Active Alerts</div>
+          <div id="active-alerts" class="text-3xl font-bold text-navy">{alertsSummary.unacknowledged || 0}</div>
+          <div class="text-xs text-yellow-600 mt-2">{alertsSummary.critical || 0} requires attention</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-navy">Recent Instances</h2>
+          </div>
+          <div id="instances-list" class="divide-y divide-slate-200">
+            {instances.slice(0, 3).map((inst) => (
+              <div class="p-6 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-10 h-10 bg-navy/5 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="font-medium text-navy">{inst.name}</div>
+                    <div class="text-sm text-slate">{inst.platform} • {inst.ram} GB RAM</div>
+                  </div>
+                </div>
+                <span class="inline-flex items-center gap-1.5 text-xs text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                  <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                  {inst.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-navy">Recent Alerts</h2>
+          </div>
+          <div id="alerts-list" class="divide-y divide-slate-200">
+            {alerts.slice(0, 3).map((alert) => (
+              <div class="p-6">
+                <div class="flex items-start gap-3">
+                  <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="font-medium text-navy text-sm">{alert.title}</div>
+                    <div class="text-xs text-slate mt-1">{alert.message}</div>
+                    <div class="text-xs text-slate mt-1">{new Date(alert.timestamp).toLocaleString()}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const errorBanner = document.getElementById('error-banner');
+    const retryBtn = document.getElementById('retry-btn');
+    const dashboardContent = document.getElementById('dashboard-content');
+    const initialError = errorBanner?.getAttribute('data-initial-error') === 'true';
+
+    function showError() {
+      errorBanner?.classList.remove('hidden');
+      dashboardContent?.classList.add('hidden');
+    }
+
+    function hideError() {
+      errorBanner?.classList.add('hidden');
+      dashboardContent?.classList.remove('hidden');
+    }
+
+    async function loadDashboard() {
+      const loadingOverlay = document.getElementById('loading-overlay');
+      if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+      try {
+        const [instancesRes, alertsRes] = await Promise.all([
+          fetch('/api/monitoring/instances'),
+          fetch('/api/alerts'),
+        ]);
+
+        if (!instancesRes.ok || !alertsRes.ok) {
+          throw new Error('Failed to fetch dashboard data');
+        }
+
+        const instancesData = await instancesRes.json();
+        const alertsData = await alertsRes.json();
+
+        const instances = instancesData.instances || [];
+        const summary = instancesData.summary || {};
+        const alerts = alertsData.alerts || [];
+        const alertsSummary = alertsData.summary || {};
+
+        const totalInstancesEl = document.getElementById('total-instances');
+        const avgCpuEl = document.getElementById('avg-cpu');
+        const activeAlertsEl = document.getElementById('active-alerts');
+        const instancesListEl = document.getElementById('instances-list');
+        const alertsListEl = document.getElementById('alerts-list');
+
+        if (totalInstancesEl) totalInstancesEl.textContent = String(summary.total || 0);
+        if (avgCpuEl) avgCpuEl.textContent = `${instances.length > 0 ? Math.round(instances.reduce((a, b) => a + b.cpu, 0) / instances.length) : 0}%`;
+        if (activeAlertsEl) {
+          activeAlertsEl.textContent = String(alertsSummary.unacknowledged || 0);
+          activeAlertsEl.nextElementSibling.textContent = `${alertsSummary.critical || 0} requires attention`;
+        }
+
+        if (instancesListEl) {
+          instancesListEl.innerHTML = instances.slice(0, 3).map((inst) => `
+            <div class="p-6 flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-navy/5 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-medium text-navy">${inst.name}</div>
+                  <div class="text-sm text-slate">${inst.platform} • ${inst.ram} GB RAM</div>
+                </div>
+              </div>
+              <span class="inline-flex items-center gap-1.5 text-xs text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                ${inst.status}
+              </span>
+            </div>
+          `).join('');
+        }
+
+        if (alertsListEl) {
+          alertsListEl.innerHTML = alerts.slice(0, 3).map((alert) => `
+            <div class="p-6">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-medium text-navy text-sm">${alert.title}</div>
+                  <div class="text-xs text-slate mt-1">${alert.message}</div>
+                  <div class="text-xs text-slate mt-1">${new Date(alert.timestamp).toLocaleString()}</div>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        hideError();
+      } catch (error) {
+        showError();
+      } finally {
+        if (loadingOverlay) loadingOverlay.classList.add('hidden');
+      }
+    }
+
+    if (initialError) {
+      showError();
+    }
+
+    retryBtn?.addEventListener('click', loadDashboard);
+
+    loadDashboard();
+  </script>
+</DashboardLayout>

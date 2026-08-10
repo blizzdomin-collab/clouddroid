@@ -1,0 +1,345 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+
+const sessionCookie = Astro.cookies.get('session');
+let currentUser: { email: string; name: string; role: string } | null = null;
+
+if (sessionCookie) {
+  try {
+    const session = JSON.parse(sessionCookie.value);
+    if (session.authenticated === true && session.email) {
+      currentUser = { email: session.email, name: session.name || 'User', role: session.role || 'user' };
+    }
+  } catch {
+    currentUser = null;
+  }
+}
+---
+
+<DashboardLayout title="Settings - CloudDroid">
+  <div class="p-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-navy mb-2">Settings</h1>
+      <p class="text-slate">Manage your account and preferences</p>
+    </div>
+
+    <div class="max-w-2xl space-y-6">
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200">
+          <h2 class="text-lg font-semibold text-navy">Profile Information</h2>
+        </div>
+        <div class="p-6 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-slate mb-1">Name</label>
+            <div class="text-navy font-medium">{currentUser?.name || 'N/A'}</div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate mb-1">Email</label>
+            <div class="text-navy font-medium">{currentUser?.email || 'N/A'}</div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate mb-1">Role</label>
+            <div class="text-navy font-medium capitalize">{currentUser?.role || 'N/A'}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200">
+          <h2 class="text-lg font-semibold text-navy">Security</h2>
+        </div>
+        <div class="p-6">
+          <p class="text-sm text-slate mb-4">Change your password to keep your account secure.</p>
+          <form id="password-form" class="space-y-4">
+            <div>
+              <label for="current-password" class="block text-sm font-medium text-navy mb-1">Current Password</label>
+              <input type="password" id="current-password" name="currentPassword" required class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" />
+            </div>
+            <div>
+              <label for="new-password" class="block text-sm font-medium text-navy mb-1">New Password</label>
+              <input type="password" id="new-password" name="newPassword" required minlength="8" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" />
+            </div>
+            <div>
+              <label for="confirm-password" class="block text-sm font-medium text-navy mb-1">Confirm New Password</label>
+              <input type="password" id="confirm-password" name="confirmPassword" required minlength="8" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" />
+            </div>
+            <div id="password-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"></div>
+            <div id="password-success" class="hidden p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800"></div>
+            <button type="submit" class="bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">Update Password</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200">
+          <h2 class="text-lg font-semibold text-navy">Two-Factor Authentication</h2>
+        </div>
+        <div class="p-6">
+          <div id="two-factor-status" class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-navy">2FA Status</p>
+              <p class="text-sm text-slate mt-1">Add an extra layer of security to your account.</p>
+            </div>
+            <span id="two-factor-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+              Disabled
+            </span>
+          </div>
+
+          <div id="two-factor-setup" class="hidden mt-6 space-y-4">
+            <div class="bg-slate-50 rounded-lg p-4">
+              <p class="text-sm text-slate mb-2">Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)</p>
+              <div id="qr-code" class="flex justify-center my-4"></div>
+              <p class="text-xs text-slate mb-2">Or enter this secret manually:</p>
+              <code id="two-factor-secret" class="block text-center text-sm bg-white px-3 py-2 rounded border border-slate-200 font-mono"></code>
+            </div>
+            <div>
+              <label for="two-factor-code" class="block text-sm font-medium text-navy mb-1">Verification Code</label>
+              <input type="text" id="two-factor-code" maxlength="6" inputmode="numeric" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" placeholder="123456" />
+            </div>
+            <div id="two-factor-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"></div>
+            <div class="flex gap-3">
+              <button type="button" id="enable-2fa-btn" class="bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">Enable 2FA</button>
+              <button type="button" id="cancel-2fa-btn" class="text-slate-700 bg-slate-100 px-4 py-2 rounded-lg font-medium hover:bg-slate-200 transition-colors">Cancel</button>
+            </div>
+          </div>
+
+          <div id="two-factor-enabled" class="hidden mt-6">
+            <p class="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 mb-4">Two-factor authentication is enabled for your account.</p>
+            <button type="button" id="disable-2fa-btn" class="text-sm bg-red-50 text-red-700 px-4 py-2 rounded-lg hover:bg-red-100 transition-colors">Disable 2FA</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200">
+          <h2 class="text-lg font-semibold text-navy">Notification Channels</h2>
+        </div>
+        <div class="p-6">
+          <p class="text-sm text-slate mb-4">Configure how you receive alert notifications.</p>
+          <div id="notification-channels" class="space-y-3 mb-4"></div>
+          <button type="button" id="add-channel-btn" class="text-sm bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">Add Channel</button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200">
+          <h2 class="text-lg font-semibold text-navy">Session</h2>
+        </div>
+        <div class="p-6">
+          <p class="text-sm text-slate mb-4">Your session will automatically expire after 7 days of inactivity.</p>
+          <form action="/api/auth/logout" method="post" class="inline">
+            <button type="submit" class="text-sm bg-red-50 text-red-700 px-4 py-2 rounded-lg hover:bg-red-100 transition-colors">Sign Out All Sessions</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('password-form');
+    const errorEl = document.getElementById('password-error');
+    const successEl = document.getElementById('password-success');
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (errorEl) errorEl.classList.add('hidden');
+      if (successEl) successEl.classList.add('hidden');
+
+      const currentPassword = (form as HTMLFormElement).currentPassword.value;
+      const newPassword = (form as HTMLFormElement).newPassword.value;
+      const confirmPassword = (form as HTMLFormElement).confirmPassword.value;
+
+      if (newPassword !== confirmPassword) {
+        if (errorEl) {
+          errorEl.textContent = 'New passwords do not match';
+          errorEl.classList.remove('hidden');
+        }
+        return;
+      }
+
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        if (successEl) {
+          successEl.textContent = data.message || 'Password updated successfully';
+          successEl.classList.remove('hidden');
+        }
+        (form as HTMLFormElement).reset();
+      } else {
+        if (errorEl) {
+          errorEl.textContent = data.error || 'Failed to update password';
+          errorEl.classList.remove('hidden');
+        }
+      }
+    });
+
+    const twoFactorStatus = document.getElementById('two-factor-status');
+    const twoFactorSetup = document.getElementById('two-factor-setup');
+    const twoFactorEnabled = document.getElementById('two-factor-enabled');
+    const twoFactorBadge = document.getElementById('two-factor-badge');
+    const enableBtn = document.getElementById('enable-2fa-btn');
+    const cancelBtn = document.getElementById('cancel-2fa-btn');
+    const disableBtn = document.getElementById('disable-2fa-btn');
+    const twoFactorError = document.getElementById('two-factor-error');
+
+    let currentSecret = '';
+
+    async function loadTwoFactorStatus() {
+      try {
+        const res = await fetch('/api/auth/2fa/setup', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          currentSecret = data.secret;
+          const qrCode = document.getElementById('qr-code');
+          const secretEl = document.getElementById('two-factor-secret');
+          if (qrCode) qrCode.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.otpauthUrl)}" alt="2FA QR Code" class="mx-auto" />`;
+          if (secretEl) secretEl.textContent = data.secret;
+          if (twoFactorSetup) twoFactorSetup.classList.remove('hidden');
+          if (twoFactorStatus) twoFactorStatus.classList.add('hidden');
+        }
+      } catch (err) {
+        console.error('Failed to load 2FA setup:', err);
+      }
+    }
+
+    enableBtn?.addEventListener('click', async () => {
+      const code = (document.getElementById('two-factor-code') as HTMLInputElement)?.value || '';
+      if (!code || code.length !== 6) {
+        if (twoFactorError) {
+          twoFactorError.textContent = 'Please enter a 6-digit code';
+          twoFactorError.classList.remove('hidden');
+        }
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/2fa/enable', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          if (twoFactorSetup) twoFactorSetup.classList.add('hidden');
+          if (twoFactorEnabled) twoFactorEnabled.classList.remove('hidden');
+          if (twoFactorBadge) {
+            twoFactorBadge.textContent = 'Enabled';
+            twoFactorBadge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800';
+          }
+        } else {
+          if (twoFactorError) {
+            twoFactorError.textContent = data.error || 'Failed to enable 2FA';
+            twoFactorError.classList.remove('hidden');
+          }
+        }
+      } catch (err) {
+        if (twoFactorError) {
+          twoFactorError.textContent = 'An error occurred';
+          twoFactorError.classList.remove('hidden');
+        }
+      }
+    });
+
+    cancelBtn?.addEventListener('click', () => {
+      if (twoFactorSetup) twoFactorSetup.classList.add('hidden');
+      if (twoFactorStatus) twoFactorStatus.classList.remove('hidden');
+    });
+
+    disableBtn?.addEventListener('click', async () => {
+      const password = prompt('Enter your password to disable 2FA:');
+      if (!password) return;
+
+      try {
+        const res = await fetch('/api/auth/2fa/disable', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          if (twoFactorEnabled) twoFactorEnabled.classList.add('hidden');
+          if (twoFactorStatus) twoFactorStatus.classList.remove('hidden');
+          if (twoFactorBadge) {
+            twoFactorBadge.textContent = 'Disabled';
+            twoFactorBadge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800';
+          }
+        } else {
+          alert(data.error || 'Failed to disable 2FA');
+        }
+      } catch (err) {
+        alert('An error occurred');
+      }
+    });
+
+    const channelsContainer = document.getElementById('notification-channels');
+    const addChannelBtn = document.getElementById('add-channel-btn');
+
+    async function loadChannels() {
+      if (!channelsContainer) return;
+      const res = await fetch('/api/notifications/channels');
+      const data = await res.json();
+      if (data.success) {
+        channelsContainer.innerHTML = data.channels.map((ch: { id: string; type: string; name: string; enabled: boolean }) => `
+          <div class="flex items-center justify-between bg-slate-50 rounded-lg p-3">
+            <div>
+              <p class="text-sm font-medium text-navy">${ch.name}</p>
+              <p class="text-xs text-slate capitalize">${ch.type}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs ${ch.enabled ? 'text-green-700' : 'text-slate-500'}">${ch.enabled ? 'Enabled' : 'Disabled'}</span>
+              <button type="button" data-id="${ch.id}" class="delete-channel text-xs text-red-700 hover:text-red-800">Delete</button>
+            </div>
+          </div>
+        `).join('');
+
+        channelsContainer.querySelectorAll('.delete-channel').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            const id = (btn as HTMLElement).dataset.id;
+            if (!id) return;
+            await fetch('/api/notifications/channels', {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id }),
+            });
+            loadChannels();
+          });
+        });
+      }
+    }
+
+    addChannelBtn?.addEventListener('click', async () => {
+      const type = prompt('Channel type (email, slack, webhook):');
+      if (!type || !['email', 'slack', 'webhook'].includes(type)) {
+        alert('Invalid type. Use: email, slack, or webhook');
+        return;
+      }
+      const name = prompt('Channel name:');
+      if (!name) return;
+      const configValue = prompt('Config (JSON or URL/email):');
+      if (!configValue) return;
+
+      let config: Record<string, string> = {};
+      try {
+        config = JSON.parse(configValue);
+      } catch {
+        if (type === 'email') config = { email: configValue };
+        else if (type === 'slack') config = { webhook_url: configValue };
+        else if (type === 'webhook') config = { url: configValue };
+      }
+
+      await fetch('/api/notifications/channels', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, name, config }),
+      });
+      loadChannels();
+    });
+
+    loadChannels();
+  </script>
+</DashboardLayout>

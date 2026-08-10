@@ -1,0 +1,40 @@
+---
+const navLinks = [
+  { label: 'Features', href: '#features' },
+  { label: 'Use Cases', href: '#use-cases' },
+  { label: 'Pricing', href: '#pricing' },
+];
+---
+
+<header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <div class="flex items-center">
+        <a href="/" class="flex items-center gap-2">
+          <div class="w-8 h-8 bg-navy rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold text-sm">CD</span>
+          </div>
+          <span class="font-bold text-xl text-navy">CloudDroid</span>
+        </a>
+      </div>
+      <nav class="hidden md:flex items-center gap-8">
+        {navLinks.map((link) => (
+          <a
+            href={link.href}
+            class="text-slate-600 hover:text-navy transition-colors font-medium text-sm"
+          >
+            {link.label}
+          </a>
+        ))}
+      </nav>
+      <div class="flex items-center gap-4">
+        <a
+          href="/login"
+          class="bg-navy text-white px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-navy-light transition-colors"
+        >
+          Dashboard Login
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
