@@ -26,7 +26,7 @@ jobs:
             git reset --hard origin/main
 
             echo "[2] Installing dependencies..."
-            npm install --production=false --unsafe-perm
+            npm install --production=false
 
             echo "[2b] Ensuring Redis is available..."
             if ! command -v redis-server >/dev/null 2>&1; then
