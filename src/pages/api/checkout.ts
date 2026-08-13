@@ -6,10 +6,10 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const { planId, customerEmail } = await request.json();
 
-    const planConfig: Record<string, { name: string; price: number; interval: string }> = {
-      developer: { name: 'Developer', price: 4900, interval: 'month' },
-      professional: { name: 'Professional', price: 14900, interval: 'month' },
-      team: { name: 'Team', price: 39900, interval: 'month' },
+    const planConfig: Record<string, { name: string; productId: string }> = {
+      developer: { name: 'Developer', productId: 'pdt_0Nl5L3f80oqubD1vFBGeV' },
+      professional: { name: 'Professional', productId: 'pdt_0Nl5Kr9NhpcLZ7C5KJFOo' },
+      team: { name: 'Team', productId: 'pdt_0Nl5K2bcCSXCritV0N8lN' },
     };
 
     const plan = planConfig[planId];
@@ -40,22 +40,12 @@ export const POST: APIRoute = async ({ request }) => {
         },
         items: [
           {
-            price_data: {
-              currency: 'usd',
-              product_data: {
-                name: `CloudDroid ${plan.name} Plan`,
-              },
-              unit_amount: plan.price,
-              recurring: {
-                interval: plan.interval,
-              },
-            },
+            product: plan.productId,
             quantity: 1,
           },
         ],
         success_url: `${import.meta.env.DODO_PAYMENTS_RETURN_URL}?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${new URL(request.headers.get('origin') || 'http://localhost:4321').origin}/checkout/cancel`,
-        mode: 'subscription',
       }),
     });
 
