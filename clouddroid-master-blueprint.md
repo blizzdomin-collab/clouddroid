@@ -104,11 +104,11 @@ Showcasing a robust backend builds trust.
 ## Business Details (Merchant Account)
 
 - **Business Name:** CloudDroid
-- **Legal Name:** Dominik Zachara
-- **Address:** Horní 791/3, Ostrava, 700 30, Czech Republic
+- **Legal Name:** RUNESTONE HANDLUNG s.r.o.
+- **Address:** Soukenická 877/9, Ostrava, 702 00, Czech Republic
 - **Support Email:** support@clouddroid.eu
-- **Structure:** Individual / Sole Proprietor (no company registration number)
-- **Tax ID:** Not applicable (individual merchant)
+- **Structure:** Limited liability company (s.r.o.)
+- **Company ID (IČO):** 23389702
 
 ## Dodo Payments Setup
 
