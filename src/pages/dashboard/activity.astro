@@ -1,0 +1,140 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+
+const sessionCookie = Astro.cookies.get('session');
+let currentUser: { email: string; name: string; role: string } | null = null;
+
+if (sessionCookie) {
+  try {
+    const session = JSON.parse(sessionCookie.value);
+    if (session.authenticated === true && session.email) {
+      currentUser = { email: session.email, name: session.name || 'User', role: session.role || 'user' };
+    }
+  } catch {
+    currentUser = null;
+  }
+}
+---
+
+<DashboardLayout title="Activity - CloudDroid">
+  <div class="p-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-navy mb-2">Activity</h1>
+      <p class="text-slate">Your recent login history and account activity</p>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-200">
+        <h2 class="text-lg font-semibold text-navy">Login History</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Timestamp</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Event</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Action</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Details</th>
+            </tr>
+          </thead>
+          <tbody id="activity-table" class="divide-y divide-slate-200">
+            <tr>
+              <td colspan="4" class="px-6 py-8 text-center text-sm text-slate">Loading activity...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+        <button id="prev-page" disabled class="text-sm text-navy hover:text-navy-light font-medium disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
+        <span id="page-info" class="text-sm text-slate">Loading...</span>
+        <button id="next-page" disabled class="text-sm text-navy hover:text-navy-light font-medium disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
+      </div>
+      <div id="pagination-data" data-offset="0" data-limit="20" data-total="0" data-has-more="false" class="hidden"></div>
+    </div>
+  </div>
+
+  <script>
+    const activityTable = document.getElementById('activity-table');
+    const prevBtn = document.getElementById('prev-page');
+    const nextBtn = document.getElementById('next-page');
+    const pageInfo = document.getElementById('page-info');
+    const paginationData = document.getElementById('pagination-data');
+    let currentOffset = 0;
+    const limit = 20;
+
+    async function loadActivity(offset: number) {
+      const res = await fetch(`/api/auth/activity?limit=${limit}&offset=${offset}`);
+      if (!res.ok) {
+        if (activityTable) {
+          activityTable.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-sm text-red-600">Failed to load activity</td></tr>`;
+        }
+        return;
+      }
+
+      const data = await res.json();
+      const logs = data.logs || [];
+      const pagination = data.pagination || {};
+
+      if (activityTable) {
+        if (logs.length === 0) {
+          activityTable.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-sm text-slate">No activity yet</td></tr>`;
+        } else {
+          activityTable.innerHTML = logs.map((log: any) => {
+            const isLogin = log.action === 'login';
+            const isFailed = log.action === 'login_failed';
+            const icon = isFailed
+              ? `<svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`
+              : `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`;
+            const severityColor = log.severity === 'critical' ? 'text-red-700 bg-red-100' : log.severity === 'warning' ? 'text-yellow-700 bg-yellow-100' : 'text-blue-700 bg-blue-100';
+            return `
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate">${new Date(log.timestamp).toLocaleString()}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center gap-2">
+                    ${icon}
+                    <span class="text-sm font-medium text-navy">${log.event}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${severityColor}">${log.severity}</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-slate">${log.details}</td>
+              </tr>
+            `;
+          }).join('');
+        }
+      }
+
+      if (pageInfo) {
+        pageInfo.textContent = `Showing ${pagination.offset + 1}-${Math.min(pagination.offset + pagination.limit, pagination.total)} of ${pagination.total}`;
+      }
+
+      if (prevBtn) prevBtn.disabled = pagination.offset === 0;
+      if (nextBtn) nextBtn.disabled = !pagination.hasMore;
+
+      if (paginationData) {
+        paginationData.setAttribute('data-offset', String(pagination.offset || 0));
+        paginationData.setAttribute('data-limit', String(pagination.limit || limit));
+        paginationData.setAttribute('data-total', String(pagination.total || 0));
+        paginationData.setAttribute('data-has-more', String(pagination.hasMore || false));
+      }
+
+      currentOffset = pagination.offset || 0;
+    }
+
+    prevBtn?.addEventListener('click', () => {
+      if (currentOffset > 0) {
+        loadActivity(currentOffset - limit);
+      }
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      const hasMore = paginationData?.getAttribute('data-has-more') === 'true';
+      if (hasMore) {
+        loadActivity(currentOffset + limit);
+      }
+    });
+
+    loadActivity(0);
+  </script>
+</DashboardLayout>

@@ -1,8 +1,9 @@
 import type { APIRoute } from 'astro';
-import { getUserByEmail, verifyPassword, createAuditLog } from '../../../lib/database';
+import { getUserByEmail, verifyPassword, createAuditLog, createSession } from '../../../lib/database';
 import { verifyTwoFactorCode } from '../../../lib/twofactor';
 import { LoginSchema, validate } from '../../../lib/validation';
 import { checkRequestSize } from '../../../lib/requestLimits';
+import crypto from 'crypto';
 
 interface RateLimitEntry {
   count: number;
@@ -104,7 +105,15 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
       }
     }
 
-    cookies.set('session', JSON.stringify({ email: user.email, authenticated: true, name: user.name, role: user.role, must_change_password: user.must_change_password }), {
+    const sessionToken = crypto.randomBytes(32).toString('hex');
+    const sessionRecord = createSession({
+      user_id: user.id,
+      token: sessionToken,
+      ip_address: ip,
+      user_agent: request.headers.get('user-agent') || null,
+    });
+
+    cookies.set('session', JSON.stringify({ email: user.email, authenticated: true, name: user.name, role: user.role, must_change_password: user.must_change_password, sessionId: sessionRecord.id }), {
       path: '/',
       httpOnly: true,
       secure: import.meta.env.PROD,

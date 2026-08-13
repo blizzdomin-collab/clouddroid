@@ -72,6 +72,8 @@ export const POST: APIRoute = async ({ request }) => {
           reset_token_expiry: null,
           must_change_password: true,
           dodo_customer_id: customerId || null,
+          registration_ip: checkoutSession.ip_address,
+          registration_user_agent: checkoutSession.user_agent,
         });
 
         const planMap: Record<string, string> = {

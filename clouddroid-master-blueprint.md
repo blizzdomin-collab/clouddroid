@@ -113,15 +113,18 @@ Showcasing a robust backend builds trust.
 ## Dodo Payments Setup
 
 - Webhook endpoint: `/api/webhooks/dodopayments`
-- Environment variables: `DODO_PAYMENTS_API_KEY`, `DODO_PAYMENTS_WEBHOOK_KEY`
+- Environment variables: `DODO_PAYMENTS_API_KEY`, `DODO_PAYMENTS_WEBHOOK_KEY`, `DODO_PAYMENTS_ENVIRONMENT=live_mode`, `DODO_PAYMENTS_RETURN_URL=https://clouddroid.eu/checkout/success`
+- Checkout endpoint: `POST /checkouts` with `product_cart`
+- Customer portal endpoint: `POST /customers/{customer_id}/customer-portal/session`
 - Subscribed events: checkout.session.completed, subscription.active, subscription.cancelled, subscription.renewed, payment.succeeded, payment.failed, refund.succeeded
+- Account status: Fully approved, live mode activated
 
 ---
 
 ## 8. Implementation Progress
 
 **Framework:** Astro 7.2 with Tailwind CSS v4  
-**Status:** Core marketing site scaffolded, build verified, and APIs functional
+**Status:** Core marketing site scaffolded, build verified, APIs functional, Dodo Payments checkout working in production
 
 ### Completed Components
 
@@ -143,6 +146,8 @@ Showcasing a robust backend builds trust.
 | Refund Policy | `src/pages/legal/refund.astro` | ✅ Done |
 | Checkout Flow | `src/pages/checkout/[plan].astro` | ✅ Done |
 | Checkout API | `src/pages/api/checkout.ts` | ✅ Done |
+| Webhook Handler | `src/pages/api/webhooks/dodopayments.ts` | ✅ Done |
+| Customer Portal | `src/pages/api/customer-portal.ts` | ✅ Done |
 | Monitoring Dashboard | `src/pages/monitoring/index.astro` | ✅ Done |
 | Monitoring API | `src/pages/api/monitoring/instances.ts` | ✅ Done |
 | Compliance Dashboard | `src/pages/compliance/index.astro` | ✅ Done |
@@ -164,13 +169,31 @@ Showcasing a robust backend builds trust.
 | Forgot Password API | `src/pages/api/auth/forgot-password.ts` | ✅ Done |
 | Change Password API | `src/pages/api/auth/change-password.ts` | ✅ Done |
 | Security Headers Middleware | `src/middleware.ts` | ✅ Done |
-| SQLite Database | `src/lib/database.ts` | ✅ Done (JSON-file based, no native deps) |
-| Database Schema | instances, audit_logs, alerts, users, subscriptions, metrics_history tables | ✅ Done |
+| JSON-File Database | `src/lib/database.ts` | ✅ Done |
+| Database Schema | instances, audit_logs, alerts, users, subscriptions, metrics_history, invoices, checkout_sessions, notification_channels | ✅ Done |
 | Billing Page | `src/pages/dashboard/billing.astro` | ✅ Done |
 | Billing API | `src/pages/api/billing/subscription.ts` | ✅ Done |
 | User Management Page | `src/pages/dashboard/users.astro` | ✅ Done |
 | User Management API | `src/pages/api/admin/users.ts` | ✅ Done |
 | Metrics History API | `src/pages/api/monitoring/metrics.ts` | ✅ Done |
+| 2FA/MFA Support | `src/lib/twofactor.ts`, `/api/auth/2fa/*` | ✅ Done |
+| Notification Channels | `src/pages/api/notifications/channels.ts` | ✅ Done |
+| Structured Logging | `src/lib/logger.ts`, `src/lib/apiMiddleware.ts` | ✅ Done |
+| Input Validation | `src/lib/validation.ts` (Zod) | ✅ Done |
+| SSE Real-time Alerts | `src/pages/api/alerts/stream.ts` | ✅ Done |
+| Health Check | `src/pages/api/health.ts` | ✅ Done |
+| CORS Headers | `src/lib/api.ts` | ✅ Done |
+| Request Size Limits | `src/lib/requestLimits.ts` | ✅ Done |
+| Error Pages | `src/pages/404.astro`, `src/pages/500.astro` | ✅ Done |
+| API Documentation | `src/pages/api-docs.astro` | ✅ Done |
+| Activity/Login History API | `src/pages/api/auth/activity.ts` | ✅ Done |
+| Activity/Login History Page | `src/pages/dashboard/activity.astro` | ✅ Done |
+| Session Management API | `src/pages/api/auth/sessions.ts` | ✅ Done |
+| Active Sessions UI | Settings page | ✅ Done |
+| Instance Detail Page | `src/pages/dashboard/instances/[id].astro` | ✅ Done |
+| Instance Detail API | `src/pages/api/instances/[id].ts` | ✅ Done |
+| Dark Mode Toggle | Settings → Appearance | ✅ Done |
+| CSS Variables for Dark Mode | `src/styles/global.css` | ✅ Done |
 
 ### Compliance Checklist
 
@@ -182,8 +205,7 @@ Showcasing a robust backend builds trust.
 - [x] 3 transparent pricing tiers with explicit RAM/Storage/Instance specs
 - [x] "No hidden fees" and "Cancel anytime" messaging present
 - [x] MoR acknowledgment: "Securely processed by Dodo Payments"
-- [x] Footer includes company name, physical address (Dublin), support email, copyright, MoR disclaimer
-- [x] Legal link placeholders: Terms of Service, Privacy Policy, AUP, Refund Policy
+- [x] Footer includes company name, physical address, support email, copyright, MoR disclaimer
 - [x] Legal pages created: `/legal/terms`, `/legal/privacy`, `/legal/aup`, `/legal/refund`
 - [x] AUP includes explicit prohibitions: DDoS, port scanning, spamming, crypto mining, 100% CPU scripts, click-fraud, card testing, identity theft
 - [x] Refund policy includes strict no-refund language for digital goods/cloud resources
@@ -209,30 +231,30 @@ Showcasing a robust backend builds trust.
 - [x] Session-based authentication with HTTP-only cookies
 - [x] Auth guard on dashboard layout redirects unauthenticated users to `/login`
 - [x] Logout functionality with form POST to `/api/auth/logout`
-- [x] SQLite database initialized with JSON-file persistence (`clouddroid.json`)
-- [x] Database tables created: instances, audit_logs, alerts
+- [x] SQLite database persistence (`clouddroid.db`) via `better-sqlite3`
+- [x] Database tables: instances, audit_logs, alerts, users, subscriptions, metrics_history, invoices, checkout_sessions, notification_channels
 - [x] Seed data inserted on first run
 - [x] Monitoring API reads from database
 - [x] Audit logs API reads from database
 - [x] Alerts API reads/writes to database
-- [x] `.gitignore` updated to exclude `*.db`, `*.json` data files
+- [x] `.gitignore` updated to exclude `.data/` and `*.json`
 - [x] Build passes cleanly (`npm run build`) — server mode with Node adapter
 - [x] Dev server running at `http://localhost:4321`
 - [x] APIs verified: `/api/monitoring/instances`, `/api/audit/logs`, `/api/alerts`
 - [x] Alert acknowledge flow verified via POST
-- [x] Dashboard overview fetches live stats from `/api/monitoring/instances` and `/api/alerts`
+- [x] Dashboard overview fetches live stats from APIs
 - [x] Dashboard instances page renders from `/api/monitoring/instances`
-- [x] Dashboard monitoring page renders health metrics and anomalies from API
+- [x] Dashboard monitoring page renders health metrics and anomalies
 - [x] Dashboard compliance page renders audit logs from `/api/audit/logs`
-- [x] Dashboard alerts page renders live alerts with acknowledge flow from `/api/alerts`
+- [x] Dashboard alerts page renders live alerts with acknowledge flow
 - [x] All dashboard pages verified loading with HTTP 200
 - [x] Registration page with name/email/password form
 - [x] Registration API with password hashing and duplicate email check
 - [x] Login API with rate limiting (5 attempts per 15 minutes)
 - [x] Forgot password page and API with reset token generation
 - [x] Change password API with current password verification
-- [x] Security headers middleware (X-Content-Type-Options, X-Frame-Options, etc.)
-- [x] Billing/subscription management page
+- [x] Security headers middleware (HSTS, nosniff, frame-options, XSS-protection, permissions-policy)
+- [x] Billing/subscription management page with Dodo customer portal
 - [x] Admin user management page with add/delete functionality
 - [x] Instance metrics history chart on monitoring page
 - [x] Dashboard sidebar includes Billing and Users links (Users admin-only)
@@ -244,6 +266,28 @@ Showcasing a robust backend builds trust.
 - [x] CSV export for audit logs (`/api/audit/export`)
 - [x] Advanced filtering on audit logs (severity, date range, search)
 - [x] Advanced filtering on alerts (severity, type, acknowledged status)
+- [x] Must-change-password flow for new users (`must_change_password` flag)
+- [x] No email verification required (removed per requirement)
+- [x] No email sending for credentials (displayed on success page only)
+- [x] Instance provisioning after subscription activation
+- [x] Health check endpoint (`/api/health`)
+- [x] CORS headers to API responses
+- [x] 2FA/MFA support with TOTP
+- [x] Notification channels (email, Slack, webhook)
+- [x] Structured logging with request IDs
+- [x] Input validation with Zod
+- [x] SSE for real-time alerts
+- [x] Customer portal route (`/api/customer-portal`)
+- [x] Error pages (`404.astro`, `500.astro`)
+- [x] Dodo Payments customer ID stored in user records
+- [x] "Manage Subscription" button on billing page
+- [x] Production domain configured (`clouddroid.eu`)
+- [x] Dodo Payments checkout working in production (`POST /checkouts`)
+- [x] Login history/activity page with paginated auth events
+- [x] Session management with active sessions list and revoke
+- [x] Instance detail page with metrics chart and action buttons
+- [x] Dark mode toggle in settings with localStorage persistence
+- [x] CSS variables for light/dark theme support
 
 ### Next Steps
 
@@ -251,7 +295,7 @@ Showcasing a robust backend builds trust.
 2. ~~Add real product screenshots/dashboard imagery~~ ✅ Completed (mockup added)
 3. ~~Replace placeholder partner logos~~ ✅ Completed (SVG placeholders)
 4. ~~Implement checkout flow with Dodo Payments integration~~ ✅ Completed
-5. ~~Add email verification before checkout access~~ ❌ Removed (not needed)
+5. ~~Remove email verification before checkout access~~ ✅ Completed (not needed)
 6. ~~Set up automated monitoring for CPU/traffic anomalies~~ ✅ Completed
 7. ~~Add audit logging and compliance reporting dashboard~~ ✅ Completed
 8. ~~Implement continuous compliance monitoring with real-time alerts~~ ✅ Completed
@@ -271,7 +315,7 @@ Showcasing a robust backend builds trust.
 22. ~~Add CSV export for audit logs~~ ✅ Completed
 23. ~~Add advanced filtering to audit logs and alerts~~ ✅ Completed
 24. ~~Add must-change-password flow for new users~~ ✅ Completed
-25. ~~Add email sending service (Resend/SMTP)~~ ✅ Completed
+25. ~~Remove email sending service~~ ✅ Completed (not needed)
 26. ~~Add instance provisioning after subscription~~ ✅ Completed
 27. ~~Add health check endpoint (`/api/health`)~~ ✅ Completed
 28. ~~Add CORS headers to API responses~~ ✅ Completed
@@ -284,4 +328,10 @@ Showcasing a robust backend builds trust.
 35. ~~Add error pages (`404.astro`, `500.astro`)~~ ✅ Completed
 36. ~~Store Dodo Payments customer ID in user records~~ ✅ Completed
 37. ~~Add "Manage Subscription" button on billing page~~ ✅ Completed
-38. ~~Update `.env` with production domain (`clouddroid.eu`)~~ ✅ Completeds
+38. ~~Update `.env` with production domain (`clouddroid.eu`)~~ ✅ Completed
+39. ~~Fix Dodo Payments checkout endpoint to `/checkouts`~~ ✅ Completed
+40. ~~Deploy to production VPS with auto-deploy~~ ✅ Completed
+41. ~~Add login history/activity page and API~~ ✅ Completed
+42. ~~Add session management with active sessions UI~~ ✅ Completed
+43. ~~Add instance detail page with metrics and actions~~ ✅ Completed
+44. ~~Add dark mode toggle with localStorage persistence~~ ✅ Completed

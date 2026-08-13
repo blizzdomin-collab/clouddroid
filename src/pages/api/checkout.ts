@@ -2,9 +2,12 @@ import type { APIRoute } from 'astro';
 import { createCheckoutSession } from '../../lib/database';
 import crypto from 'crypto';
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
     const { planId, customerEmail } = await request.json();
+
+    const ipAddress = clientAddress || null;
+    const userAgent = request.headers.get('user-agent') || null;
 
     const planConfig: Record<string, { name: string; productId: string }> = {
       developer: { name: 'Developer', productId: 'pdt_0Nl5L3f80oqubD1vFBGeV' },
@@ -69,6 +72,8 @@ export const POST: APIRoute = async ({ request }) => {
       plan: plan.name,
       status: 'pending',
       temp_password: tempPassword,
+      ip_address: ipAddress,
+      user_agent: userAgent,
     });
 
     return new Response(JSON.stringify({ checkout_url: session.checkout_url, sessionId: session.session_id }), {
