@@ -31,7 +31,7 @@ export const POST: APIRoute = async ({ request }) => {
     const environment = import.meta.env.DODO_PAYMENTS_ENVIRONMENT || 'live_mode';
     const baseUrl = environment === 'test_mode' ? 'https://test.dodopayments.com' : 'https://live.dodopayments.com';
 
-    const response = await fetch(`${baseUrl}/v1/checkout-sessions`, {
+    const response = await fetch(`${baseUrl}/checkouts`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${dodoApiKey}`,
@@ -64,14 +64,14 @@ export const POST: APIRoute = async ({ request }) => {
     const tempPassword = crypto.randomBytes(12).toString('hex');
 
     createCheckoutSession({
-      session_id: session.id,
+      session_id: session.session_id,
       email: customerEmail,
       plan: plan.name,
       status: 'pending',
       temp_password: tempPassword,
     });
 
-    return new Response(JSON.stringify({ checkout_url: session.url, sessionId: session.id }), {
+    return new Response(JSON.stringify({ checkout_url: session.checkout_url, sessionId: session.session_id }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

@@ -39,7 +39,7 @@ export const GET: APIRoute = async ({ cookies, url }) => {
     const baseUrl = environment === 'test_mode' ? 'https://test.dodopayments.com' : 'https://live.dodopayments.com';
 
     const response = await fetch(
-      `${baseUrl}/v1/customers/${encodeURIComponent(user.dodo_customer_id)}/portal`,
+      `${baseUrl}/customers/${encodeURIComponent(user.dodo_customer_id)}/customer-portal/session`,
       {
         method: 'POST',
         headers: {
