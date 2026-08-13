@@ -15,7 +15,6 @@ git fetch origin
 git reset --hard "origin/$BRANCH"
 
   echo "[2/5] Installing dependencies..."
-  chown -R "$USER:$USER" "$APP_DIR" || true
   npm install --production=false --unsafe-perm
 
   echo "[2b/5] Ensuring Redis is available..."

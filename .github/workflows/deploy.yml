@@ -25,15 +25,16 @@ jobs:
             git fetch origin
             git reset --hard origin/main
 
-            echo "[1b] Fixing permissions..."
-            chown -R "$USER:$USER" /var/www/clouddroid || true
-
             echo "[2] Installing dependencies..."
             npm install --production=false --unsafe-perm
 
             echo "[2b] Ensuring Redis is available..."
             if ! command -v redis-server >/dev/null 2>&1; then
               echo "Redis not found. Install it manually on VPS or enable passwordless sudo for deploy user."
+            fi
+            if command -v systemctl >/dev/null 2>&1; then
+              systemctl enable redis-server || true
+              systemctl restart redis-server || true
             fi
             if command -v systemctl >/dev/null 2>&1; then
               systemctl enable redis-server || true
