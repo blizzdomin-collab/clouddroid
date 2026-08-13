@@ -26,6 +26,7 @@ export const GET: APIRoute = async ({ cookies }) => {
       name: u.name,
       role: u.role,
       created_at: u.created_at,
+      suspended: Boolean(u.suspended),
     }));
 
     return new Response(JSON.stringify({ users: safeUsers }), {

@@ -1,0 +1,256 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+
+const sessionCookie = Astro.cookies.get('session');
+let isAdmin = false;
+let stats: any = null;
+let error: string | null = null;
+
+if (sessionCookie) {
+  try {
+    const session = JSON.parse(sessionCookie.value);
+    if (session.authenticated === true && session.role === 'admin') {
+      isAdmin = true;
+      const res = await fetch(`${Astro.url.origin}/api/admin/stats`);
+      if (res.ok) {
+        stats = await res.json();
+      } else {
+        error = 'Failed to load admin stats';
+      }
+    }
+  } catch {
+    isAdmin = false;
+  }
+}
+---
+
+<DashboardLayout title="Admin Dashboard - CloudDroid">
+  <div class="p-8">
+    {isAdmin ? (
+      error ? (
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">{error}</div>
+      ) : stats ? (
+        <div class="space-y-8">
+          <div>
+            <h1 class="text-3xl font-bold text-navy mb-2">Admin Dashboard</h1>
+            <p class="text-slate">Platform overview and key metrics</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+              <div class="text-sm text-slate mb-1">Total Users</div>
+              <div class="text-3xl font-bold text-navy">{stats.overview.totalUsers}</div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+              <div class="text-sm text-slate mb-1">Total Instances</div>
+              <div class="text-3xl font-bold text-navy">{stats.overview.totalInstances}</div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+              <div class="text-sm text-slate mb-1">Active Subscriptions</div>
+              <div class="text-3xl font-bold text-green-600">{stats.overview.activeSubscriptions}</div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+              <div class="text-sm text-slate mb-1">Total Revenue</div>
+              <div class="text-3xl font-bold text-navy">${stats.overview.totalRevenue.toFixed(2)}</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <div class="px-6 py-4 border-b border-slate-200">
+                <h2 class="text-lg font-semibold text-navy">User Growth (Last 30 Days)</h2>
+              </div>
+              <div class="p-6">
+                <div class="relative h-64">
+                  <canvas id="user-growth-chart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <div class="px-6 py-4 border-b border-slate-200">
+                <h2 class="text-lg font-semibold text-navy">Revenue (Last 30 Days)</h2>
+              </div>
+              <div class="p-6">
+                <div class="relative h-64">
+                  <canvas id="revenue-chart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200">
+              <h2 class="text-lg font-semibold text-navy">Instance Status</h2>
+            </div>
+            <div class="p-6">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-green-50 rounded-lg p-4">
+                  <div class="text-sm text-slate mb-1">Running</div>
+                  <div class="text-2xl font-bold text-green-700">{stats.instanceStatusCounts.running}</div>
+                </div>
+                <div class="bg-yellow-50 rounded-lg p-4">
+                  <div class="text-sm text-slate mb-1">Stopped</div>
+                  <div class="text-2xl font-bold text-yellow-700">{stats.instanceStatusCounts.stopped}</div>
+                </div>
+                <div class="bg-red-50 rounded-lg p-4">
+                  <div class="text-sm text-slate mb-1">Warnings</div>
+                  <div class="text-2xl font-bold text-red-700">{stats.instanceStatusCounts.warning}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <div class="px-6 py-4 border-b border-slate-200">
+                <h2 class="text-lg font-semibold text-navy">Recent Users</h2>
+              </div>
+              <div class="p-6">
+                {stats.recentUsers.length > 0 ? (
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                      <thead>
+                        <tr class="border-b border-slate-200">
+                          <th class="text-left py-3 px-4 font-medium text-slate">Name</th>
+                          <th class="text-left py-3 px-4 font-medium text-slate">Email</th>
+                          <th class="text-left py-3 px-4 font-medium text-slate">Created</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {stats.recentUsers.map((user: any) => (
+                          <tr class="border-b border-slate-100 last:border-0">
+                            <td class="py-3 px-4 text-navy font-medium">{user.name}</td>
+                            <td class="py-3 px-4 text-slate">{user.email}</td>
+                            <td class="py-3 px-4 text-slate">{new Date(user.created_at).toLocaleDateString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p class="text-sm text-slate">No users yet.</p>
+                )}
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <div class="px-6 py-4 border-b border-slate-200">
+                <h2 class="text-lg font-semibold text-navy">Recent Invoices</h2>
+              </div>
+              <div class="p-6">
+                {stats.recentInvoices.length > 0 ? (
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                      <thead>
+                        <tr class="border-b border-slate-200">
+                          <th class="text-left py-3 px-4 font-medium text-slate">Invoice ID</th>
+                          <th class="text-left py-3 px-4 font-medium text-slate">Amount</th>
+                          <th class="text-left py-3 px-4 font-medium text-slate">Status</th>
+                          <th class="text-left py-3 px-4 font-medium text-slate">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {stats.recentInvoices.map((inv: any) => (
+                          <tr class="border-b border-slate-100 last:border-0">
+                            <td class="py-3 px-4 text-navy font-medium">{inv.id}</td>
+                            <td class="py-3 px-4 text-slate">${inv.amount} {inv.currency}</td>
+                            <td class="py-3 px-4">
+                              <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${inv.status === 'paid' ? 'text-green-700 bg-green-100' : inv.status === 'pending' ? 'text-yellow-700 bg-yellow-100' : 'text-red-700 bg-red-100'}`}>
+                                {inv.status}
+                              </span>
+                            </td>
+                            <td class="py-3 px-4 text-slate">{new Date(inv.created_at).toLocaleDateString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p class="text-sm text-slate">No invoices yet.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null
+    ) : (
+      <div class="bg-white rounded-xl border border-slate-200 p-8 text-center">
+        <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-navy mb-2">Access Denied</h3>
+        <p class="text-sm text-slate">You need admin privileges to view this page.</p>
+      </div>
+    )}
+  </div>
+
+  {isAdmin && stats && (
+    <script type="module">
+      import Chart from 'chart.js/auto';
+
+      const userGrowthCtx = document.getElementById('user-growth-chart');
+      const revenueCtx = document.getElementById('revenue-chart');
+
+      const userGrowthData = { ...stats.userGrowth };
+      const revenueData = { ...stats.revenueByDay };
+
+      if (userGrowthCtx) {
+        new Chart(userGrowthCtx, {
+          type: 'line',
+          data: {
+            labels: userGrowthData.map((d: any) => d.date),
+            datasets: [
+              {
+                label: 'Users',
+                data: userGrowthData.map((d: any) => d.count),
+                borderColor: '#0f172a',
+                backgroundColor: 'rgba(15, 23, 42, 0.1)',
+                tension: 0.4,
+                fill: true,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'top' },
+            },
+            scales: {
+              y: { beginAtZero: true },
+            },
+          },
+        });
+      }
+
+      if (revenueCtx) {
+        new Chart(revenueCtx, {
+          type: 'bar',
+          data: {
+            labels: revenueData.map((d: any) => d.date),
+            datasets: [
+              {
+                label: 'Revenue ($)',
+                data: revenueData.map((d: any) => d.amount),
+                backgroundColor: 'rgba(15, 23, 42, 0.8)',
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'top' },
+            },
+            scales: {
+              y: { beginAtZero: true },
+            },
+          },
+        });
+      }
+    </script>
+  )}
+</DashboardLayout>

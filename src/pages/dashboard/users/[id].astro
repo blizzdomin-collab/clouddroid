@@ -1,0 +1,297 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+
+const sessionCookie = Astro.cookies.get('session');
+let isAdmin = false;
+let userDetail: any = null;
+let error: string | null = null;
+
+if (sessionCookie) {
+  try {
+    const session = JSON.parse(sessionCookie.value);
+    if (session.authenticated === true && session.role === 'admin') {
+      isAdmin = true;
+      const id = Astro.params.id;
+      if (id) {
+        const res = await fetch(`${Astro.url.origin}/api/admin/users/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          userDetail = data;
+        } else {
+          error = 'Failed to load user details';
+        }
+      }
+    }
+  } catch {
+    isAdmin = false;
+  }
+}
+---
+
+<DashboardLayout title={userDetail ? `User: ${userDetail.user.name} - CloudDroid` : 'User Not Found - CloudDroid'}>
+  <div class="p-8">
+    {isAdmin ? (
+      userDetail ? (
+        <div class="space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-3xl font-bold text-navy mb-2">{userDetail.user.name}</h1>
+              <p class="text-slate">{userDetail.user.email}</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${userDetail.user.suspended ? 'text-red-700 bg-red-100' : 'text-green-700 bg-green-100'}`}>
+                {userDetail.user.suspended ? 'Suspended' : 'Active'}
+              </span>
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-navy bg-navy/10 capitalize">
+                {userDetail.user.role}
+              </span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+              <div class="text-sm text-slate mb-1">Instances</div>
+              <div class="text-3xl font-bold text-navy">{userDetail.instances.length}</div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+              <div class="text-sm text-slate mb-1">Subscriptions</div>
+              <div class="text-3xl font-bold text-navy">{userDetail.subscriptions.length}</div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+              <div class="text-sm text-slate mb-1">Invoices</div>
+              <div class="text-3xl font-bold text-navy">{userDetail.invoices.length}</div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200">
+              <h2 class="text-lg font-semibold text-navy">User Details</h2>
+            </div>
+            <div class="p-6 space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span class="text-slate">User ID</span>
+                  <div class="text-navy font-mono">{userDetail.user.id}</div>
+                </div>
+                <div>
+                  <span class="text-slate">Email</span>
+                  <div class="text-navy">{userDetail.user.email}</div>
+                </div>
+                <div>
+                  <span class="text-slate">Role</span>
+                  <div class="text-navy capitalize">{userDetail.user.role}</div>
+                </div>
+                <div>
+                  <span class="text-slate">Created</span>
+                  <div class="text-navy">{new Date(userDetail.user.created_at).toLocaleString()}</div>
+                </div>
+                <div>
+                  <span class="text-slate">2FA Enabled</span>
+                  <div class="text-navy">{userDetail.user.two_factor_enabled ? 'Yes' : 'No'}</div>
+                </div>
+                <div>
+                  <span class="text-slate">Dodo Customer ID</span>
+                  <div class="text-navy font-mono">{userDetail.user.dodo_customer_id || 'N/A'}</div>
+                </div>
+                <div>
+                  <span class="text-slate">Registration IP</span>
+                  <div class="text-navy font-mono">{userDetail.user.registration_ip || 'N/A'}</div>
+                </div>
+                <div>
+                  <span class="text-slate">Registration User Agent</span>
+                  <div class="text-navy break-all">{userDetail.user.registration_user_agent || 'N/A'}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-navy">Instances</h2>
+            </div>
+            <div class="p-6">
+              {userDetail.instances.length > 0 ? (
+                <div class="overflow-x-auto">
+                  <table class="w-full text-sm">
+                    <thead>
+                      <tr class="border-b border-slate-200">
+                        <th class="text-left py-3 px-4 font-medium text-slate">Name</th>
+                        <th class="text-left py-3 px-4 font-medium text-slate">Platform</th>
+                        <th class="text-left py-3 px-4 font-medium text-slate">Resources</th>
+                        <th class="text-left py-3 px-4 font-medium text-slate">Status</th>
+                        <th class="text-left py-3 px-4 font-medium text-slate">Created</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {userDetail.instances.map((inst: any) => (
+                        <tr class="border-b border-slate-100 last:border-0">
+                          <td class="py-3 px-4 text-navy font-medium">{inst.name}</td>
+                          <td class="py-3 px-4 text-slate">{inst.platform}</td>
+                          <td class="py-3 px-4 text-slate">{inst.ram} GB RAM • {inst.storage} GB Storage</td>
+                          <td class="py-3 px-4">
+                            <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${inst.status === 'running' ? 'text-green-700 bg-green-100' : inst.status === 'stopped' ? 'text-yellow-700 bg-yellow-100' : 'text-red-700 bg-red-100'}`}>
+                              {inst.status}
+                            </span>
+                          </td>
+                          <td class="py-3 px-4 text-slate">{new Date(inst.created_at).toLocaleDateString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p class="text-sm text-slate">No instances found.</p>
+              )}
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200">
+              <h2 class="text-lg font-semibold text-navy">Subscriptions</h2>
+            </div>
+            <div class="p-6">
+              {userDetail.subscriptions.length > 0 ? (
+                <div class="overflow-x-auto">
+                  <table class="w-full text-sm">
+                    <thead>
+                      <tr class="border-b border-slate-200">
+                        <th class="text-left py-3 px-4 font-medium text-slate">Plan</th>
+                        <th class="text-left py-3 px-4 font-medium text-slate">Status</th>
+                        <th class="text-left py-3 px-4 font-medium text-slate">Amount</th>
+                        <th class="text-left py-3 px-4 font-medium text-slate">Period</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {userDetail.subscriptions.map((sub: any) => (
+                        <tr class="border-b border-slate-100 last:border-0">
+                          <td class="py-3 px-4 text-navy font-medium">{sub.plan}</td>
+                          <td class="py-3 px-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-green-700 bg-green-100">
+                              {sub.status}
+                            </span>
+                          </td>
+                          <td class="py-3 px-4 text-slate">${sub.amount} {sub.currency}</td>
+                          <td class="py-3 px-4 text-slate">{new Date(sub.current_period_start).toLocaleDateString()} - {new Date(sub.current_period_end).toLocaleDateString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p class="text-sm text-slate">No subscriptions found.</p>
+              )}
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200">
+              <h2 class="text-lg font-semibold text-navy">Invoices</h2>
+            </div>
+            <div class="p-6">
+              {userDetail.invoices.length > 0 ? (
+                <div class="overflow-x-auto">
+                  <table class="w-full text-sm">
+                    <thead>
+                      <tr class="border-b border-slate-200">
+                        <th class="text-left py-3 px-4 font-medium text-slate">Invoice ID</th>
+                        <th class="text-left py-3 px-4 font-medium text-slate">Date</th>
+                        <th class="text-left py-3 px-4 font-medium text-slate">Amount</th>
+                        <th class="text-left py-3 px-4 font-medium text-slate">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {userDetail.invoices.map((inv: any) => (
+                        <tr class="border-b border-slate-100 last:border-0">
+                          <td class="py-3 px-4 text-navy font-medium">{inv.id}</td>
+                          <td class="py-3 px-4 text-slate">{new Date(inv.created_at).toLocaleDateString()}</td>
+                          <td class="py-3 px-4 text-slate">${inv.amount} {inv.currency}</td>
+                          <td class="py-3 px-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-green-700 bg-green-100">
+                              {inv.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p class="text-sm text-slate">No invoices found.</p>
+              )}
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200">
+              <h2 class="text-lg font-semibold text-navy">Account Actions</h2>
+            </div>
+            <div class="p-6">
+              <div class="flex items-center gap-4">
+                <button id="suspend-btn" class={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${userDetail.user.suspended ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-red-600 text-white hover:bg-red-700'}`}>
+                  {userDetail.user.suspended ? 'Unsuspend User' : 'Suspend User'}
+                </button>
+                <input type="text" id="suspension-reason" placeholder="Suspension reason (optional)" class="px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none text-sm" />
+              </div>
+              <div id="action-error" class="hidden mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"></div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div class="bg-white rounded-xl border border-slate-200 p-8 text-center">
+          <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-navy mb-2">User Not Found</h3>
+          <p class="text-sm text-slate mb-6">The requested user does not exist.</p>
+          <a href="/dashboard/users" class="inline-flex items-center gap-2 bg-navy text-white px-6 py-3 rounded-lg font-medium hover:bg-navy-light transition-colors">
+            Back to Users
+          </a>
+        </div>
+      )
+    ) : (
+      <div class="bg-white rounded-xl border border-slate-200 p-8 text-center">
+        <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-navy mb-2">Access Denied</h3>
+        <p class="text-sm text-slate">You need admin privileges to view this page.</p>
+      </div>
+    )}
+  </div>
+
+  {isAdmin && userDetail && (
+    <script>
+      const suspendBtn = document.getElementById('suspend-btn');
+      const reasonInput = document.getElementById('suspension-reason');
+      const errorEl = document.getElementById('action-error');
+
+      suspendBtn?.addEventListener('click', async () => {
+        if (!reasonInput) return;
+        const reason = reasonInput.value.trim();
+        const suspended = suspendBtn.textContent === 'Unsuspend User';
+        const body: any = { suspended: !suspended };
+        if (!suspended && reason) body.suspension_reason = reason;
+
+        const res = await fetch(`/api/admin/users/${window.location.pathname.split('/').pop()}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        if (res.ok) {
+          window.location.reload();
+        } else {
+          const data = await res.json();
+          if (errorEl) {
+            errorEl.textContent = data.error || 'Failed to update user';
+            errorEl.classList.remove('hidden');
+          }
+        }
+      });
+    </script>
+  )}
+</DashboardLayout>

@@ -33,8 +33,9 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 │   │   │   ├── compliance.astro  # Audit logs
 │   │   │   ├── alerts.astro      # Real-time alerts
 │   │   │   ├── billing.astro     # Subscription & invoices
-│   │   │   ├── users.astro       # Admin user management
-│   │   │   ├── activity.astro    # Login history
+  │   │   │   ├── users.astro       # Admin user management
+  │   │   │   ├── admin.astro       # Admin dashboard with stats and charts
+  │   │   │   ├── activity.astro    # Login history
 │   │   │   ├── settings.astro    # Profile, 2FA, notifications, dark mode
 │   │   │   └── instances/[id].astro # Instance detail with metrics
 │   │   ├── checkout/             # Checkout flow
@@ -55,7 +56,7 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 │   │   │   ├── audit/            # Logs, export CSV
 │   │   │   ├── alerts/           # Alerts + SSE stream
 │   │   │   ├── billing/          # Subscription, invoices
-│   │   │   ├── admin/            # User management
+  │   │   │   ├── admin/            # User management + admin stats
 │   │   │   ├── notifications/    # Notification channels
 │   │   │   └── health.ts         # Health check
 │   │   └── api-docs.astro        # API documentation page

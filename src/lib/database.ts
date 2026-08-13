@@ -45,6 +45,9 @@ export {
   updateSession,
   deleteSession,
   deleteSessionsByUserId,
+  getInstancesByUserId,
+  getSubscriptionsByUserId,
+  getInvoicesByUserId,
 } from './database-sqlite';
 
 export type {

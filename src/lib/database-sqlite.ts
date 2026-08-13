@@ -32,11 +32,14 @@ db.exec(`
     two_factor_enabled INTEGER NOT NULL DEFAULT 0,
     dodo_customer_id TEXT,
     registration_ip TEXT,
-    registration_user_agent TEXT
+    registration_user_agent TEXT,
+    suspended INTEGER NOT NULL DEFAULT 0,
+    suspension_reason TEXT
   );
 
   CREATE TABLE IF NOT EXISTS instances (
     id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL DEFAULT '',
     name TEXT NOT NULL,
     platform TEXT NOT NULL,
     ram INTEGER NOT NULL,
@@ -163,10 +166,10 @@ function seedData() {
     const insertSubscription = db.prepare(`INSERT INTO subscriptions (id, user_id, plan, status, amount, currency, current_period_start, current_period_end, cancel_at_period_end, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
     insertSubscription.run('sub_001', 'user_001', 'Professional', 'active', 149, 'USD', now, new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), 0, now);
 
-    const insertInstance = db.prepare(`INSERT INTO instances (id, name, platform, ram, storage, status, cpu, memory, network_in, network_out, created_at, updated_at, tags, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-    insertInstance.run('inst_001', 'QA-Test-Android-14', 'Android 14', 8, 64, 'running', 34, 62, 120, 85, now, now, JSON.stringify(['qa', 'test']), 'Primary QA testing instance');
-    insertInstance.run('inst_002', 'Prod-E2E-Android-13', 'Android 13', 4, 32, 'running', 12, 45, 45, 32, now, now, JSON.stringify(['production', 'e2e']), 'End-to-end testing in production');
-    insertInstance.run('inst_003', 'Legacy-Test-Android-12', 'Android 12', 4, 32, 'warning', 98, 89, 450, 1200, now, now, JSON.stringify(['legacy', 'test']), 'Legacy app compatibility testing');
+    const insertInstance = db.prepare(`INSERT INTO instances (id, user_id, name, platform, ram, storage, status, cpu, memory, network_in, network_out, created_at, updated_at, tags, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+    insertInstance.run('inst_001', 'user_001', 'QA-Test-Android-14', 'Android 14', 8, 64, 'running', 34, 62, 120, 85, now, now, JSON.stringify(['qa', 'test']), 'Primary QA testing instance');
+    insertInstance.run('inst_002', 'user_001', 'Prod-E2E-Android-13', 'Android 13', 4, 32, 'running', 12, 45, 45, 32, now, now, JSON.stringify(['production', 'e2e']), 'End-to-end testing in production');
+    insertInstance.run('inst_003', 'user_001', 'Legacy-Test-Android-12', 'Android 12', 4, 32, 'warning', 98, 89, 450, 1200, now, now, JSON.stringify(['legacy', 'test']), 'Legacy app compatibility testing');
 
     const insertAuditLog = db.prepare(`INSERT INTO audit_logs (id, timestamp, event, severity, instance_id, user_id, details, action) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`);
     insertAuditLog.run('log_001', new Date(Date.now() - 1000 * 60 * 5).toISOString(), 'Instance Created', 'info', 'inst_001', 'user_123', 'QA-Test-Android-14 provisioned successfully', 'provision');
@@ -199,6 +202,23 @@ function seedData() {
 }
 
 seedData();
+
+function migrateSchema() {
+  const userColumns = db.prepare("PRAGMA table_info(users)").all() as any[];
+  const hasSuspended = userColumns.some((col) => col.name === 'suspended');
+  if (!hasSuspended) {
+    db.exec("ALTER TABLE users ADD COLUMN suspended INTEGER NOT NULL DEFAULT 0");
+    db.exec("ALTER TABLE users ADD COLUMN suspension_reason TEXT");
+  }
+
+  const instanceColumns = db.prepare("PRAGMA table_info(instances)").all() as any[];
+  const hasUserId = instanceColumns.some((col) => col.name === 'user_id');
+  if (!hasUserId) {
+    db.exec("ALTER TABLE instances ADD COLUMN user_id TEXT NOT NULL DEFAULT ''");
+  }
+}
+
+migrateSchema();
 
 export function hashPassword(password: string): string {
   return crypto.createHash('sha256').update(password).digest('hex');
@@ -246,6 +266,8 @@ export function updateUser(id: string, updates: Partial<any>) {
   if (updates.dodo_customer_id !== undefined) { fields.push('dodo_customer_id = ?'); values.push(updates.dodo_customer_id); }
   if (updates.registration_ip !== undefined) { fields.push('registration_ip = ?'); values.push(updates.registration_ip); }
   if (updates.registration_user_agent !== undefined) { fields.push('registration_user_agent = ?'); values.push(updates.registration_user_agent); }
+  if (updates.suspended !== undefined) { fields.push('suspended = ?'); values.push(updates.suspended ? 1 : 0); }
+  if (updates.suspension_reason !== undefined) { fields.push('suspension_reason = ?'); values.push(updates.suspension_reason); }
   if (!fields.length) return null;
   values.push(id);
   db.prepare(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`).run(...values);
@@ -262,13 +284,13 @@ export function provisionInstancesForUser(userId: string, plan: string): any[] {
   const spec = PLAN_SPECS[plan] || PLAN_SPECS['Professional'];
   const now = new Date().toISOString();
   const instances: any[] = [];
-  const insertInstance = db.prepare(`INSERT INTO instances (id, name, platform, ram, storage, status, cpu, memory, network_in, network_out, created_at, updated_at, tags, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+  const insertInstance = db.prepare(`INSERT INTO instances (id, user_id, name, platform, ram, storage, status, cpu, memory, network_in, network_out, created_at, updated_at, tags, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
   const insertAuditLog = db.prepare(`INSERT INTO audit_logs (id, timestamp, event, severity, instance_id, user_id, details, action) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`);
 
   for (let i = 0; i < spec.instances; i++) {
     const id = `inst_${Date.now()}_${i}`;
     const instance = {
-      id, name: `${plan}-Instance-${i + 1}`, platform: spec.platform, ram: spec.ram, storage: spec.storage,
+      id, user_id: userId, name: `${plan}-Instance-${i + 1}`, platform: spec.platform, ram: spec.ram, storage: spec.storage,
       status: 'running', cpu: Math.floor(Math.random() * 30) + 5, memory: Math.floor(Math.random() * 40) + 20,
       network_in: Math.floor(Math.random() * 100) + 10, network_out: Math.floor(Math.random() * 100) + 10,
       created_at: now, updated_at: now, tags: JSON.stringify([plan.toLowerCase(), 'provisioned']), notes: `Auto-provisioned for ${plan} plan`
@@ -372,8 +394,8 @@ export function getInstanceById(id: string) {
 export function createInstance(data: Omit<any, 'id' | 'created_at' | 'updated_at'>) {
   const now = new Date().toISOString();
   const id = `inst_${String(Date.now()).slice(-3)}`;
-  db.prepare(`INSERT INTO instances (id, name, platform, ram, storage, status, cpu, memory, network_in, network_out, created_at, updated_at, tags, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-    id, data.name, data.platform, data.ram, data.storage, data.status, data.cpu || 0, data.memory || 0, data.network_in || 0, data.network_out || 0, now, now, JSON.stringify(data.tags || []), data.notes || ''
+  db.prepare(`INSERT INTO instances (id, user_id, name, platform, ram, storage, status, cpu, memory, network_in, network_out, created_at, updated_at, tags, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    id, data.user_id || '', data.name, data.platform, data.ram, data.storage, data.status, data.cpu || 0, data.memory || 0, data.network_in || 0, data.network_out || 0, now, now, JSON.stringify(data.tags || []), data.notes || ''
   );
   return getInstanceById(id);
 }
@@ -392,6 +414,7 @@ export function updateInstance(id: string, updates: Partial<any>) {
   if (updates.network_out !== undefined) { fields.push('network_out = ?'); values.push(updates.network_out); }
   if (updates.tags !== undefined) { fields.push('tags = ?'); values.push(JSON.stringify(updates.tags)); }
   if (updates.notes !== undefined) { fields.push('notes = ?'); values.push(updates.notes); }
+  if (updates.user_id !== undefined) { fields.push('user_id = ?'); values.push(updates.user_id); }
   values.push(id);
   db.prepare(`UPDATE instances SET ${fields.join(', ')} WHERE id = ?`).run(...values);
   return getInstanceById(id);
@@ -510,6 +533,18 @@ export function getSessionsByUserId(userId: string) {
   return db.prepare('SELECT * FROM sessions WHERE user_id = ? ORDER BY created_at DESC').all(userId) as any[];
 }
 
+export function getInstancesByUserId(userId: string) {
+  return db.prepare('SELECT * FROM instances WHERE user_id = ? ORDER BY created_at DESC').all(userId) as any[];
+}
+
+export function getSubscriptionsByUserId(userId: string) {
+  return db.prepare('SELECT * FROM subscriptions WHERE user_id = ? ORDER BY created_at DESC').all(userId) as any[];
+}
+
+export function getInvoicesByUserId(userId: string) {
+  return db.prepare('SELECT * FROM invoices WHERE user_id = ? ORDER BY created_at DESC').all(userId) as any[];
+}
+
 export function getSessionById(id: string) {
   return db.prepare('SELECT * FROM sessions WHERE id = ?').get(id) as any || null;
 }
@@ -547,6 +582,7 @@ export function saveToDisk() {
 
 export interface Instance {
   id: string;
+  user_id: string;
   name: string;
   platform: string;
   ram: number;
@@ -600,6 +636,8 @@ export interface User {
   dodo_customer_id: string | null;
   registration_ip: string | null;
   registration_user_agent: string | null;
+  suspended: boolean;
+  suspension_reason: string | null;
 }
 
 export interface Subscription {

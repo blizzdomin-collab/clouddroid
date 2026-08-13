@@ -174,6 +174,8 @@ Showcasing a robust backend builds trust.
 | Billing Page | `src/pages/dashboard/billing.astro` | ✅ Done |
 | Billing API | `src/pages/api/billing/subscription.ts` | ✅ Done |
 | User Management Page | `src/pages/dashboard/users.astro` | ✅ Done |
+| Admin Dashboard | `src/pages/dashboard/admin.astro` | ✅ Done |
+| Admin Stats API | `src/pages/api/admin/stats.ts` | ✅ Done |
 | User Management API | `src/pages/api/admin/users.ts` | ✅ Done |
 | Metrics History API | `src/pages/api/monitoring/metrics.ts` | ✅ Done |
 | 2FA/MFA Support | `src/lib/twofactor.ts`, `/api/auth/2fa/*` | ✅ Done |
@@ -260,6 +262,8 @@ Showcasing a robust backend builds trust.
 - [x] Security headers middleware (HSTS, nosniff, frame-options, XSS-protection, permissions-policy)
 - [x] Billing/subscription management page with Dodo customer portal
 - [x] Admin user management page with add/delete functionality
+- [x] Admin dashboard with overview cards and Chart.js graphs
+- [x] Admin stats API (`/api/admin/stats`) for user growth and revenue
 - [x] Instance metrics history chart on monitoring page
 - [x] Dashboard sidebar includes Billing and Users links (Users admin-only)
 - [x] Forgot-password reset flow with token-based password reset
@@ -296,6 +300,7 @@ Showcasing a robust backend builds trust.
 - [x] WebSocket server for real-time metrics and alerts
 - [x] Nginx proxy for WebSocket `/ws` endpoint
 - [x] PM2 process for WebSocket server
+- [x] Admin dashboard with stats API and Chart.js graphs
 
 ### Next Steps
 
