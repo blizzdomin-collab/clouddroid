@@ -47,15 +47,13 @@ const legalLinks = [
         </ul>
       </div>
       <div>
-        <h3 class="text-white font-semibold mb-4">Legal</h3>
+        <h3 class="text-white font-semibold mb-4">Company</h3>
         <ul class="space-y-2 text-sm">
-          {legalLinks.map((link) => (
-            <li>
-              <a href={link.href} class="hover:text-white transition-colors">
-                {link.label}
-              </a>
-            </li>
-          ))}
+          <li><a href="/about" class="hover:text-white transition-colors">About</a></li>
+          <li><a href="/legal/terms" class="hover:text-white transition-colors">Terms of Service</a></li>
+          <li><a href="/legal/privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
+          <li><a href="/legal/aup" class="hover:text-white transition-colors">Acceptable Use Policy</a></li>
+          <li><a href="/legal/refund" class="hover:text-white transition-colors">Refund Policy</a></li>
         </ul>
       </div>
     </div>
