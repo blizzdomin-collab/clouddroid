@@ -26,7 +26,16 @@ jobs:
             git reset --hard origin/main
 
             echo "[2] Installing dependencies..."
-            npm ci --production=false
+            npm install --production=false
+
+            echo "[2b] Ensuring Redis is available..."
+            if ! command -v redis-server >/dev/null 2>&1; then
+              echo "Installing Redis..."
+              sudo apt-get update
+              sudo apt-get install -y redis-server
+            fi
+            sudo systemctl enable redis-server || true
+            sudo systemctl restart redis-server || true
 
             echo "[3] Building..."
             npm run build
