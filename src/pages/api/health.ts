@@ -8,12 +8,22 @@ const handler: APIRoute = async () => {
     const userCount = db.users?.length || 0;
     const instanceCount = db.instances?.length || 0;
 
+    let redisStatus: string;
+    try {
+      const redis = (await import('../../lib/redis')).redis;
+      await redis.ping();
+      redisStatus = 'ok';
+    } catch {
+      redisStatus = 'unavailable';
+    }
+
     return jsonResponse({
       status: 'healthy',
       timestamp: new Date().toISOString(),
       version: '0.0.1',
       checks: {
         database: 'ok',
+        redis: redisStatus,
         users: userCount,
         instances: instanceCount,
       },
@@ -22,7 +32,7 @@ const handler: APIRoute = async () => {
     return jsonResponse({
       status: 'unhealthy',
       timestamp: new Date().toISOString(),
-      error: 'Database check failed',
+      error: 'Health check failed',
     }, 503);
   }
 };
