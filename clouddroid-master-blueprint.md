@@ -194,6 +194,10 @@ Showcasing a robust backend builds trust.
 | Instance Detail API | `src/pages/api/instances/[id].ts` | ✅ Done |
 | Dark Mode Toggle | Settings → Appearance | ✅ Done |
 | CSS Variables for Dark Mode | `src/styles/global.css` | ✅ Done |
+| Redis Caching | `src/lib/redis.ts` | ✅ Done |
+| WebSocket Server | `server/websocket.mjs` | ✅ Done |
+| Real-time Metrics | WebSocket `/ws` + Redis pub/sub | ✅ Done |
+| Real-time Alerts | WebSocket `/ws` + Redis pub/sub | ✅ Done |
 
 ### Compliance Checklist
 
@@ -288,6 +292,10 @@ Showcasing a robust backend builds trust.
 - [x] Instance detail page with metrics chart and action buttons
 - [x] Dark mode toggle in settings with localStorage persistence
 - [x] CSS variables for light/dark theme support
+- [x] Redis caching for monitoring and alerts APIs
+- [x] WebSocket server for real-time metrics and alerts
+- [x] Nginx proxy for WebSocket `/ws` endpoint
+- [x] PM2 process for WebSocket server
 
 ### Next Steps
 
@@ -335,3 +343,5 @@ Showcasing a robust backend builds trust.
 42. ~~Add session management with active sessions UI~~ ✅ Completed
 43. ~~Add instance detail page with metrics and actions~~ ✅ Completed
 44. ~~Add dark mode toggle with localStorage persistence~~ ✅ Completed
+45. ~~Add Redis caching for frequent queries~~ ✅ Completed
+46. ~~Add WebSocket server for real-time updates~~ ✅ Completed

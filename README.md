@@ -7,6 +7,7 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 - **Framework:** Astro 7.2 with Node.js adapter
 - **Styling:** Tailwind CSS v4
 - **Database:** SQLite via `better-sqlite3` (`.data/clouddroid.db`)
+- **Cache/Realtime:** Redis (`ioredis`) + WebSocket server (`ws`)
 - **Payments:** Dodo Payments integration
 - **Deployment:** PM2 + Nginx + Let's Encrypt SSL
 - **Auto-deploy:** GitHub Actions on push to `main`
@@ -64,7 +65,9 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 │   │   ├── Pricing.astro
 │   │   └── ProductShowcase.astro
 │   ├── lib/
-│   │   ├── database.ts           # JSON-file DB with CRUD
+│   │   ├── database.ts           # SQLite DB with CRUD
+│   │   ├── database-sqlite.ts    # SQLite implementation
+│   │   ├── redis.ts              # Redis client + cache helpers
 │   │   ├── validation.ts         # Zod schemas
 │   │   ├── logger.ts             # Structured logging
 │   │   ├── apiMiddleware.ts      # Request logging wrapper
@@ -74,6 +77,8 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 │   │   └── api.ts                # CORS + JSON helpers
 │   └── styles/
 │       └── global.css            # Tailwind v4 theme
+├── server/
+│   └── websocket.mjs             # WebSocket server for real-time updates
 ├── deploy/
 │   ├── ecosystem.config.cjs      # PM2 production config
 │   ├── nginx.conf                # Nginx reverse proxy template
@@ -106,14 +111,17 @@ DODO_PAYMENTS_API_KEY=your-api-key
 DODO_PAYMENTS_WEBHOOK_KEY=your-webhook-secret
 DODO_PAYMENTS_ENVIRONMENT=live_mode
 DODO_PAYMENTS_RETURN_URL=https://clouddroid.eu/checkout/success
+REDIS_URL=redis://localhost:6379
+WS_PORT=4322
 ```
 
 ## 🚢 Deployment
 
 Production runs on VPS with:
 - Node.js 22+
-- PM2 process manager
-- Nginx reverse proxy
+- PM2 process manager (2 processes: app + WebSocket server)
+- Nginx reverse proxy with WebSocket proxy
+- Redis for caching and pub/sub
 - Let's Encrypt SSL (`clouddroid.eu`)
 
 Auto-deploy via GitHub Actions on push to `main`.
