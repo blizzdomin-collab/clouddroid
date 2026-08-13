@@ -35,17 +35,16 @@ export const POST: APIRoute = async ({ request }) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        customer: {
-          email: customerEmail,
-        },
-        items: [
+        product_cart: [
           {
-            product: plan.productId,
+            product_id: plan.productId,
             quantity: 1,
           },
         ],
-        success_url: `${import.meta.env.DODO_PAYMENTS_RETURN_URL}?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${new URL(request.headers.get('origin') || 'http://localhost:4321').origin}/checkout/cancel`,
+        customer: {
+          email: customerEmail,
+        },
+        return_url: import.meta.env.DODO_PAYMENTS_RETURN_URL,
       }),
     });
 
@@ -69,7 +68,7 @@ export const POST: APIRoute = async ({ request }) => {
       temp_password: tempPassword,
     });
 
-    return new Response(JSON.stringify({ url: session.url, sessionId: session.id }), {
+    return new Response(JSON.stringify({ checkout_url: session.url, sessionId: session.id }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
