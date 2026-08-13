@@ -15,7 +15,7 @@ git fetch origin
 git reset --hard "origin/$BRANCH"
 
 echo "[2/5] Installing dependencies..."
-npm ci --production=false
+npm install --production=false
 
 echo "[3/5] Building..."
 npm run build
