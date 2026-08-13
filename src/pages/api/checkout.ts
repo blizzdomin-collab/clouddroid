@@ -28,7 +28,10 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const response = await fetch('https://api.dodopayments.com/v1/checkout-sessions', {
+    const environment = import.meta.env.DODO_PAYMENTS_ENVIRONMENT || 'live_mode';
+    const baseUrl = environment === 'test_mode' ? 'https://test.dodopayments.com' : 'https://live.dodopayments.com';
+
+    const response = await fetch(`${baseUrl}/v1/checkout-sessions`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${dodoApiKey}`,

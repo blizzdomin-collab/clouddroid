@@ -35,8 +35,11 @@ export const GET: APIRoute = async ({ cookies, url }) => {
       });
     }
 
+    const environment = import.meta.env.DODO_PAYMENTS_ENVIRONMENT || 'live_mode';
+    const baseUrl = environment === 'test_mode' ? 'https://test.dodopayments.com' : 'https://live.dodopayments.com';
+
     const response = await fetch(
-      `https://api.dodopayments.com/v1/customers/${encodeURIComponent(user.dodo_customer_id)}/portal`,
+      `${baseUrl}/v1/customers/${encodeURIComponent(user.dodo_customer_id)}/portal`,
       {
         method: 'POST',
         headers: {
