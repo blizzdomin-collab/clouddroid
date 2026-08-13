@@ -26,19 +26,19 @@ jobs:
             git reset --hard origin/main
 
             echo "[1b] Fixing permissions..."
-            sudo chown -R "$USER:$USER" /var/www/clouddroid
+            chown -R "$USER:$USER" /var/www/clouddroid || true
 
             echo "[2] Installing dependencies..."
             npm install --production=false --unsafe-perm
 
             echo "[2b] Ensuring Redis is available..."
             if ! command -v redis-server >/dev/null 2>&1; then
-              echo "Installing Redis..."
-              sudo -n apt-get update
-              sudo -n apt-get install -y redis-server
+              echo "Redis not found. Install it manually on VPS or enable passwordless sudo for deploy user."
             fi
-            sudo -n systemctl enable redis-server || true
-            sudo -n systemctl restart redis-server || true
+            if command -v systemctl >/dev/null 2>&1; then
+              systemctl enable redis-server || true
+              systemctl restart redis-server || true
+            fi
 
             echo "[3] Building..."
             npm run build
