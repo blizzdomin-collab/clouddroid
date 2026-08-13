@@ -17,6 +17,25 @@ module.exports = {
       out_file: '/var/log/pm2/clouddroid-out.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       merge_logs: true
+    },
+    {
+      name: 'clouddroid-ws',
+      script: './server/websocket.mjs',
+      cwd: '/var/www/clouddroid',
+      instances: 1,
+      exec_mode: 'cluster',
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '256M',
+      env: {
+        NODE_ENV: 'production',
+        WS_PORT: 4322,
+        REDIS_URL: 'redis://localhost:6379'
+      },
+      error_file: '/var/log/pm2/clouddroid-ws-error.log',
+      out_file: '/var/log/pm2/clouddroid-ws-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true
     }
   ]
 };

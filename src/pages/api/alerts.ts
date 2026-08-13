@@ -1,8 +1,14 @@
 import type { APIRoute } from 'astro';
 import { getAlerts, acknowledgeAlert } from '../../lib/database.ts';
+import { getCached, invalidateCache } from '../../lib/redis.ts';
 
 export const GET: APIRoute = async ({ url }) => {
-  const alerts = getAlerts();
+  const alerts = await getCached(
+    'alerts:all',
+    async () => getAlerts(),
+    30
+  );
+
   const limit = Number(url.searchParams.get('limit') || 10);
   const offset = Number(url.searchParams.get('offset') || 0);
   const severity = url.searchParams.get('severity') || '';
@@ -76,6 +82,8 @@ export const POST: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       });
     }
+
+    await invalidateCache('alerts:*');
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

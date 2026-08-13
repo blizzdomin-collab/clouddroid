@@ -28,6 +28,7 @@ export {
   createAuditLog,
   getAlerts,
   acknowledgeAlert,
+  createAlert,
   saveToDisk,
   createCheckoutSession,
   getCheckoutSessionBySessionId,

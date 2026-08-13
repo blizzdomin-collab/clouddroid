@@ -424,6 +424,15 @@ export function acknowledgeAlert(alertId: string) {
   return result.changes > 0;
 }
 
+export function createAlert(data: Omit<any, 'id' | 'timestamp'>) {
+  const now = new Date().toISOString();
+  const id = `alert_${String(Date.now()).slice(-3)}`;
+  db.prepare(`INSERT INTO alerts (id, timestamp, type, severity, title, message, instance_id, acknowledged) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    id, now, data.type, data.severity, data.title, data.message, data.instance_id || null, data.acknowledged || 0
+  );
+  return db.prepare('SELECT * FROM alerts WHERE id = ?').get(id) as any;
+}
+
 export function createCheckoutSession(data: Omit<any, 'id' | 'created_at'>) {
   const now = new Date().toISOString();
   const id = `cs_${String(Date.now()).slice(-3)}`;

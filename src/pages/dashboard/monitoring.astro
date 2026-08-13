@@ -118,9 +118,6 @@ const serializedMetrics = JSON.stringify(Array.from(metricsMap.entries()));
   </div>
 
   <script>
-    window.__instanceMetrics__ = {serializedMetrics};
-  </script>
-  <script>
     const refreshBtn = document.getElementById('refresh-btn');
     const lastUpdated = document.getElementById('last-updated');
 
@@ -138,9 +135,6 @@ const serializedMetrics = JSON.stringify(Array.from(metricsMap.entries()));
     setInterval(() => {
       fetch('/api/monitoring/collect', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).catch(() => {});
     }, 30000);
-    setInterval(() => {
-      window.location.reload();
-    }, 30000);
 
     const serverMetrics = {
       'inst_001': { labels: [], cpu: [], memory: [] },
@@ -157,12 +151,14 @@ const serializedMetrics = JSON.stringify(Array.from(metricsMap.entries()));
       };
     });
 
+    const charts: Record<string, any> = {};
+
     Object.keys(serverMetrics).forEach((instanceId) => {
       const data = serverMetrics[instanceId];
       const ctx = document.getElementById(`chart-${instanceId}`) as HTMLCanvasElement | null;
       if (!ctx) return;
 
-      new Chart(ctx, {
+      charts[instanceId] = new Chart(ctx, {
         type: 'line',
         data: {
           labels: data.labels,
@@ -202,6 +198,45 @@ const serializedMetrics = JSON.stringify(Array.from(metricsMap.entries()));
         },
       });
     });
+
+    let ws: WebSocket | null = null;
+    function connectWebSocket() {
+      const wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`;
+      ws = new WebSocket(wsUrl);
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'metrics' && data.data) {
+          const instanceId = data.data.instance_id;
+          const chart = charts[instanceId];
+          if (chart) {
+            const label = new Date(data.data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            chart.data.labels.push(label);
+            chart.data.datasets[0].data.push(data.data.cpu);
+            chart.data.datasets[1].data.push(data.data.memory);
+
+            if (chart.data.labels.length > 20) {
+              chart.data.labels.shift();
+              chart.data.datasets[0].data.shift();
+              chart.data.datasets[1].data.shift();
+            }
+
+            chart.update('none');
+            updateTimestamp();
+          }
+        }
+      };
+
+      ws.onclose = () => {
+        setTimeout(connectWebSocket, 3000);
+      };
+
+      ws.onerror = () => {
+        ws?.close();
+      };
+    }
+
+    connectWebSocket();
   </script>
 </DashboardLayout>
 
