@@ -1,0 +1,72 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Service Level Agreement - CloudDroid" description="CloudDroid Service Level Agreement for Professional and Enterprise plans.">
+  <div class="bg-slate-light py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold text-navy mb-4">Service Level Agreement</h1>
+      <p class="text-slate text-lg">Commitments for Professional and Enterprise subscriptions.</p>
+    </div>
+  </div>
+  <div class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">1. Uptime Commitment</h2>
+        <p class="text-slate mb-4">CloudDroid commits to the following monthly uptime percentages for paid subscription tiers:</p>
+        <div class="overflow-x-auto">
+          <table class="min-w-full border border-slate-200 rounded-xl overflow-hidden">
+            <thead class="bg-slate-50">
+              <tr>
+                <th class="text-left text-sm font-semibold text-navy px-4 py-3 border-b border-slate-200">Plan</th>
+                <th class="text-left text-sm font-semibold text-navy px-4 py-3 border-b border-slate-200">Uptime SLA</th>
+                <th class="text-left text-sm font-semibold text-navy px-4 py-3 border-b border-slate-200">Service Credit</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+              <tr>
+                <td class="px-4 py-3 text-sm text-slate">Developer</td>
+                <td class="px-4 py-3 text-sm text-slate">Best effort</td>
+                <td class="px-4 py-3 text-sm text-slate">Not applicable</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-3 text-sm text-slate">Professional</td>
+                <td class="px-4 py-3 text-sm text-slate">99.5%</td>
+                <td class="px-4 py-3 text-sm text-slate">10% of monthly fee per 0.5% below SLA</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-3 text-sm text-slate">Enterprise</td>
+                <td class="px-4 py-3 text-sm text-slate">99.9%</td>
+                <td class="px-4 py-3 text-sm text-slate">25% of monthly fee per 0.1% below SLA</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">2. Definitions</h2>
+        <ul class="list-disc pl-6 text-slate space-y-2">
+          <li><strong>Uptime</strong> is measured as the percentage of minutes in a calendar month during which the dashboard and API are reachable and respond successfully to health checks.</li>
+          <li><strong>Scheduled Maintenance</strong> is excluded from uptime calculations if announced at least 48 hours in advance via the status page or direct notification.</li>
+          <li><strong>Service Credit</strong> is applied as a credit to future invoices and does not constitute a refund.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">3. Claim Process</h2>
+        <p class="text-slate mb-4">To request a service credit, contact support@clouddroid.eu within 30 days of the incident. Include the affected period, impact description, and any relevant logs or screenshots. Credits are issued within one billing cycle after validation.</p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">4. Limitations</h2>
+        <p class="text-slate mb-4">This SLA does not apply to downtime caused by factors outside CloudDroid's reasonable control, including but not limited to: force majeure, third-party service failures, actions of the customer or its users, or misconfiguration by the customer.</p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">5. Contact</h2>
+        <p class="text-slate">For SLA-related questions, contact <a href="mailto:support@clouddroid.eu" class="text-navy underline">support@clouddroid.eu</a>.</p>
+      </section>
+    </div>
+  </div>
+</Layout>

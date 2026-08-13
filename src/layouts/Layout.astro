@@ -41,5 +41,40 @@ const {
       <slot />
     </main>
     <Footer />
+
+    <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 bg-navy text-white p-4 shadow-lg transform translate-y-full transition-transform duration-300 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-sm text-slate-300">
+          This site uses essential cookies to operate. We do not use tracking cookies for advertising without your consent.
+          <a href="/legal/privacy" class="underline text-white">Learn more</a>
+        </p>
+        <button id="cookie-accept" class="bg-white text-navy px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-100 transition-colors whitespace-nowrap">
+          Accept
+        </button>
+      </div>
+    </div>
+
+    <script>
+      (function() {
+        const banner = document.getElementById('cookie-banner');
+        const acceptBtn = document.getElementById('cookie-accept');
+        if (!banner || !acceptBtn) return;
+
+        if (localStorage.getItem('cookie-consent') === 'accepted') {
+          banner.remove();
+          return;
+        }
+
+        requestAnimationFrame(() => {
+          banner.classList.remove('translate-y-full');
+        });
+
+        acceptBtn.addEventListener('click', () => {
+          localStorage.setItem('cookie-consent', 'accepted');
+          banner.classList.add('translate-y-full');
+          setTimeout(() => banner.remove(), 300);
+        });
+      })();
+    </script>
   </body>
 </html>

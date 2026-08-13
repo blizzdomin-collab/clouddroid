@@ -2,32 +2,48 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Security - CloudDroid" description="CloudDroid security practices: encryption, audit logging, access controls, and compliance measures.">
+<Layout title="Security Whitepaper - CloudDroid" description="CloudDroid security architecture, controls, and operational practices.">
   <div class="bg-slate-light py-16">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 class="text-4xl font-bold text-navy mb-4">Security</h1>
-      <p class="text-slate text-lg">How CloudDroid protects your data, instances, and accounts.</p>
+      <h1 class="text-4xl font-bold text-navy mb-4">Security Whitepaper</h1>
+      <p class="text-slate text-lg">Architecture, controls, and operational practices for CloudDroid.</p>
     </div>
   </div>
   <div class="py-16 bg-white">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
       <section>
-        <h2 class="text-2xl font-bold text-navy mb-4">Encryption</h2>
+        <h2 class="text-2xl font-bold text-navy mb-4">Overview</h2>
+        <p class="text-slate mb-4">CloudDroid is designed with a security-first architecture. This document describes the technical and organizational measures implemented to protect customer data, ensure service integrity, and support compliance requirements.</p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">1. Encryption</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
             <h3 class="font-semibold text-navy mb-1">In Transit</h3>
-            <p class="text-sm text-slate">All web traffic is encrypted with TLS 1.3. API and dashboard connections require HTTPS.</p>
+            <p class="text-sm text-slate">All web traffic is encrypted with TLS 1.3. API and dashboard connections require HTTPS. HSTS is enforced with a long max-age.</p>
           </div>
           <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
             <h3 class="font-semibold text-navy mb-1">At Rest</h3>
-            <p class="text-sm text-slate">Database files and stored data are protected with AES-256-grade storage controls on the host layer.</p>
+            <p class="text-sm text-slate">Database files and stored data are protected with AES-256-grade storage controls on the host layer. Sensitive credentials are hashed with SHA-256 before storage.</p>
           </div>
         </div>
       </section>
 
       <section>
-        <h2 class="text-2xl font-bold text-navy mb-4">Audit Logging</h2>
-        <p class="text-slate mb-4">CloudDroid maintains structured audit logs for security-relevant events. Logged events include authentication, instance actions, administrative changes, and policy-relevant system events.</p>
+        <h2 class="text-2xl font-bold text-navy mb-4">2. Authentication & Access</h2>
+        <ul class="list-disc pl-6 text-slate space-y-2">
+          <li>Session-based authentication with HTTP-only cookies</li>
+          <li>Optional TOTP-based two-factor authentication</li>
+          <li>Active session inventory with remote revocation</li>
+          <li>Role-based access controls for administrative functions</li>
+          <li>Rate limiting on authentication endpoints</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">3. Audit Logging</h2>
+        <p class="text-slate mb-4">Structured audit logs are maintained for security-relevant events. Logged events include authentication, instance actions, administrative changes, and policy-relevant system events. Logs are reviewable in the dashboard and exportable as CSV.</p>
         <ul class="list-disc pl-6 text-slate space-y-2">
           <li>Login, logout, and failed authentication attempts</li>
           <li>Instance start, stop, restart, and deletion</li>
@@ -38,41 +54,38 @@ import Layout from '../layouts/Layout.astro';
       </section>
 
       <section>
-        <h2 class="text-2xl font-bold text-navy mb-4">Access Controls</h2>
-        <p class="text-slate mb-4">Access to production systems and customer data is restricted. Authentication uses session-based access with HTTP-only cookies, optional TOTP-based two-factor authentication, and active session management.</p>
-        <ul class="list-disc pl-6 text-slate space-y-2">
-          <li>Role-based access for administrative functions</li>
-          <li>Session inventory and remote revocation</li>
-          <li>Rate limiting on sensitive endpoints</li>
-          <li>Request size limits and input validation</li>
-        </ul>
+        <h2 class="text-2xl font-bold text-navy mb-4">4. Input Validation & Rate Limiting</h2>
+        <p class="text-slate mb-4">All API inputs are validated using Zod schemas. Rate limiting is applied to sensitive endpoints such as registration and password reset. Request size limits prevent abuse.</p>
       </section>
 
       <section>
-        <h2 class="text-2xl font-bold text-navy mb-4">Operational Practices</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
-            <h3 class="font-semibold text-navy mb-1">Monitoring</h3>
-            <p class="text-sm text-slate">Instance metrics, alerting, and anomaly detection are available in the dashboard.</p>
-          </div>
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
-            <h3 class="font-semibold text-navy mb-1">Incident Response</h3>
-            <p class="text-sm text-slate">Security events are logged and reviewable. Customers can report issues to support@clouddroid.eu.</p>
-          </div>
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
-            <h3 class="font-semibold text-navy mb-1">Data Handling</h3>
-            <p class="text-sm text-slate">Payment data is handled by Dodo Payments. CloudDroid does not store raw card data.</p>
-          </div>
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
-            <h3 class="font-semibold text-navy mb-1">Dependencies</h3>
-            <p class="text-sm text-slate">Runtime dependencies are reviewed and kept minimal. Production builds exclude development tooling.</p>
-          </div>
-        </div>
+        <h2 class="text-2xl font-bold text-navy mb-4">5. Security Headers</h2>
+        <p class="text-slate mb-4">The application applies security headers including HSTS, X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, and a restrictive Content-Security-Policy.</p>
       </section>
 
       <section>
-        <h2 class="text-2xl font-bold text-navy mb-4">Reporting a Security Issue</h2>
-        <p class="text-slate">If you believe you have found a security vulnerability, please report it to <a href="mailto:support@clouddroid.eu" class="text-navy underline">support@clouddroid.eu</a>. We ask that responsible disclosure be followed.</p>
+        <h2 class="text-2xl font-bold text-navy mb-4">6. Monitoring & Alerting</h2>
+        <p class="text-slate mb-4">Instance metrics, alerting, and anomaly detection are available in the dashboard. Real-time alerts are delivered via WebSocket and SSE. Alert states can be acknowledged and tracked.</p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">7. Incident Response</h2>
+        <p class="text-slate mb-4">Security events are logged and reviewable. Customers can report issues to support@clouddroid.eu. Responsible disclosure is requested for vulnerability reports.</p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">8. Data Handling</h2>
+        <p class="text-slate mb-4">Payment data is handled by Dodo Payments. CloudDroid does not store raw card data. Personal data is retained for the duration of the subscription and as required by law. Deletion requests are processed within 30 days.</p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">9. Dependencies</h2>
+        <p class="text-slate mb-4">Runtime dependencies are reviewed and kept minimal. Production builds exclude development tooling. The application avoids unnecessary native dependencies where possible.</p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">10. Contact</h2>
+        <p class="text-slate">For security inquiries, contact <a href="mailto:support@clouddroid.eu" class="text-navy underline">support@clouddroid.eu</a>.</p>
       </section>
     </div>
   </div>
