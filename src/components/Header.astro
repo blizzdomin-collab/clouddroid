@@ -7,6 +7,15 @@ const navLinks = [
   { label: 'Security', href: '/security' },
   { label: 'Status', href: '/status' },
 ];
+
+const legalLinks = [
+  { label: 'Terms of Service', href: '/legal/terms' },
+  { label: 'Privacy Policy', href: '/legal/privacy' },
+  { label: 'Acceptable Use Policy', href: '/legal/aup' },
+  { label: 'Refund Policy', href: '/legal/refund' },
+  { label: 'Subprocessors', href: '/legal/subprocessors' },
+  { label: 'AML / CFT', href: '/legal/aml' },
+];
 ---
 
 <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
@@ -29,6 +38,26 @@ const navLinks = [
             {link.label}
           </a>
         ))}
+        <div class="relative group">
+          <button class="text-slate-600 hover:text-navy transition-colors font-medium text-sm flex items-center gap-1">
+            Legal
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div class="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl border border-slate-200 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+            <div class="py-2">
+              {legalLinks.map((link) => (
+                <a
+                  href={link.href}
+                  class="block px-4 py-2 text-sm text-slate-600 hover:text-navy hover:bg-slate-50 transition-colors"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
       </nav>
       <div class="flex items-center gap-4">
         <a
