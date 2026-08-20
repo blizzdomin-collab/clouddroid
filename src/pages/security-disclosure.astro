@@ -1,0 +1,113 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Security & Vulnerability Disclosure - CloudDroid" description="Security practices and responsible vulnerability disclosure policy for CloudDroid.">
+  <div class="bg-slate-light py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold text-navy mb-4">Security & Vulnerability Disclosure</h1>
+      <p class="text-slate text-lg">Our security practices and how to responsibly report vulnerabilities.</p>
+    </div>
+  </div>
+
+  <div class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">Security Practices</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">Encryption</h3>
+            <p class="text-sm text-slate">TLS 1.3 for all web traffic, AES-256 encryption for data at rest. All payment data is handled by PCI DSS compliant processors.</p>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">Access Controls</h3>
+            <p class="text-sm text-slate">Role-based access controls, least privilege principles, and regular access reviews for all systems.</p>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">Monitoring</h3>
+            <p class="text-sm text-slate">Continuous security monitoring, audit logging, and automated alerting for suspicious activities.</p>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">Infrastructure</h3>
+            <p class="text-sm text-slate">Containerized workloads, network segmentation, regular security patches, and automated backups.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">Responsible Disclosure</h2>
+        <p class="text-slate mb-4">We welcome security research and responsible disclosure of vulnerabilities. If you discover a security issue, please follow these guidelines:</p>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+          <div>
+            <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Do Not</div>
+            <ul class="list-disc pl-5 text-sm text-slate space-y-1">
+              <li>Exploit the vulnerability beyond what is necessary to demonstrate the issue</li>
+              <li>Access, modify, or delete data belonging to other users</li>
+              <li>Disrupt services or cause denial of service</li>
+              <li>Disclose the vulnerability publicly before we have addressed it</li>
+            </ul>
+          </div>
+          <div>
+            <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Do</div>
+            <ul class="list-disc pl-5 text-sm text-slate space-y-1">
+              <li>Report the vulnerability to us promptly</li>
+              <li>Provide detailed information including steps to reproduce</li>
+              <li>Allow us reasonable time to address the issue before disclosure</li>
+              <li>Act in good faith and avoid privacy violations</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">Reporting a Vulnerability</h2>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-6">
+          <p class="text-sm text-navy mb-4">To report a security vulnerability, please email us at:</p>
+          <p class="text-lg font-semibold text-navy mb-2">security@clouddroid.eu</p>
+          <p class="text-sm text-slate mb-4">Include the following information in your report:</p>
+          <ul class="list-disc pl-5 text-sm text-slate space-y-1">
+            <li>Description of the vulnerability</li>
+            <li>Steps to reproduce the issue</li>
+            <li>Potential impact of the vulnerability</li>
+            <li>Suggested fix or mitigation (if any)</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">Response Timeline</h2>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-6">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Acknowledgment</div>
+              <div class="text-2xl font-bold text-navy">48 hours</div>
+              <div class="text-xs text-slate">We will acknowledge receipt of your report</div>
+            </div>
+            <div>
+              <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Initial Assessment</div>
+              <div class="text-2xl font-bold text-navy">7 days</div>
+              <div class="text-xs text-slate">We will provide an initial assessment of the issue</div>
+            </div>
+            <div>
+              <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Resolution</div>
+              <div class="text-2xl font-bold text-navy">30 days</div>
+              <div class="text-xs text-slate">Target resolution for confirmed vulnerabilities</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">Bug Bounty</h2>
+        <p class="text-slate mb-4">We do not currently offer a paid bug bounty program. However, we greatly appreciate the efforts of security researchers who help us improve our security. We will acknowledge your contribution in our security hall of fame (with your permission).</p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">Safe Harbor</h2>
+        <p class="text-slate mb-4">We will not pursue legal action against security researchers who act in good faith and follow this responsible disclosure policy. This safe harbor applies to research conducted in accordance with this policy and applicable laws.</p>
+      </section>
+
+    </div>
+  </div>
+</Layout>

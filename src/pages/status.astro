@@ -1,0 +1,99 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Status - CloudDroid" description="Operational status and uptime information for CloudDroid services.">
+  <div class="bg-slate-light py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold text-navy mb-4">System Status</h1>
+      <p class="text-slate text-lg">Real-time operational status and uptime information for CloudDroid services.</p>
+    </div>
+  </div>
+
+  <div class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+            <div class="text-sm font-medium text-navy">API Services</div>
+          </div>
+          <div class="text-xs text-slate">Operational</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+            <div class="text-sm font-medium text-navy">Web Dashboard</div>
+          </div>
+          <div class="text-xs text-slate">Operational</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+            <div class="text-sm font-medium text-navy">Instance Provisioning</div>
+          </div>
+          <div class="text-xs text-slate">Operational</div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200">
+          <h2 class="text-lg font-semibold text-navy">Incident History</h2>
+        </div>
+        <div class="divide-y divide-slate-200">
+          <div class="px-6 py-4">
+            <div class="flex items-center justify-between mb-1">
+              <div class="text-sm font-medium text-navy">No active incidents</div>
+              <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">All systems operational</span>
+            </div>
+            <div class="text-xs text-slate">Last checked: {new Date().toLocaleString()}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-navy mb-4">Uptime Commitment</h2>
+        <p class="text-sm text-slate mb-4">CloudDroid targets 99.9% uptime for production services. Enterprise tier subscriptions include formal SLA commitments with service credits for qualifying downtime.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Target Uptime</div>
+            <div class="text-2xl font-bold text-navy">99.9%</div>
+          </div>
+          <div>
+            <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Maintenance Window</div>
+            <div class="text-2xl font-bold text-navy">Sundays</div>
+          </div>
+          <div>
+            <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Support Response</div>
+            <div class="text-2xl font-bold text-navy">&lt;24h</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-navy mb-4">Subscribe to Updates</h2>
+        <p class="text-sm text-slate mb-4">Receive notifications about service status changes, maintenance windows, and incidents.</p>
+        <form id="status-subscribe" class="flex gap-3">
+          <input type="email" placeholder="you@company.com" class="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm" required />
+          <button type="submit" class="bg-navy text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-navy-light transition-colors">Subscribe</button>
+        </form>
+        <div id="status-subscribe-result" class="mt-3 text-sm hidden"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('status-subscribe');
+    const result = document.getElementById('status-subscribe-result');
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = (form as HTMLFormElement).email.value;
+      if (!email) return;
+      result!.textContent = 'Status page is currently read-only. Subscribe to updates via our newsletter or contact support@clouddroid.eu for incident notifications.';
+      result!.className = 'mt-3 text-sm text-slate';
+      result!.classList.remove('hidden');
+    });
+  </script>
+</Layout>

@@ -1,0 +1,106 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Subprocessors - CloudDroid" description="List of third-party subprocessors used by CloudDroid for service delivery, payment processing, and infrastructure.">
+  <div class="bg-slate-light py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold text-navy mb-4">Subprocessors</h1>
+      <p class="text-slate text-lg">Third-party service providers that process data on our behalf.</p>
+    </div>
+  </div>
+
+  <div class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">Overview</h2>
+        <p class="text-slate mb-4">CloudDroid uses carefully selected third-party service providers to deliver our services. These subprocessors have access to certain personal data only to the extent necessary to provide their services to us. We ensure all subprocessors meet appropriate data protection and security standards.</p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-6">Current Subprocessors</h2>
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-slate-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Service Provider</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Purpose</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Data Categories</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Location</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+              <tr>
+                <td class="px-6 py-4 text-sm font-medium text-navy">Dodo Payments</td>
+                <td class="px-6 py-4 text-sm text-slate">Payment processing, subscription management, customer portal</td>
+                <td class="px-6 py-4 text-sm text-slate">Payment data, email, customer ID</td>
+                <td class="px-6 py-4 text-sm text-slate">EU / Global</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 text-sm font-medium text-navy">Mollie</td>
+                <td class="px-6 py-4 text-sm text-slate">Payment processing (EU market), iDEAL, Bancontact</td>
+                <td class="px-6 py-4 text-sm text-slate">Payment data, email, customer ID</td>
+                <td class="px-6 py-4 text-sm text-slate">EU / Netherlands</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 text-sm font-medium text-navy">Cloud Infrastructure Provider</td>
+                <td class="px-6 py-4 text-sm text-slate">Hosting, compute, storage, networking</td>
+                <td class="px-6 py-4 text-sm text-slate">All service data, logs, backups</td>
+                <td class="px-6 py-4 text-sm text-slate">EU / Global</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 text-sm font-medium text-navy">Redis</td>
+                <td class="px-6 py-4 text-sm text-slate">Session storage, rate limiting, caching</td>
+                <td class="px-6 py-4 text-sm text-slate">Session tokens, rate limit counters</td>
+                <td class="px-6 py-4 text-sm text-slate">On-premises</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 text-sm font-medium text-navy">Let's Encrypt</td>
+                <td class="px-6 py-4 text-sm text-slate">SSL/TLS certificate issuance and validation</td>
+                <td class="px-6 py-4 text-sm text-slate">Domain names</td>
+                <td class="px-6 py-4 text-sm text-slate">Global</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">Data Processing Standards</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">Data Minimization</h3>
+            <p class="text-sm text-slate">We share only the data necessary for each subprocessor to perform their services. No excessive data is transferred.</p>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">Security Requirements</h3>
+            <p class="text-sm text-slate">All subprocessors must meet industry-standard security requirements including encryption, access controls, and regular security assessments.</p>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">Contractual Protections</h3>
+            <p class="text-sm text-slate">We maintain data processing agreements with all subprocessors that meet GDPR Article 28 requirements.</p>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">Audit Rights</h3>
+            <p class="text-sm text-slate">We reserve the right to audit subprocessors for compliance with data protection obligations.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">Subprocessor Changes</h2>
+        <p class="text-slate mb-4">We may update this list from time to time as our service needs evolve. We will notify customers of any material changes to our subprocessors via email or dashboard notification at least 30 days before the change takes effect.</p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">Contact</h2>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+          <p class="text-slate">For questions about our subprocessors or data processing practices, please contact us at:</p>
+          <p class="text-slate mt-2">CloudDroid<br>RUNESTONE HANDLUNG s.r.o.<br>Soukenická 877/9<br>Ostrava, 702 00<br>Czech Republic<br>IČO: 23389702<br><a href="mailto:support@clouddroid.eu" class="text-navy underline">support@clouddroid.eu</a></p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</Layout>
