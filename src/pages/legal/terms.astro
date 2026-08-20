@@ -6,65 +6,91 @@ import Layout from '../../layouts/Layout.astro';
   <div class="bg-slate-light py-16">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <h1 class="text-4xl font-bold text-navy mb-4">Terms of Service</h1>
-      <p class="text-slate">Last updated: August 2026</p>
+      <p class="text-slate text-lg">Terms governing your use of CloudDroid services.</p>
     </div>
   </div>
   <div class="py-16 bg-white">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-slate max-w-none">
-      <h2>1. Acceptance of Terms</h2>
-      <p>By accessing or using CloudDroid's services, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.</p>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">1. Acceptance of Terms</h2>
+        <p class="text-slate mb-4">By accessing or using CloudDroid's services, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.</p>
+      </section>
 
-      <h2>2. Description of Service</h2>
-      <p>CloudDroid provides enterprise-grade cloud Android workspaces for QA automation, app testing, and secure remote productivity. Services are provided on a subscription basis with various tiers as described on our Pricing page.</p>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">2. Description of Service</h2>
+        <p class="text-slate mb-4">CloudDroid provides enterprise-grade cloud Android workspaces for QA automation, app testing, and secure remote productivity. Services are provided on a subscription basis with various tiers as described on our Pricing page.</p>
+      </section>
 
-      <h2>3. Acceptable Use Policy</h2>
-      <p>You agree not to use CloudDroid services for any unlawful purpose or any purpose prohibited under this section. The following activities are strictly prohibited:</p>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">3. Acceptable Use Policy</h2>
+        <p class="text-slate mb-4">You agree not to use CloudDroid services for any unlawful purpose or any purpose prohibited under this section. The following activities are strictly prohibited:</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">3.1 Network Abuse</h3>
+            <ul class="list-disc pl-5 text-sm text-slate space-y-1">
+              <li>Distributed Denial of Service (DDoS) attacks</li>
+              <li>Port scanning or network reconnaissance</li>
+              <li>Spamming (email, SMS, or other messaging platforms)</li>
+              <li>Unauthorized access to systems or networks</li>
+            </ul>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">3.2 Resource Abuse</h3>
+            <ul class="list-disc pl-5 text-sm text-slate space-y-1">
+              <li>Cryptocurrency mining or blockchain-related computational activities</li>
+              <li>Continuous 100% CPU utilization scripts or processes</li>
+              <li>Any activity that materially degrades service performance for other users</li>
+              <li>Unauthorized sharing of resources with third parties</li>
+            </ul>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">3.3 Fraudulent Activity</h3>
+            <ul class="list-disc pl-5 text-sm text-slate space-y-1">
+              <li>Click-fraud or ad-abuse schemes</li>
+              <li>Card testing or payment fraud</li>
+              <li>Identity theft or impersonation</li>
+              <li>Any activity designed to manipulate or abuse our billing system</li>
+            </ul>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">3.4 Consequences of Violation</h3>
+            <p class="text-sm text-slate">Violation of this Acceptable Use Policy will result in immediate termination of your instance without a refund. CloudDroid reserves the right to report violations to law enforcement authorities.</p>
+          </div>
+        </div>
+      </section>
 
-      <h3>3.1 Network Abuse</h3>
-      <ul>
-        <li>Distributed Denial of Service (DDoS) attacks</li>
-        <li>Port scanning or network reconnaissance</li>
-        <li>Spamming (email, SMS, or other messaging platforms)</li>
-        <li>Unauthorized access to systems or networks</li>
-      </ul>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">4. User Responsibilities</h2>
+        <p class="text-slate mb-4">You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You must notify CloudDroid immediately of any unauthorized use of your account.</p>
+      </section>
 
-      <h3>3.2 Resource Abuse</h3>
-      <ul>
-        <li>Cryptocurrency mining or blockchain-related computational activities</li>
-        <li>Continuous 100% CPU utilization scripts or processes</li>
-        <li>Any activity that materially degrades service performance for other users</li>
-        <li>Unauthorized sharing of resources with third parties</li>
-      </ul>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">5. Payment Terms</h2>
+        <p class="text-slate mb-4">Subscription fees are billed monthly in advance. All fees are non-refundable except as expressly set forth in our Refund Policy. CloudDroid reserves the right to change pricing with 30 days' notice.</p>
+      </section>
 
-      <h3>3.3 Fraudulent Activity</h3>
-      <ul>
-        <li>Click-fraud or ad-abuse schemes</li>
-        <li>Card testing or payment fraud</li>
-        <li>Identity theft or impersonation</li>
-        <li>Any activity designed to manipulate or abuse our billing system</li>
-      </ul>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">6. Service Level Agreement</h2>
+        <p class="text-slate mb-4">Enterprise tier subscriptions include a 99.9% uptime SLA. Service credits are available for qualifying downtime as described in the SLA documentation.</p>
+      </section>
 
-      <h3>3.4 Consequences of Violation</h3>
-      <p>Violation of this Acceptable Use Policy will result in immediate termination of your instance without a refund. CloudDroid reserves the right to report violations to law enforcement authorities.</p>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">7. Limitation of Liability</h2>
+        <p class="text-slate mb-4">CloudDroid shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of profits, data, or goodwill.</p>
+      </section>
 
-      <h2>4. User Responsibilities</h2>
-      <p>You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You must notify CloudDroid immediately of any unauthorized use of your account.</p>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">8. Governing Law</h2>
+        <p class="text-slate mb-4">These terms shall be governed by and construed in accordance with the laws of Ireland, without regard to its conflict of law provisions.</p>
+      </section>
 
-      <h2>5. Payment Terms</h2>
-      <p>Subscription fees are billed monthly in advance. All fees are non-refundable except as expressly set forth in our Refund Policy. CloudDroid reserves the right to change pricing with 30 days' notice.</p>
-
-      <h2>6. Service Level Agreement</h2>
-      <p>Enterprise tier subscriptions include a 99.9% uptime SLA. Service credits are available for qualifying downtime as described in the SLA documentation.</p>
-
-      <h2>7. Limitation of Liability</h2>
-      <p>CloudDroid shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of profits, data, or goodwill.</p>
-
-      <h2>8. Governing Law</h2>
-      <p>These terms shall be governed by and construed in accordance with the laws of Ireland, without regard to its conflict of law provisions.</p>
-
-      <h2>9. Contact Information</h2>
-      <p>For questions about these Terms of Service, please contact us at:</p>
-      <p>CloudDroid<br>RUNESTONE HANDLUNG s.r.o.<br>Soukenická 877/9<br>Ostrava, 702 00<br>Czech Republic<br>IČO: 23389702<br>support@clouddroid.eu</p>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">9. Contact Information</h2>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+          <p class="text-slate">For questions about these Terms of Service, please contact us at:</p>
+          <p class="text-slate mt-2">CloudDroid<br>RUNESTONE HANDLUNG s.r.o.<br>Soukenická 877/9<br>Ostrava, 702 00<br>Czech Republic<br>IČO: 23389702<br><a href="mailto:support@clouddroid.eu" class="text-navy underline">support@clouddroid.eu</a></p>
+        </div>
+      </section>
     </div>
   </div>
 </Layout>

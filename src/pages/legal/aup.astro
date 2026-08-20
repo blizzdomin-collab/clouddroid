@@ -6,77 +6,101 @@ import Layout from '../../layouts/Layout.astro';
   <div class="bg-slate-light py-16">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <h1 class="text-4xl font-bold text-navy mb-4">Acceptable Use Policy</h1>
-      <p class="text-slate">Last updated: August 2026</p>
+      <p class="text-slate text-lg">Prohibited activities and enforcement guidelines.</p>
     </div>
   </div>
   <div class="py-16 bg-white">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-slate max-w-none">
-      <h2>1. Purpose</h2>
-      <p>This Acceptable Use Policy ("AUP") defines prohibited activities when using CloudDroid's cloud Android workspace services. Violation of this policy may result in immediate service termination without refund.</p>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">1. Purpose</h2>
+        <p class="text-slate mb-4">This Acceptable Use Policy ("AUP") defines prohibited activities when using CloudDroid's cloud Android workspace services. Violation of this policy may result in immediate service termination without refund.</p>
+      </section>
 
-      <h2>2. Prohibited Activities</h2>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">2. Prohibited Activities</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">2.1 Network Abuse</h3>
+            <p class="text-sm text-slate mb-2">The following network-related activities are strictly prohibited:</p>
+            <ul class="list-disc pl-5 text-sm text-slate space-y-1">
+              <li>Distributed Denial of Service (DDoS) attacks against any target</li>
+              <li>Port scanning, network reconnaissance, or vulnerability probing</li>
+              <li>Spamming via email, SMS, or any messaging platform</li>
+              <li>Unauthorized access to systems, networks, or data</li>
+              <li>Operating open proxies or relay services</li>
+            </ul>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">2.2 Resource Abuse</h3>
+            <p class="text-sm text-slate mb-2">The following resource-related activities are strictly prohibited:</p>
+            <ul class="list-disc pl-5 text-sm text-slate space-y-1">
+              <li>Cryptocurrency mining or blockchain-related computational activities</li>
+              <li>Continuous 100% CPU utilization scripts or processes</li>
+              <li>Any activity that materially degrades service performance for other users</li>
+              <li>Unauthorized sharing, reselling, or redistribution of cloud resources</li>
+              <li>Running resource-intensive workloads not aligned with your subscription tier</li>
+            </ul>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">2.3 Fraudulent Activity</h3>
+            <p class="text-sm text-slate mb-2">The following fraudulent activities are strictly prohibited:</p>
+            <ul class="list-disc pl-5 text-sm text-slate space-y-1">
+              <li>Click-fraud or ad-abuse schemes</li>
+              <li>Card testing or payment fraud</li>
+              <li>Identity theft, impersonation, or social engineering</li>
+              <li>Any activity designed to manipulate or abuse our billing system</li>
+              <li>Using services to facilitate illegal transactions</li>
+            </ul>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">2.4 Content and Conduct</h3>
+            <ul class="list-disc pl-5 text-sm text-slate space-y-1">
+              <li>Hosting, transmitting, or distributing illegal content</li>
+              <li>Harassment, threats, or abusive behavior</li>
+              <li>Impersonation of individuals or entities</li>
+              <li>Reverse engineering or attempting to extract source code</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-      <h3>2.1 Network Abuse</h3>
-      <p>The following network-related activities are strictly prohibited:</p>
-      <ul>
-        <li>Distributed Denial of Service (DDoS) attacks against any target</li>
-        <li>Port scanning, network reconnaissance, or vulnerability probing</li>
-        <li>Spamming via email, SMS, or any messaging platform</li>
-        <li>Unauthorized access to systems, networks, or data</li>
-        <li>Operating open proxies or relay services</li>
-      </ul>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">3. Monitoring and Enforcement</h2>
+        <p class="text-slate mb-4">CloudDroid employs automated monitoring systems to detect policy violations. We reserve the right to:</p>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+          <ul class="list-disc pl-5 text-slate space-y-2">
+            <li>Monitor instance activity for policy compliance</li>
+            <li>Suspend or terminate instances that violate this policy</li>
+            <li>Report violations to law enforcement authorities</li>
+            <li>Cooperate with legal investigations</li>
+          </ul>
+        </div>
+      </section>
 
-      <h3>2.2 Resource Abuse</h3>
-      <p>The following resource-related activities are strictly prohibited:</p>
-      <ul>
-        <li>Cryptocurrency mining or blockchain-related computational activities</li>
-        <li>Continuous 100% CPU utilization scripts or processes</li>
-        <li>Any activity that materially degrades service performance for other users</li>
-        <li>Unauthorized sharing, reselling, or redistribution of cloud resources</li>
-        <li>Running resource-intensive workloads not aligned with your subscription tier</li>
-      </ul>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">4. Consequences of Violation</h2>
+        <p class="text-slate mb-4">Violation of this Acceptable Use Policy will result in <strong>immediate termination of the instance without a refund</strong>. Depending on the severity of the violation, we may also:</p>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+          <ul class="list-disc pl-5 text-slate space-y-2">
+            <li>Terminate your account permanently</li>
+            <li>Report the violation to relevant authorities</li>
+            <li>Cooperate with law enforcement investigations</li>
+          </ul>
+        </div>
+      </section>
 
-      <h3>2.3 Fraudulent Activity</h3>
-      <p>The following fraudulent activities are strictly prohibited:</p>
-      <ul>
-        <li>Click-fraud or ad-abuse schemes</li>
-        <li>Card testing or payment fraud</li>
-        <li>Identity theft, impersonation, or social engineering</li>
-        <li>Any activity designed to manipulate or abuse our billing system</li>
-        <li>Using services to facilitate illegal transactions</li>
-      </ul>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">5. Reporting Violations</h2>
+        <p class="text-slate mb-4">If you become aware of any violation of this policy, please report it to support@clouddroid.eu.</p>
+      </section>
 
-      <h3>2.4 Content and Conduct</h3>
-      <ul>
-        <li>Hosting, transmitting, or distributing illegal content</li>
-        <li>Harassment, threats, or abusive behavior</li>
-        <li>Impersonation of individuals or entities</li>
-        <li>Reverse engineering or attempting to extract source code</li>
-      </ul>
-
-      <h2>3. Monitoring and Enforcement</h2>
-      <p>CloudDroid employs automated monitoring systems to detect policy violations. We reserve the right to:</p>
-      <ul>
-        <li>Monitor instance activity for policy compliance</li>
-        <li>Suspend or terminate instances that violate this policy</li>
-        <li>Report violations to law enforcement authorities</li>
-        <li>Cooperate with legal investigations</li>
-      </ul>
-
-      <h2>4. Consequences of Violation</h2>
-      <p>Violation of this Acceptable Use Policy will result in <strong>immediate termination of the instance without a refund</strong>. Depending on the severity of the violation, we may also:</p>
-      <ul>
-        <li>Terminate your account permanently</li>
-        <li>Report the violation to relevant authorities</li>
-        <li>Cooperate with law enforcement investigations</li>
-      </ul>
-
-      <h2>5. Reporting Violations</h2>
-      <p>If you become aware of any violation of this policy, please report it to support@clouddroid.eu.</p>
-
-      <h2>6. Contact Information</h2>
-      <p>For questions about this Acceptable Use Policy, please contact us at:</p>
-      <p>CloudDroid<br>RUNESTONE HANDLUNG s.r.o.<br>Soukenická 877/9<br>Ostrava, 702 00<br>Czech Republic<br>IČO: 23389702<br>support@clouddroid.eu</p>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">6. Contact Information</h2>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+          <p class="text-slate">For questions about this Acceptable Use Policy, please contact us at:</p>
+          <p class="text-slate mt-2">CloudDroid<br>RUNESTONE HANDLUNG s.r.o.<br>Soukenická 877/9<br>Ostrava, 702 00<br>Czech Republic<br>IČO: 23389702<br><a href="mailto:support@clouddroid.eu" class="text-navy underline">support@clouddroid.eu</a></p>
+        </div>
+      </section>
     </div>
   </div>
 </Layout>

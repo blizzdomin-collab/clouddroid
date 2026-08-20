@@ -6,71 +6,104 @@ import Layout from '../../layouts/Layout.astro';
   <div class="bg-slate-light py-16">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <h1 class="text-4xl font-bold text-navy mb-4">Privacy Policy</h1>
-      <p class="text-slate">Last updated: August 2026</p>
+      <p class="text-slate text-lg">How we collect, use, and protect your data.</p>
     </div>
   </div>
   <div class="py-16 bg-white">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-slate max-w-none">
-      <h2>1. Introduction</h2>
-      <p>CloudDroid ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our cloud Android workspace services.</p>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">1. Introduction</h2>
+        <p class="text-slate mb-4">CloudDroid ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our cloud Android workspace services.</p>
+      </section>
 
-      <h2>2. Information We Collect</h2>
-      <h3>2.1 Personal Information</h3>
-      <ul>
-        <li>Name, email address, and contact information</li>
-        <li>Company name and job title (for business accounts)</li>
-        <li>Payment information (processed securely by our payment processor)</li>
-        <li>Account credentials and authentication data</li>
-      </ul>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">2. Information We Collect</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">2.1 Personal Information</h3>
+            <ul class="list-disc pl-5 text-sm text-slate space-y-1">
+              <li>Name, email address, and contact information</li>
+              <li>Company name and job title (for business accounts)</li>
+              <li>Payment information (processed securely by our payment processor)</li>
+              <li>Account credentials and authentication data</li>
+            </ul>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+            <h3 class="font-semibold text-navy mb-2">2.2 Usage Data</h3>
+            <ul class="list-disc pl-5 text-sm text-slate space-y-1">
+              <li>Instance usage metrics (CPU, memory, storage)</li>
+              <li>Access logs and connection timestamps</li>
+              <li>API usage and integration activity</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-      <h3>2.2 Usage Data</h3>
-      <ul>
-        <li>Instance usage metrics (CPU, memory, storage)</li>
-        <li>Access logs and connection timestamps</li>
-        <li>API usage and integration activity</li>
-      </ul>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">3. How We Use Your Information</h2>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+          <ul class="list-disc pl-5 text-slate space-y-2">
+            <li>To provide and maintain our services</li>
+            <li>To process payments and send billing information</li>
+            <li>To communicate with you about service updates and support</li>
+            <li>To improve our services and develop new features</li>
+            <li>To detect and prevent fraud, abuse, and security incidents</li>
+            <li>To comply with legal obligations</li>
+          </ul>
+        </div>
+      </section>
 
-      <h2>3. How We Use Your Information</h2>
-      <ul>
-        <li>To provide and maintain our services</li>
-        <li>To process payments and send billing information</li>
-        <li>To communicate with you about service updates and support</li>
-        <li>To improve our services and develop new features</li>
-        <li>To detect and prevent fraud, abuse, and security incidents</li>
-        <li>To comply with legal obligations</li>
-      </ul>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">4. Data Security</h2>
+        <p class="text-slate mb-4">CloudDroid does not store raw credit card data. All payment information is processed securely by our payment processors, Dodo Payments and Mollie, using industry-standard encryption. We implement TLS 1.3 for all web traffic and AES-256 encryption for data at rest.</p>
+      </section>
 
-      <h2>4. Data Security</h2>
-      <p>CloudDroid does not store raw credit card data. All payment information is processed securely by our payment processors, Dodo Payments and Mollie, using industry-standard encryption. We implement TLS 1.3 for all web traffic and AES-256 encryption for data at rest.</p>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">5. Data Retention</h2>
+        <p class="text-slate mb-4">We retain your personal information for as long as your account is active or as needed to provide you with our services. After account deletion, we will retain certain data as required by law or for legitimate business purposes (e.g., accounting records, fraud prevention). You may request deletion of your personal data by contacting support@clouddroid.eu.</p>
+      </section>
 
-      <h2>5. Data Retention</h2>
-      <p>We retain your personal information for as long as your account is active or as needed to provide you with our services. After account deletion, we will retain certain data as required by law or for legitimate business purposes (e.g., accounting records, fraud prevention). You may request deletion of your personal data by contacting support@clouddroid.eu.</p>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">6. Your Rights (GDPR & CCPA)</h2>
+        <p class="text-slate mb-4">Depending on your location, you may have the following rights:</p>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+          <ul class="list-disc pl-5 text-slate space-y-2">
+            <li><strong>Access:</strong> Request a copy of your personal data</li>
+            <li><strong>Rectification:</strong> Request correction of inaccurate data</li>
+            <li><strong>Erasure:</strong> Request deletion of your personal data</li>
+            <li><strong>Portability:</strong> Request transfer of your data to another service</li>
+            <li><strong>Objection:</strong> Object to processing of your personal data</li>
+          </ul>
+        </div>
+      </section>
 
-      <h2>6. Your Rights (GDPR & CCPA)</h2>
-      <p>Depending on your location, you may have the following rights:</p>
-      <ul>
-        <li><strong>Access:</strong> Request a copy of your personal data</li>
-        <li><strong>Rectification:</strong> Request correction of inaccurate data</li>
-        <li><strong>Erasure:</strong> Request deletion of your personal data</li>
-        <li><strong>Portability:</strong> Request transfer of your data to another service</li>
-        <li><strong>Objection:</strong> Object to processing of your personal data</li>
-      </ul>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">7. Cookies and Tracking</h2>
+        <p class="text-slate mb-4">We use essential cookies to operate our service. We do not use tracking cookies for advertising purposes without your consent.</p>
+      </section>
 
-      <h2>7. Cookies and Tracking</h2>
-      <p>We use essential cookies to operate our service. We do not use tracking cookies for advertising purposes without your consent.</p>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">8. Third-Party Services</h2>
+        <p class="text-slate mb-4">Our services integrate with third-party tools (CI/CD platforms, monitoring services). These services have their own privacy policies, and we encourage you to review them.</p>
+      </section>
 
-      <h2>8. Third-Party Services</h2>
-      <p>Our services integrate with third-party tools (CI/CD platforms, monitoring services). These services have their own privacy policies, and we encourage you to review them.</p>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">9. Data Breach Notification</h2>
+        <p class="text-slate mb-4">In the event of a data breach that affects your personal information, we will notify you and relevant authorities as required by applicable law within 72 hours.</p>
+      </section>
 
-      <h2>9. Data Breach Notification</h2>
-      <p>In the event of a data breach that affects your personal information, we will notify you and relevant authorities as required by applicable law within 72 hours.</p>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">10. Changes to This Policy</h2>
+        <p class="text-slate mb-4">We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new policy on this page and updating the "Last updated" date.</p>
+      </section>
 
-      <h2>10. Changes to This Policy</h2>
-      <p>We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new policy on this page and updating the "Last updated" date.</p>
-
-      <h2>11. Contact Us</h2>
-      <p>If you have questions about this Privacy Policy, please contact us at:</p>
-      <p>CloudDroid<br>RUNESTONE HANDLUNG s.r.o.<br>Soukenická 877/9<br>Ostrava, 702 00<br>Czech Republic<br>IČO: 23389702<br>support@clouddroid.eu</p>
+      <section>
+        <h2 class="text-2xl font-bold text-navy mb-4">11. Contact Us</h2>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+          <p class="text-slate">If you have questions about this Privacy Policy, please contact us at:</p>
+          <p class="text-slate mt-2">CloudDroid<br>RUNESTONE HANDLUNG s.r.o.<br>Soukenická 877/9<br>Ostrava, 702 00<br>Czech Republic<br>IČO: 23389702<br><a href="mailto:support@clouddroid.eu" class="text-navy underline">support@clouddroid.eu</a></p>
+        </div>
+      </section>
     </div>
   </div>
 </Layout>
