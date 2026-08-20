@@ -1,0 +1,136 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Pricing from '../components/Pricing.astro';
+
+const annualPrices = {
+  developer: { monthly: 49, annual: 470, savings: 118 },
+  professional: { monthly: 149, annual: 1430, savings: 358 },
+  team: { monthly: 399, annual: 3830, savings: 958 },
+};
+---
+
+<Layout title="Pricing - CloudDroid" description="Simple, transparent pricing for CloudDroid cloud Android workspaces. Monthly and annual billing options.">
+  <div class="bg-slate-light py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl font-bold text-navy mb-4">Pricing</h1>
+      <p class="text-lg text-slate mb-8">Simple, transparent pricing. No hidden fees. Cancel anytime.</p>
+
+      <div class="inline-flex items-center gap-3 bg-white rounded-xl border border-slate-200 p-1">
+        <button id="monthly-toggle" class="px-4 py-2 rounded-lg text-sm font-medium bg-navy text-white transition-colors">Monthly</button>
+        <button id="annual-toggle" class="px-4 py-2 rounded-lg text-sm font-medium text-slate hover:text-navy transition-colors">Annual <span class="text-xs text-green-600 font-semibold">Save 20%</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pricing-section">
+    <Pricing />
+  </div>
+
+  <div class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-bold text-navy mb-8 text-center">Frequently Asked Questions</h2>
+      <div class="space-y-4">
+        <details class="bg-slate-50 rounded-xl border border-slate-200 p-6 group">
+          <summary class="text-sm font-semibold text-navy cursor-pointer list-none flex items-center justify-between">
+            What Android versions are supported?
+            <svg class="w-5 h-5 text-slate group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <p class="mt-3 text-sm text-slate">We support Android 10 through Android 14. Each instance runs a clean, isolated Android environment with full ADB access.</p>
+        </details>
+        <details class="bg-slate-50 rounded-xl border border-slate-200 p-6 group">
+          <summary class="text-sm font-semibold text-navy cursor-pointer list-none flex items-center justify-between">
+            Can I cancel my subscription anytime?
+            <svg class="w-5 h-5 text-slate group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <p class="mt-3 text-sm text-slate">Yes. You can cancel your subscription at any time from the billing dashboard. Your service continues until the end of the current billing period.</p>
+        </details>
+        <details class="bg-slate-50 rounded-xl border border-slate-200 p-6 group">
+          <summary class="text-sm font-semibold text-navy cursor-pointer list-none flex items-center justify-between">
+            Do you offer a free trial?
+            <svg class="w-5 h-5 text-slate group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <p class="mt-3 text-sm text-slate">We do not offer a free trial. However, we provide a 14-day money-back guarantee if you are not satisfied with the service.</p>
+        </details>
+        <details class="bg-slate-50 rounded-xl border border-slate-200 p-6 group">
+          <summary class="text-sm font-semibold text-navy cursor-pointer list-none flex items-center justify-between">
+            What payment methods do you accept?
+            <svg class="w-5 h-5 text-slate group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <p class="mt-3 text-sm text-slate">We accept all major credit cards (Visa, Mastercard, American Express) via Dodo Payments. European customers can also pay via iDEAL, Bancontact, and other local methods through Mollie.</p>
+        </details>
+        <details class="bg-slate-50 rounded-xl border border-slate-200 p-6 group">
+          <summary class="text-sm font-semibold text-navy cursor-pointer list-none flex items-center justify-between">
+            Is my data isolated from other customers?
+            <svg class="w-5 h-5 text-slate group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <p class="mt-3 text-sm text-slate">Yes. Each instance runs in a strictly containerized environment with zero cross-talk between customers. Data is encrypted at rest with AES-256.</p>
+        </details>
+        <details class="bg-slate-50 rounded-xl border border-slate-200 p-6 group">
+          <summary class="text-sm font-semibold text-navy cursor-pointer list-none flex items-center justify-between">
+            Do you offer custom enterprise plans?
+            <svg class="w-5 h-5 text-slate group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <p class="mt-3 text-sm text-slate">Yes. Contact us at sales@clouddroid.eu for custom pricing, dedicated infrastructure, and SLA guarantees tailored to your organization.</p>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const monthlyToggle = document.getElementById('monthly-toggle');
+    const annualToggle = document.getElementById('annual-toggle');
+    const pricingSection = document.getElementById('pricing-section');
+
+    const updatePricing = (isAnnual: boolean) => {
+      if (!pricingSection) return;
+      const cards = pricingSection.querySelectorAll('.grid > div');
+      cards.forEach((card, index) => {
+        const plans = ['developer', 'professional', 'team'];
+        const plan = plans[index];
+        if (!plan || !annualPrices[plan]) return;
+
+        const priceEl = card.querySelector('.text-4xl');
+        const intervalEl = card.querySelector('.text-slate');
+        if (priceEl && intervalEl) {
+          priceEl.textContent = isAnnual ? `$${annualPrices[plan].annual}` : `$${annualPrices[plan].monthly}`;
+          intervalEl.textContent = isAnnual ? '/year' : '/month';
+        }
+
+        const ctaLink = card.querySelector('a[href^="/checkout/"]');
+        if (ctaLink) {
+          const currentHref = ctaLink.getAttribute('href') || '';
+          const planName = currentHref.split('/')[2];
+          ctaLink.setAttribute('href', isAnnual ? `/checkout/${planName}?annual=true` : `/checkout/${planName}`);
+        }
+      });
+    };
+
+    monthlyToggle?.addEventListener('click', () => {
+      monthlyToggle.classList.add('bg-navy', 'text-white');
+      monthlyToggle.classList.remove('text-slate');
+      annualToggle?.classList.remove('bg-navy', 'text-white');
+      annualToggle?.classList.add('text-slate');
+      updatePricing(false);
+    });
+
+    annualToggle?.addEventListener('click', () => {
+      annualToggle.classList.add('bg-navy', 'text-white');
+      annualToggle.classList.remove('text-slate');
+      monthlyToggle?.classList.remove('bg-navy', 'text-white');
+      monthlyToggle?.classList.add('text-slate');
+      updatePricing(true);
+    });
+  </script>
+</Layout>

@@ -1,40 +1,78 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+export const prerender = false;
+
+interface ServiceStatus {
+  name: string;
+  status: 'operational' | 'degraded' | 'outage';
+  latency?: number;
+}
+
+const services: ServiceStatus[] = [
+  { name: 'API Services', status: 'operational' },
+  { name: 'Web Dashboard', status: 'operational' },
+  { name: 'Instance Provisioning', status: 'operational' },
+  { name: 'Monitoring', status: 'operational' },
+  { name: 'Alerting', status: 'operational' },
+  { name: 'Billing', status: 'operational' },
+];
+
+let healthData: any = null;
+let monitoringData: any = null;
+
+try {
+  const healthRes = await fetch(`${Astro.url.origin}/api/health`);
+  if (healthRes.ok) {
+    healthData = await healthRes.json();
+  }
+} catch {}
+
+try {
+  const monitoringRes = await fetch(`${Astro.url.origin}/api/monitoring/instances`);
+  if (monitoringRes.ok) {
+    monitoringData = await monitoringRes.json();
+  }
+} catch {}
+
+if (healthData?.status === 'healthy') {
+  services.forEach(s => s.status = 'operational');
+} else if (healthData?.status === 'degraded') {
+  services[0].status = 'degraded';
+  services[1].status = 'degraded';
+}
+
+const overallStatus = services.every(s => s.status === 'operational') ? 'operational' : 'degraded';
+const statusColor = overallStatus === 'operational' ? 'green' : 'yellow';
+const statusText = overallStatus === 'operational' ? 'All Systems Operational' : 'Some Systems Degraded';
 ---
 
-<Layout title="Status - CloudDroid" description="Operational status and uptime information for CloudDroid services.">
+<Layout title="Status - CloudDroid" description="Real-time operational status and uptime information for CloudDroid services.">
   <div class="bg-slate-light py-16">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 class="text-4xl font-bold text-navy mb-4">System Status</h1>
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-3 h-3 bg-{statusColor}-500 rounded-full animate-pulse"></div>
+        <h1 class="text-4xl font-bold text-navy">{statusText}</h1>
+      </div>
       <p class="text-slate text-lg">Real-time operational status and uptime information for CloudDroid services.</p>
+      <p class="text-sm text-slate mt-2">Last checked: {new Date().toLocaleString()}</p>
     </div>
   </div>
 
   <div class="py-16 bg-white">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white rounded-xl border border-slate-200 p-6">
-          <div class="flex items-center gap-3 mb-2">
-            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-            <div class="text-sm font-medium text-navy">API Services</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {services.map((service) => (
+          <div class="bg-white rounded-xl border border-slate-200 p-6">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-3 h-3 bg-{service.status === 'operational' ? 'green' : service.status === 'degraded' ? 'yellow' : 'red'}-500 rounded-full"></div>
+              <div class="text-sm font-medium text-navy">{service.name}</div>
+            </div>
+            <div class="text-xs text-slate capitalize">{service.status === 'operational' ? 'Operational' : service.status === 'degraded' ? 'Degraded Performance' : 'Service Outage'}</div>
+            {service.latency && <div class="text-xs text-slate mt-1">Latency: {service.latency}ms</div>}
           </div>
-          <div class="text-xs text-slate">Operational</div>
-        </div>
-        <div class="bg-white rounded-xl border border-slate-200 p-6">
-          <div class="flex items-center gap-3 mb-2">
-            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-            <div class="text-sm font-medium text-navy">Web Dashboard</div>
-          </div>
-          <div class="text-xs text-slate">Operational</div>
-        </div>
-        <div class="bg-white rounded-xl border border-slate-200 p-6">
-          <div class="flex items-center gap-3 mb-2">
-            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-            <div class="text-sm font-medium text-navy">Instance Provisioning</div>
-          </div>
-          <div class="text-xs text-slate">Operational</div>
-        </div>
+        ))}
       </div>
 
       <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">

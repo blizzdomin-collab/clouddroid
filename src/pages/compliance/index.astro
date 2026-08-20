@@ -1,5 +1,27 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { getUserByEmail } from '../../lib/database';
+
+const sessionCookie = Astro.cookies.get('session');
+let isAuthenticated = false;
+
+if (sessionCookie) {
+  try {
+    const session = JSON.parse(sessionCookie.value);
+    if (session.authenticated === true && session.email) {
+      const user = getUserByEmail(session.email);
+      if (user) {
+        isAuthenticated = true;
+      }
+    }
+  } catch {
+    isAuthenticated = false;
+  }
+}
+
+if (!isAuthenticated) {
+  return Astro.redirect('/login');
+}
 ---
 
 <Layout title="Compliance Dashboard - CloudDroid" description="Audit logs and compliance reporting for CloudDroid">
