@@ -40,6 +40,7 @@ jobs:
             fi
 
             echo "[3] Building..."
+            rm -rf dist
             npm run build
 
             echo "[4] Ensuring data directory exists..."

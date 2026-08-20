@@ -11,6 +11,16 @@ export default defineConfig({
     mode: 'standalone',
   }),
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    build: {
+      cssCodeSplit: false,
+      rollupOptions: {
+        output: {
+          entryFileNames: 'entry.js',
+          chunkFileNames: 'chunks/[name].js',
+          assetFileNames: 'assets/[name].[ext]'
+        }
+      }
+    }
   }
 });
