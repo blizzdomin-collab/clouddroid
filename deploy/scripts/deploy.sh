@@ -11,6 +11,7 @@ echo "=== Deploying $APP_NAME ==="
 cd "$APP_DIR"
 
 echo "[1/5] Pulling latest code..."
+git config --global --add safe.directory "$APP_DIR"
 git fetch origin
 git reset --hard "origin/$BRANCH"
 

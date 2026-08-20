@@ -22,6 +22,7 @@ jobs:
             cd /var/www/clouddroid
 
             echo "[1] Pulling latest code..."
+            git config --global --add safe.directory /var/www/clouddroid
             git fetch origin
             git reset --hard origin/main
 
