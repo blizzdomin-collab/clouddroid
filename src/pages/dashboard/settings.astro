@@ -136,6 +136,36 @@ if (sessionCookie) {
           <p class="text-sm text-slate mb-4">Configure how you receive alert notifications.</p>
           <div id="notification-channels" class="space-y-3 mb-4"></div>
           <button type="button" id="add-channel-btn" class="text-sm bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">Add Channel</button>
+
+          <div id="add-channel-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-xl shadow-lg p-6 max-w-md w-full mx-4">
+              <h3 class="text-lg font-semibold text-navy mb-4">Add Notification Channel</h3>
+              <form id="add-channel-form" class="space-y-4">
+                <div>
+                  <label for="channel-type" class="block text-sm font-medium text-navy mb-1">Channel Type</label>
+                  <select id="channel-type" required class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none">
+                    <option value="email">Email</option>
+                    <option value="slack">Slack</option>
+                    <option value="webhook">Webhook</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="channel-name" class="block text-sm font-medium text-navy mb-1">Channel Name</label>
+                  <input type="text" id="channel-name" required class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" placeholder="My channel" />
+                </div>
+                <div>
+                  <label for="channel-config" class="block text-sm font-medium text-navy mb-1">Config</label>
+                  <textarea id="channel-config" rows="3" required class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" placeholder='{"email": "you@example.com"}'></textarea>
+                  <p class="text-xs text-slate mt-1">Enter JSON config, or for email/webhook just the value.</p>
+                </div>
+                <div id="add-channel-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"></div>
+                <div class="flex gap-3">
+                  <button type="submit" class="bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">Add Channel</button>
+                  <button type="button" id="cancel-add-channel" class="text-slate-700 bg-slate-100 px-4 py-2 rounded-lg font-medium hover:bg-slate-200 transition-colors">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -384,16 +414,47 @@ if (sessionCookie) {
       }
     }
 
-    addChannelBtn?.addEventListener('click', async () => {
-      const type = prompt('Channel type (email, slack, webhook):');
+    addChannelBtn?.addEventListener('click', () => {
+      const modal = document.getElementById('add-channel-modal');
+      if (modal) modal.classList.remove('hidden');
+    });
+
+    const cancelAddChannelBtn = document.getElementById('cancel-add-channel');
+    const addChannelForm = document.getElementById('add-channel-form');
+    const addChannelError = document.getElementById('add-channel-error');
+
+    cancelAddChannelBtn?.addEventListener('click', () => {
+      const modal = document.getElementById('add-channel-modal');
+      if (modal) modal.classList.add('hidden');
+      if (addChannelError) addChannelError.classList.add('hidden');
+      const typeInput = document.getElementById('channel-type') as HTMLSelectElement | null;
+      const nameInput = document.getElementById('channel-name') as HTMLInputElement | null;
+      const configInput = document.getElementById('channel-config') as HTMLTextAreaElement | null;
+      if (typeInput) typeInput.value = 'email';
+      if (nameInput) nameInput.value = '';
+      if (configInput) configInput.value = '';
+    });
+
+    addChannelForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (addChannelError) addChannelError.classList.add('hidden');
+
+      const typeInput = document.getElementById('channel-type') as HTMLSelectElement | null;
+      const nameInput = document.getElementById('channel-name') as HTMLInputElement | null;
+      const configInput = document.getElementById('channel-config') as HTMLTextAreaElement | null;
+
+      const type = typeInput?.value || '';
+      const name = nameInput?.value || '';
+      const configValue = configInput?.value || '';
+
       if (!type || !['email', 'slack', 'webhook'].includes(type)) {
-        alert('Invalid type. Use: email, slack, or webhook');
+        if (addChannelError) {
+          addChannelError.textContent = 'Invalid type. Use: email, slack, or webhook';
+          addChannelError.classList.remove('hidden');
+        }
         return;
       }
-      const name = prompt('Channel name:');
-      if (!name) return;
-      const configValue = prompt('Config (JSON or URL/email):');
-      if (!configValue) return;
+      if (!name || !configValue) return;
 
       let config: Record<string, string> = {};
       try {
@@ -410,6 +471,12 @@ if (sessionCookie) {
         body: JSON.stringify({ type, name, config }),
       });
       loadChannels();
+
+      const modal = document.getElementById('add-channel-modal');
+      if (modal) modal.classList.add('hidden');
+      if (typeInput) typeInput.value = 'email';
+      if (nameInput) nameInput.value = '';
+      if (configInput) configInput.value = '';
     });
 
     loadChannels();
