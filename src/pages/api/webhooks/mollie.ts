@@ -136,12 +136,7 @@ export const POST: APIRoute = async ({ request }) => {
           registration_user_agent: checkoutSession.user_agent,
         });
 
-        const planMap: Record<string, string> = {
-          'CloudDroid Developer Plan': 'Developer',
-          'CloudDroid Professional Plan': 'Professional',
-          'CloudDroid Team Plan': 'Team',
-        };
-        const plan = planMap[checkoutSession.plan] || 'Professional';
+        const plan = checkoutSession.plan;
 
         const subscription = createSubscription({
           user_id: user.id,

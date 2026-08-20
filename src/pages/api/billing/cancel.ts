@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getSubscriptionByUserId, updateSubscription, createAuditLog } from '../../../lib/database';
+import { getSubscriptionByUserId, updateSubscription, createAuditLog, getUserByEmail } from '../../../lib/database';
 
 export const POST: APIRoute = async ({ cookies, request }) => {
   try {
@@ -19,8 +19,7 @@ export const POST: APIRoute = async ({ cookies, request }) => {
       });
     }
 
-    const db = (await import('../../../lib/database')).default;
-    const user = db.users.find((u: any) => u.email === session.email);
+    const user = getUserByEmail(session.email);
     if (!user) {
       return new Response(JSON.stringify({ error: 'User not found' }), {
         status: 404,

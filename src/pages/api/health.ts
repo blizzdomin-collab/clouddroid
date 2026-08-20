@@ -1,12 +1,14 @@
 import type { APIRoute } from 'astro';
 import { jsonResponse, corsHeaders } from '../../lib/api';
 import { withLogging } from '../../lib/apiMiddleware';
+import { getUsers, getInstances } from '../../lib/database';
 
 const handler: APIRoute = async () => {
   try {
-    const db = (await import('../../lib/database')).default;
-    const userCount = db.users?.length || 0;
-    const instanceCount = db.instances?.length || 0;
+    const users = getUsers();
+    const instances = getInstances();
+    const userCount = users?.length || 0;
+    const instanceCount = instances?.length || 0;
 
     let redisStatus: string;
     try {

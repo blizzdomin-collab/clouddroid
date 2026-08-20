@@ -7,13 +7,14 @@ interface Props {
   plan: string;
 }
 
-const planConfig: Record<string, { name: string; price: number; interval: string; specs: string[]; description: string }> = {
+const planConfig: Record<string, { name: string; price: number; interval: string; specs: string[]; description: string; mollieAmount: string }> = {
   developer: {
     name: 'Developer',
     price: 49,
     interval: 'month',
     description: 'For individual developers and small projects',
     specs: ['4 GB RAM', '32 GB Storage', '1 Concurrent Instance', 'Email Support'],
+    mollieAmount: '49.00',
   },
   professional: {
     name: 'Professional',
@@ -21,6 +22,7 @@ const planConfig: Record<string, { name: string; price: number; interval: string
     interval: 'month',
     description: 'For growing teams and production workloads',
     specs: ['8 GB RAM', '64 GB Storage', '4 Concurrent Instances', 'Priority Support', 'CI/CD Integrations'],
+    mollieAmount: '149.00',
   },
   team: {
     name: 'Team',
@@ -28,6 +30,7 @@ const planConfig: Record<string, { name: string; price: number; interval: string
     interval: 'month',
     description: 'For organizations requiring maximum scale',
     specs: ['16 GB RAM', '128 GB Storage', '12 Concurrent Instances', '24/7 Dedicated Support', '99.9% Uptime SLA'],
+    mollieAmount: '399.00',
   },
 };
 
@@ -174,7 +177,7 @@ if (!selectedPlan) {
                       </div>
                       <div class="flex items-center justify-between">
                         <span class="text-xs font-medium text-slate">EUR pricing</span>
-                        <span class="text-xs font-medium text-navy">€49.00/mo</span>
+                        <span class="text-xs font-medium text-navy">€{selectedPlan.mollieAmount}/mo</span>
                       </div>
                     </div>
                   </label>

@@ -232,32 +232,32 @@ const pagination = alertsData.pagination || {};
     });
 
     const eventSource = new EventSource('/api/alerts/stream');
+    const insertedAlertIds = new Set<string>();
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === 'alerts') {
         const alertsList = document.getElementById('alerts-list');
         if (alertsList && data.data) {
-          const newAlerts = data.data.filter((newAlert: { id: string }) => !alerts.some((a) => a.id === newAlert.id));
-          if (newAlerts.length > 0) {
-            newAlerts.forEach((alert: { id: string; severity: string; title: string; message: string; timestamp: string; acknowledged: number }) => {
-              const alertEl = document.createElement('div');
-              alertEl.className = 'p-4 border-b border-slate-100 last:border-b-0';
-              alertEl.innerHTML = `
-                <div class="flex items-start justify-between">
-                  <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-1">
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${alert.severity === 'critical' ? 'bg-red-100 text-red-800' : alert.severity === 'warning' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'}">${alert.severity}</span>
-                      <span class="text-sm font-medium text-navy">${alert.title}</span>
-                    </div>
-                    <p class="text-sm text-slate">${alert.message}</p>
-                    <p class="text-xs text-slate-400 mt-1">${new Date(alert.timestamp).toLocaleString()}</p>
+          const newAlerts = data.data.filter((newAlert: { id: string }) => !insertedAlertIds.has(newAlert.id));
+          newAlerts.forEach((alert: { id: string; severity: string; title: string; message: string; timestamp: string; acknowledged: number }) => {
+            insertedAlertIds.add(alert.id);
+            const alertEl = document.createElement('div');
+            alertEl.className = 'p-4 border-b border-slate-100 last:border-b-0';
+            alertEl.innerHTML = `
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${alert.severity === 'critical' ? 'bg-red-100 text-red-800' : alert.severity === 'warning' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'}">${alert.severity}</span>
+                    <span class="text-sm font-medium text-navy">${alert.title}</span>
                   </div>
-                  ${alert.acknowledged === 0 ? `<button data-alert-id="${alert.id}" class="acknowledge-btn text-xs bg-navy text-white px-3 py-1.5 rounded-lg hover:bg-navy-light transition-colors">Acknowledge</button>` : '<span class="text-xs text-slate-400">Acknowledged</span>'}
+                  <p class="text-sm text-slate">${alert.message}</p>
+                  <p class="text-xs text-slate-400 mt-1">${new Date(alert.timestamp).toLocaleString()}</p>
                 </div>
-              `;
-              alertsList.insertBefore(alertEl, alertsList.firstChild);
-            });
-          }
+                ${alert.acknowledged === 0 ? `<button data-alert-id="${alert.id}" class="acknowledge-btn text-xs bg-navy text-white px-3 py-1.5 rounded-lg hover:bg-navy-light transition-colors">Acknowledge</button>` : '<span class="text-xs text-slate-400">Acknowledged</span>'}
+              </div>
+            `;
+            alertsList.insertBefore(alertEl, alertsList.firstChild);
+          });
         }
       }
     };
@@ -278,6 +278,8 @@ const pagination = alertsData.pagination || {};
           const alertsList = document.getElementById('alerts-list');
           if (alertsList) {
             const alert = data.data;
+            if (insertedAlertIds.has(alert.id)) return;
+            insertedAlertIds.add(alert.id);
             const alertEl = document.createElement('div');
             alertEl.className = 'p-4 border-b border-slate-100 last:border-b-0';
             alertEl.innerHTML = `

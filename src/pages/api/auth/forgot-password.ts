@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getUserByEmail } from '../../../lib/database';
+import { getUserByEmail, updateUser } from '../../../lib/database';
 import { checkRateLimit } from '../../../lib/rateLimit';
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
@@ -33,16 +33,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetExpiry = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-    const db = (await import('../../../lib/database')).default;
-    const userIndex = db.users.findIndex((u) => u.id === user.id);
-    if (userIndex !== -1) {
-      db.users[userIndex].reset_token = resetToken;
-      db.users[userIndex].reset_token_expiry = resetExpiry;
-      const { saveToDisk } = await import('../../../lib/database');
-      saveToDisk();
-    }
+    updateUser(user.id, {
+      reset_token: resetToken,
+      reset_token_expiry: resetExpiry,
+    });
 
-    return new Response(JSON.stringify({ success: true, message: 'If an account exists, a reset link will be sent', token: resetToken }), {
+    return new Response(JSON.stringify({ success: true, message: 'If an account exists, a reset link will be sent' }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

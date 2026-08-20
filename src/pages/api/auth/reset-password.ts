@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { verifyResetToken, clearResetToken, hashPassword } from '../../../lib/database';
+import { verifyResetToken, clearResetToken, hashPassword, getUserByEmail, updateUser } from '../../../lib/database';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -27,16 +27,9 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const db = (await import('../../../lib/database')).default;
-    const userIndex = db.users.findIndex((u) => u.id === user.id);
-    if (userIndex === -1) {
-      return new Response(JSON.stringify({ error: 'User not found' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    db.users[userIndex].password_hash = hashPassword(password);
+    updateUser(user.id, {
+      password_hash: hashPassword(password),
+    });
     clearResetToken(user.id);
 
     return new Response(JSON.stringify({ success: true, message: 'Password reset successfully' }), {

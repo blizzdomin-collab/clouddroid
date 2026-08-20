@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getInvoices } from '../../../lib/database';
+import { getInvoices, getUserByEmail } from '../../../lib/database';
 
 export const GET: APIRoute = async ({ cookies }) => {
   try {
@@ -19,8 +19,7 @@ export const GET: APIRoute = async ({ cookies }) => {
       });
     }
 
-    const db = (await import('../../../lib/database')).default;
-    const user = db.users.find((u: any) => u.email === session.email);
+    const user = getUserByEmail(session.email);
     if (!user) {
       return new Response(JSON.stringify({ error: 'User not found' }), {
         status: 404,

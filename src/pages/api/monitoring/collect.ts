@@ -7,8 +7,25 @@ function randomVariation(base: number, variance: number): number {
   return Math.max(0, Math.min(100, Math.round(base + variation)));
 }
 
-export const POST: APIRoute = async () => {
+export const POST: APIRoute = async ({ request }) => {
   try {
+    const serviceToken = import.meta.env.MONITORING_SERVICE_TOKEN;
+    if (!serviceToken) {
+      return new Response(JSON.stringify({ error: 'Service token not configured' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const authHeader = request.headers.get('authorization') || '';
+    const token = authHeader.replace(/^Bearer\s+/i, '');
+    if (token !== serviceToken) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const instances = getInstances();
     const now = new Date().toISOString();
 

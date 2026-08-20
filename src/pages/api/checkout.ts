@@ -112,7 +112,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         customer: {
           email: customerEmail,
         },
-        return_url: import.meta.env.DODO_PAYMENTS_RETURN_URL,
+        return_url: import.meta.env.DODO_PAYMENTS_RETURN_URL || 'https://clouddroid.eu/checkout/success',
       }),
     });
 
