@@ -8,7 +8,7 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 - **Styling:** Tailwind CSS v4
 - **Database:** SQLite via `better-sqlite3` (`.data/clouddroid.db`)
 - **Cache/Realtime:** Redis (`ioredis`) + WebSocket server (`ws`)
-- **Payments:** Dodo Payments integration
+- **Payments:** Dodo Payments + Mollie
 - **Deployment:** PM2 + Nginx + Let's Encrypt SSL
 - **Auto-deploy:** GitHub Actions on push to `main`
 
@@ -21,11 +21,20 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 │   │   └── DashboardLayout.astro # Authenticated dashboard shell
 │   ├── pages/
 │   │   ├── index.astro           # Marketing homepage
+│   │   ├── about.astro           # About page
+│   │   ├── status.astro          # System status / uptime
+│   │   ├── business.astro        # KYB/business verification info
+│   │   ├── security.astro        # Security overview
+│   │   ├── security-disclosure.astro # Vulnerability disclosure
+│   │   ├── sla.astro             # Service Level Agreement
+│   │   ├── dpa.astro             # Data Processing Agreement
+│   │   ├── api-docs.astro        # API documentation
 │   │   ├── login.astro           # Login page
 │   │   ├── register.astro        # Registration page
 │   │   ├── forgot-password.astro # Password reset request
 │   │   ├── reset-password.astro  # Password reset form
 │   │   ├── change-password.astro # Forced password change
+│   │   ├── 404.astro, 500.astro  # Error pages
 │   │   ├── dashboard/            # Authenticated dashboard pages
 │   │   │   ├── index.astro       # Overview
 │   │   │   ├── instances.astro   # Instance management
@@ -33,38 +42,43 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 │   │   │   ├── compliance.astro  # Audit logs
 │   │   │   ├── alerts.astro      # Real-time alerts
 │   │   │   ├── billing.astro     # Subscription & invoices
-  │   │   │   ├── users.astro       # Admin user management
-  │   │   │   ├── admin.astro       # Admin dashboard with stats and charts
-  │   │   │   ├── activity.astro    # Login history
+│   │   │   ├── users.astro       # Admin user management
+│   │   │   ├── admin.astro       # Admin dashboard with stats and charts
+│   │   │   ├── activity.astro    # Login history
 │   │   │   ├── settings.astro    # Profile, 2FA, notifications, dark mode
 │   │   │   └── instances/[id].astro # Instance detail with metrics
 │   │   ├── checkout/             # Checkout flow
 │   │   │   ├── [plan].astro      # Plan checkout page
 │   │   │   ├── success.astro     # Payment success + credentials
 │   │   │   └── cancel.astro      # Payment cancel
-│   │   ├── legal/                # Legal pages
+│   │   ├── legal/                # Legal & compliance pages
 │   │   │   ├── terms.astro
 │   │   │   ├── privacy.astro
 │   │   │   ├── aup.astro
-│   │   │   └── refund.astro
-│   │   ├── api/                  # API routes
-│   │   │   ├── auth/             # Login, logout, register, password reset, 2FA, activity, sessions
-│   │   │   ├── checkout.ts       # Dodo Payments checkout session
-│   │   │   ├── webhooks/         # Dodo Payments webhooks
-│   │   │   ├── instances/        # Instance CRUD + actions + detail
-│   │   │   ├── monitoring/       # Metrics, collect, charts
-│   │   │   ├── audit/            # Logs, export CSV
-│   │   │   ├── alerts/           # Alerts + SSE stream
-│   │   │   ├── billing/          # Subscription, invoices
-  │   │   │   ├── admin/            # User management + admin stats
-│   │   │   ├── notifications/    # Notification channels
-│   │   │   └── health.ts         # Health check
-│   │   └── api-docs.astro        # API documentation page
-│   │   └── 404.astro, 500.astro  # Error pages
+│   │   │   ├── refund.astro
+│   │   │   ├── subprocessors.astro
+│   │   │   └── aml.astro
+│   │   └── api/                  # API routes
+│   │       ├── auth/             # Login, logout, register, password reset, 2FA, activity, sessions
+│   │       ├── checkout.ts       # Dodo Payments + Mollie checkout session
+│   │       ├── webhooks/         # Dodo Payments + Mollie webhooks
+│   │       ├── instances/        # Instance CRUD + actions + detail
+│   │       ├── monitoring/       # Metrics, collect, charts
+│   │       ├── audit/            # Logs, export CSV
+│   │       ├── alerts/           # Alerts + SSE stream
+│   │       ├── billing/          # Subscription, invoices
+│   │       ├── admin/            # User management + admin stats
+│   │       ├── notifications/    # Notification channels
+│   │       └── health.ts         # Health check
 │   ├── components/
 │   │   ├── Header.astro
-│   │   ├── Pricing.astro
-│   │   └── ProductShowcase.astro
+│   │   ├── Footer.astro
+│   │   ├── Hero.astro
+│   │   ├── TrustStrip.astro
+│   │   ├── Features.astro
+│   │   ├── UseCases.astro
+│   │   ├── ProductShowcase.astro
+│   │   └── Pricing.astro
 │   ├── lib/
 │   │   ├── database.ts           # SQLite DB with CRUD
 │   │   ├── database-sqlite.ts    # SQLite implementation
@@ -89,7 +103,8 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 │   └── deploy.yml                # GitHub Actions auto-deploy
 ├── .env.example                  # Environment variables template
 ├── astro.config.mjs              # Astro + Tailwind + Node adapter
-└── package.json
+├── package.json
+└── clouddroid-master-blueprint.md # Compliance/KYB master blueprint
 ```
 
 ## 🧞 Commands
@@ -112,6 +127,9 @@ DODO_PAYMENTS_API_KEY=your-api-key
 DODO_PAYMENTS_WEBHOOK_KEY=your-webhook-secret
 DODO_PAYMENTS_ENVIRONMENT=live_mode
 DODO_PAYMENTS_RETURN_URL=https://clouddroid.eu/checkout/success
+MOLLIE_API_KEY=your-mollie-api-key
+MOLLIE_ENVIRONMENT=live
+MOLLIE_RETURN_URL=https://clouddroid.eu/checkout/success
 REDIS_URL=redis://localhost:6379
 WS_PORT=4322
 ```

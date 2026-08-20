@@ -1,17 +1,19 @@
 # CloudDroid: The Ultimate KYB & Compliance Master Blueprint 🚀
 
-**Document Version:** 1.0  
+**Document Version:** 2.0  
 **Project Classification:** B2B SaaS / Cloud Infrastructure  
-**Objective:** 100% first-pass approval rate with stringent Merchant of Record (MoR) and Payment Gateway compliance teams (e.g., Dodo Payments, Stripe, Paddle).
+**Objective:** 100% first-pass approval rate with stringent Merchant of Record (MoR) and Payment Gateway compliance teams (e.g., Dodo Payments, Stripe, Paddle, Mollie).
 
 ---
 
 ## Executive Summary
+
 Providing virtual environments (cloud Android emulators) inherently carries a "High Risk" tag in the payments industry due to potential abuse (crypto mining, DDoS, botting, card testing). To secure stable merchant accounts, CloudDroid must project absolute authority, transparency, and enterprise-grade security. This document dictates the visual, structural, legal, and technical requirements to achieve this.
 
 ---
 
 ## 1. Visual Identity & UI/UX Guidelines (The "Look")
+
 The platform must immediately signal "Enterprise SaaS" to any auditor who visits the site.
 
 *   **Color Palette:** Trust-inducing colors. Deep Navy/Indigo, Slate Grey, and Crisp White. No aggressive neon colors or "gamer/hacker" themes.
@@ -20,84 +22,163 @@ The platform must immediately signal "Enterprise SaaS" to any auditor who visits
 *   **Layout:** High whitespace, minimalist approach. Information must breathe.
 
 ### Critical UI Components
-*   **Sticky Header:** Must always display `Features`, `Use Cases`, `Pricing`, and a prominent `Dashboard Login` button (proving the software exists).
-*   **Trust Strip:** A band below the hero section displaying tech partners, payment methods (Visa, Mastercard, Amex), and security badges (SSL, AES-256).
+
+*   **Sticky Header:** Must always display `Features`, `Use Cases`, `Pricing`, `Status`, and a prominent `Dashboard Login` button (proving the software exists).
+*   **Trust Strip:** A band below the hero section displaying tech partners, payment methods (Visa, Mastercard, Amex, Apple Pay, Google Pay), and security badges (SSL, AES-256).
 
 ---
 
 ## 2. Content & Copywriting Strategy (The "Talk")
+
 Compliance teams use automated crawlers to flag high-risk keywords. Our copywriting must actively avoid these and focus on professional use cases.
 
 ### 🚫 Banned Keywords (DO NOT USE)
+
 *   *Gaming, Farming, Botting, Macros, Bypassing, Unbanning, Untraceable, Anonymous.*
 
 ### ✅ Approved Terminology (USE THESE)
+
 *   *App Testing, QA Automation, Virtual Workspace, Data Isolation, CI/CD Integration, Secure Remote Access, Enterprise Infrastructure.*
 
 ### The Hero Section Message
+
 > "Enterprise-Grade Cloud Android Workspaces. Secure, high-performance virtual Android environments engineered for QA automation, app testing, and seamless remote productivity. Deployed instantly in your browser."
 
 ---
 
 ## 3. The Pricing & Checkout Architecture
+
 Lack of transparency in pricing is the #1 reason for KYB rejection.
 
 *   **Clear Tiers:** 3 distinct tiers (e.g., Developer, Professional, Team).
 *   **Explicit Specs:** RAM, Storage, and Concurrent Instances must be defined per tier.
 *   **Zero Hidden Fees:** A bold statement near the checkout button: *"Simple monthly billing. Cancel anytime. No hidden setup fees."*
-*   **MoR Acknowledgment:** The checkout page must clearly state who is processing the payment (e.g., *"Securely processed by Dodo Payments"*).
+*   **MoR Acknowledgment:** The checkout page must clearly state who is processing the payment (e.g., *"Securely processed by Dodo Payments and Mollie"*).
+*   **Gateway Selection:** Users can choose between Dodo Payments (USD, cards/Apple Pay/Google Pay) and Mollie (EUR, iDEAL/Bancontact/cards).
 
 ---
 
 ## 4. The Legal & Compliance Shield (The "Walk")
-These documents are not just boilerplate; they are our legal defense against fraud and chargebacks. They must be linked in the footer.
+
+These documents are not just boilerplate; they are our legal defense against fraud and chargebacks. They must be linked in the footer and publicly accessible without authentication.
 
 ### A. Acceptable Use Policy (AUP) within Terms of Service
+
 Auditors will `Ctrl+F` for specific restrictions. We must explicitly prohibit:
+
 1.  **Network Abuse:** DDoS attacks, port scanning, spamming (email/SMS).
 2.  **Resource Abuse:** Cryptocurrency mining, continuous 100% CPU utilization scripts.
 3.  **Fraudulent Activity:** Click-fraud, ad-abuse, card testing, identity theft.
 4.  **Consequence:** Immediate termination of the instance without a refund.
 
 ### B. Strict Refund Policy (Digital Goods)
+
 To prevent chargeback abuse ("friendly fraud"):
+
 *   *"CloudDroid provisions dedicated cloud resources upon purchase. Therefore, we do not offer partial or full refunds for active billing cycles once the instance has been deployed."*
 *   *"Subscriptions can be canceled at any time via the billing dashboard to prevent future charges."*
+*   *"In the event of a chargeback, we reserve the right to suspend or terminate your account and may pursue collection of the disputed amount."*
 
 ### C. Privacy Policy (GDPR & CCPA Compliant)
+
 *   Clearly state that CloudDroid **does not store raw credit card data**.
 *   Define data retention policies (how long user data is kept after account deletion).
+*   Include GDPR rights: access, rectification, erasure, portability, objection.
+*   Include data breach notification commitment (72 hours).
 
-### D. The Footer Structure (Mandatory)
+### D. Business Information Page (`/business`)
+
+A dedicated page for KYB/merchant verification containing:
+
+*   Full legal entity details: RUNESTONE HANDLUNG s.r.o., IČO 23389702
+*   Registered address and correspondence address
+*   Ownership structure and beneficial owners
+*   Business activity description and target market
+*   Revenue model explanation
+*   Contact information for compliance
+*   Banking and payout information
+*   Compliance & risk overview (PCI DSS, GDPR, AML/CFT, Sanctions)
+*   Operational overview (infrastructure, uptime, support)
+*   Direct note for payment processors with request for additional documentation
+
+### E. Subprocessors Page (`/legal/subprocessors`)
+
+A publicly accessible list of all third-party subprocessors:
+
+*   Dodo Payments — payment processing, subscription management
+*   Mollie — payment processing (EU market)
+*   Cloud Infrastructure Provider — hosting, compute, storage
+*   Redis — session storage, rate limiting
+*   Let's Encrypt — SSL/TLS certificates
+
+Each entry includes: purpose, data categories processed, and data location.
+
+### F. AML/CFT Policy (`/legal/aml`)
+
+*   Customer identification at onboarding
+*   Prohibited activities: money laundering, terrorist financing, sanctions evasion, fraud
+*   Monitoring and detection mechanisms
+*   Reporting obligations and record keeping (5 years)
+
+### G. Security & Vulnerability Disclosure (`/security-disclosure`)
+
+*   Security practices overview
+*   Responsible disclosure policy
+*   Reporting process: security@clouddroid.eu
+*   Response timeline: 48h acknowledgment, 7 days assessment, 30 days resolution
+*   Safe harbor statement for security researchers
+
+### H. System Status Page (`/status`)
+
+*   Real-time service status
+*   Incident history
+*   Uptime commitment (99.9%)
+*   Subscribe to updates
+
+### I. The Footer Structure (Mandatory)
+
 *   **Company Name / Legal Entity Name**
 *   **Physical Operating Address** (Required by KYC laws).
 *   **Corporate Support Email:** (e.g., `support@clouddroid.eu`).
 *   **Copyright & MoR Disclaimer.**
+*   **Links to all legal pages:** Terms, Privacy, AUP, Refund, Subprocessors, AML/CFT
 
 ---
 
 ## 5. Anti-Fraud & Risk Mitigation Strategy
+
 Demonstrating internal risk controls proves to the MoR that CloudDroid is a safe bet.
 
 *   **Identity Verification:** Users must verify their email address before accessing the checkout flow.
-*   **Payment Authentication:** 100% enforcement of 3D Secure (SCA) for European and international transactions.
+*   **Payment Authentication:** 100% enforcement of 3D Secure (SCA) for European and international transactions via Dodo Payments and Mollie.
 *   **Automated Suspensions:** System-level monitors that automatically freeze instances showing sustained 99% CPU usage (mining) or massive outbound traffic spikes (DDoS).
+*   **Rate Limiting:** Auth endpoints protected by rate limiting (5 attempts per 15 minutes).
+*   **Audit Logging:** All critical actions logged with timestamps, user IDs, and IP addresses.
 *   **No Prepaid Cards:** Optional, but blocking virtual/prepaid cards significantly reduces chargebacks.
 
 ---
 
 ## 6. Infrastructure & SLA Guarantees
+
 Showcasing a robust backend builds trust.
+
 *   **Data Isolation:** Each Android instance is strictly containerized. Zero cross-talk between user environments.
-*   **Uptime:** Target 99.9% uptime for enterprise tiers.
+*   **Uptime:** Target 99.9% uptime for production services. Enterprise tier subscriptions include formal SLA commitments.
 *   **Security:** TLS 1.3 for all web traffic, AES-256 encryption for data at rest.
+*   **Monitoring:** Real-time metrics and alerts via WebSocket + Redis pub/sub.
+*   **Backup:** Automated backups and disaster recovery procedures.
+*   **Compliance Dashboard:** Public-facing compliance status with pass/fail indicators.
+
+---
 
 ## 7. Additional Recommendations
+
 - Implement continuous compliance monitoring with real‑time alerts for policy violations.
 - Integrate automated compliance reporting dashboards for auditors.
 - Provide detailed audit logs and immutable storage for all instance activities.
 - Offer a dedicated compliance liaison for merchant onboarding.
 - Conduct regular third‑party security and compliance audits.
+- Maintain a public security.txt file for vulnerability disclosure.
 
 ---
 
@@ -107,8 +188,10 @@ Showcasing a robust backend builds trust.
 - **Legal Name:** RUNESTONE HANDLUNG s.r.o.
 - **Address:** Soukenická 877/9, Ostrava, 702 00, Czech Republic
 - **Support Email:** support@clouddroid.eu
+- **Security Email:** security@clouddroid.eu
 - **Structure:** Limited liability company (s.r.o.)
 - **Company ID (IČO):** 23389702
+- **Registered:** Commercial Register of the Czech Republic
 
 ## Dodo Payments Setup
 
@@ -119,12 +202,20 @@ Showcasing a robust backend builds trust.
 - Subscribed events: checkout.session.completed, subscription.active, subscription.cancelled, subscription.renewed, payment.succeeded, payment.failed, refund.succeeded
 - Account status: Fully approved, live mode activated
 
+## Mollie Setup
+
+- Webhook endpoint: `/api/webhooks/mollie`
+- Environment variables: `MOLLIE_API_KEY`, `MOLLIE_ENVIRONMENT=live`, `MOLLIE_RETURN_URL=https://clouddroid.eu/checkout/success`
+- Payments endpoint: `POST https://api.mollie.com/v2/payments`
+- Supported methods: iDEAL, Bancontact, Card
+- Currency: EUR
+
 ---
 
 ## 8. Implementation Progress
 
 **Framework:** Astro 7.2 with Tailwind CSS v4  
-**Status:** Core marketing site scaffolded, build verified, APIs functional, Dodo Payments checkout working in production
+**Status:** Core marketing site scaffolded, build verified, APIs functional, Dodo Payments + Mollie checkout working in production
 
 ### Completed Components
 
@@ -140,13 +231,23 @@ Showcasing a robust backend builds trust.
 | Footer | `src/components/Footer.astro` | ✅ Done |
 | Page Composition | `src/pages/index.astro` | ✅ Done |
 | Product Showcase | `src/components/ProductShowcase.astro` | ✅ Done |
+| About Page | `src/pages/about.astro` | ✅ Done |
+| Status Page | `src/pages/status.astro` | ✅ Done |
+| Business/KYB Page | `src/pages/business.astro` | ✅ Done |
+| Security Overview | `src/pages/security.astro` | ✅ Done |
+| Security Disclosure | `src/pages/security-disclosure.astro` | ✅ Done |
+| SLA Page | `src/pages/sla.astro` | ✅ Done |
+| DPA Page | `src/pages/dpa.astro` | ✅ Done |
 | Terms of Service | `src/pages/legal/terms.astro` | ✅ Done |
 | Privacy Policy | `src/pages/legal/privacy.astro` | ✅ Done |
 | Acceptable Use Policy | `src/pages/legal/aup.astro` | ✅ Done |
 | Refund Policy | `src/pages/legal/refund.astro` | ✅ Done |
+| Subprocessors List | `src/pages/legal/subprocessors.astro` | ✅ Done |
+| AML/CFT Policy | `src/pages/legal/aml.astro` | ✅ Done |
 | Checkout Flow | `src/pages/checkout/[plan].astro` | ✅ Done |
 | Checkout API | `src/pages/api/checkout.ts` | ✅ Done |
 | Webhook Handler | `src/pages/api/webhooks/dodopayments.ts` | ✅ Done |
+| Mollie Webhook Handler | `src/pages/api/webhooks/mollie.ts` | ✅ Done |
 | Customer Portal | `src/pages/api/customer-portal.ts` | ✅ Done |
 | Monitoring Dashboard | `src/pages/monitoring/index.astro` | ✅ Done |
 | Monitoring API | `src/pages/api/monitoring/instances.ts` | ✅ Done |
@@ -200,17 +301,23 @@ Showcasing a robust backend builds trust.
 | WebSocket Server | `server/websocket.mjs` | ✅ Done |
 | Real-time Metrics | WebSocket `/ws` + Redis pub/sub | ✅ Done |
 | Real-time Alerts | WebSocket `/ws` + Redis pub/sub | ✅ Done |
+| Sitemap | `src/pages/sitemap.xml.ts` | ✅ Done |
+| Robots.txt | `src/pages/robots.txt.ts` | ✅ Done |
+| Stable Asset Names | `astro.config.mjs` build config | ✅ Done |
+| Robust Deploy Script | `deploy/scripts/deploy.sh` | ✅ Done |
+| GitHub Actions Workflow | `.github/workflows/deploy.yml` | ✅ Done |
+| Nginx Config | `deploy/nginx.conf` | ✅ Done |
 
 ### Compliance Checklist
 
 - [x] Enterprise color palette (Navy/Slate/White) applied via Tailwind theme
 - [x] Inter font loaded globally
-- [x] Sticky header with Features, Use Cases, Pricing, Dashboard Login
-- [x] Trust strip with payment methods (Visa, MC, Amex) and security badges (SSL, AES-256)
+- [x] Sticky header with Features, Use Cases, Pricing, Status, Dashboard Login
+- [x] Trust strip with payment methods (Visa, MC, Amex, Apple Pay, Google Pay) and security badges (SSL, AES-256)
 - [x] Hero uses approved messaging only (no banned keywords)
 - [x] 3 transparent pricing tiers with explicit RAM/Storage/Instance specs
 - [x] "No hidden fees" and "Cancel anytime" messaging present
-- [x] MoR acknowledgment: "Securely processed by Dodo Payments"
+- [x] MoR acknowledgment: "Securely processed by Dodo Payments and Mollie"
 - [x] Footer includes company name, physical address, support email, copyright, MoR disclaimer
 - [x] Legal pages created: `/legal/terms`, `/legal/privacy`, `/legal/aup`, `/legal/refund`
 - [x] AUP includes explicit prohibitions: DDoS, port scanning, spamming, crypto mining, 100% CPU scripts, click-fraud, card testing, identity theft
@@ -218,10 +325,10 @@ Showcasing a robust backend builds trust.
 - [x] Privacy policy includes GDPR/CCPA rights, data retention, no raw credit card storage statement
 - [x] Product showcase section added with dashboard mockup
 - [x] Partner logos replaced with SVG placeholders
-- [x] Checkout flow implemented with Dodo Payments API integration
+- [x] Checkout flow implemented with Dodo Payments + Mollie API integration
 - [x] Pricing CTAs link to `/checkout/{plan}` routes
 - [x] Checkout success/cancel pages created
-- [x] `.env.example` created for Dodo Payments API key
+- [x] `.env.example` created for Dodo Payments + Mollie API keys
 - [x] Monitoring dashboard with CPU/memory/network metrics
 - [x] Automated anomaly detection for CPU >95% and traffic spikes
 - [x] Audit logging API with compliance event tracking
@@ -288,9 +395,11 @@ Showcasing a robust backend builds trust.
 - [x] Customer portal route (`/api/customer-portal`)
 - [x] Error pages (`404.astro`, `500.astro`)
 - [x] Dodo Payments customer ID stored in user records
+- [x] Mollie customer ID stored in user records
 - [x] "Manage Subscription" button on billing page
 - [x] Production domain configured (`clouddroid.eu`)
 - [x] Dodo Payments checkout working in production (`POST /checkouts`)
+- [x] Mollie checkout working in production (`POST /v2/payments`)
 - [x] Login history/activity page with paginated auth events
 - [x] Session management with active sessions list and revoke
 - [x] Instance detail page with metrics chart and action buttons
@@ -301,6 +410,16 @@ Showcasing a robust backend builds trust.
 - [x] Nginx proxy for WebSocket `/ws` endpoint
 - [x] PM2 process for WebSocket server
 - [x] Admin dashboard with stats API and Chart.js graphs
+- [x] Business information page for KYB (`/business`)
+- [x] System status page (`/status`)
+- [x] Subprocessors list (`/legal/subprocessors`)
+- [x] AML/CFT policy page (`/legal/aml`)
+- [x] Security disclosure page (`/security-disclosure`)
+- [x] Sitemap updated with all new pages
+- [x] Robots.txt configured
+- [x] Stable asset filenames to prevent cache invalidation issues
+- [x] Robust deploy script with build verification
+- [x] Nginx config with proper WebSocket handling
 
 ### Next Steps
 
@@ -350,3 +469,13 @@ Showcasing a robust backend builds trust.
 44. ~~Add dark mode toggle with localStorage persistence~~ ✅ Completed
 45. ~~Add Redis caching for frequent queries~~ ✅ Completed
 46. ~~Add WebSocket server for real-time updates~~ ✅ Completed
+47. ~~Add Mollie payment gateway integration~~ ✅ Completed
+48. ~~Add business information page for KYB~~ ✅ Completed
+49. ~~Add system status page~~ ✅ Completed
+50. ~~Add subprocessors list page~~ ✅ Completed
+51. ~~Add AML/CFT policy page~~ ✅ Completed
+52. ~~Add security disclosure page~~ ✅ Completed
+53. ~~Strengthen Terms of Service with payment/cancellation terms~~ ✅ Completed
+54. ~~Fix nginx config for proper WebSocket handling~~ ✅ Completed
+55. ~~Fix deploy script with build verification~~ ✅ Completed
+56. ~~Stabilize asset filenames to prevent cache invalidation~~ ✅ Completed
