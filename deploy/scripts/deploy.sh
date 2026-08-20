@@ -12,7 +12,7 @@ cd "$APP_DIR"
 
 echo "[1/5] Pulling latest code..."
 git config --global --add safe.directory "$APP_DIR"
-sudo chown -R $USER:$USER "$APP_DIR" || true
+sudo -n chown -R $USER:$USER "$APP_DIR" || true
 git fetch origin
 git reset --hard "origin/$BRANCH"
 
@@ -24,8 +24,8 @@ git reset --hard "origin/$BRANCH"
     echo "Redis not found. Install it manually on VPS."
   fi
   if command -v systemctl >/dev/null 2>&1; then
-    systemctl enable redis-server || true
-    systemctl restart redis-server || true
+    sudo -n systemctl enable redis-server || true
+    sudo -n systemctl restart redis-server || true
   fi
 
   echo "[3/5] Building..."

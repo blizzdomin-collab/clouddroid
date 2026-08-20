@@ -23,7 +23,7 @@ jobs:
 
             echo "[1] Pulling latest code..."
             git config --global --add safe.directory /var/www/clouddroid
-            sudo chown -R $USER:$USER /var/www/clouddroid || true
+            sudo -n chown -R $USER:$USER /var/www/clouddroid || true
             git fetch origin
             git reset --hard origin/main
 
