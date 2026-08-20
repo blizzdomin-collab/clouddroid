@@ -50,11 +50,5 @@ jobs:
             pm2 reload deploy/ecosystem.config.cjs --update-env || pm2 start deploy/ecosystem.config.cjs
             pm2 save
 
-            echo "[5b] Updating nginx config..."
-            if [ -f deploy/nginx.conf ]; then
-              sudo -n cp deploy/nginx.conf /etc/nginx/sites-available/clouddroid || true
-              sudo -n nginx -t && sudo -n systemctl reload nginx || true
-            fi
-
             echo "=== Deployment complete ==="
             pm2 status
