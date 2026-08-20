@@ -36,8 +36,9 @@ const endpoints = [
   { method: 'GET', path: '/api/notifications/channels', description: 'List notification channels', auth: true },
   { method: 'POST', path: '/api/notifications/channels', description: 'Create notification channel', auth: true },
   { method: 'DELETE', path: '/api/notifications/channels', description: 'Delete notification channel', auth: true },
-  { method: 'POST', path: '/api/checkout', description: 'Create Dodo Payments checkout session', auth: false },
+  { method: 'POST', path: '/api/checkout', description: 'Create checkout session (Dodo Payments or Mollie)', auth: false },
   { method: 'POST', path: '/api/webhooks/dodopayments', description: 'Dodo Payments webhook', auth: false },
+  { method: 'POST', path: '/api/webhooks/mollie', description: 'Mollie webhook', auth: false },
 ];
 
 const methodColors: Record<string, string> = {

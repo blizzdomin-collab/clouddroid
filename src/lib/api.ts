@@ -10,7 +10,7 @@ export function corsHeaders(origin?: string): Record<string, string> {
   return {
     'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Dodo-Signature',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Dodo-Signature, X-Mollie-Signature',
     'Access-Control-Max-Age': '86400',
   };
 }

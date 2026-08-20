@@ -20,9 +20,16 @@ export const GET: APIRoute = async ({ cookies, url }) => {
     }
 
     const user = getUserByEmail(session.email);
-    if (!user?.dodo_customer_id) {
-      return new Response(JSON.stringify({ error: 'No Dodo Payments customer ID found for this account' }), {
+    if (!user?.dodo_customer_id && !user?.mollie_customer_id) {
+      return new Response(JSON.stringify({ error: 'No payment customer ID found for this account' }), {
         status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (user?.mollie_customer_id && !user?.dodo_customer_id) {
+      return new Response(JSON.stringify({ error: 'Mollie does not provide a customer portal. Please contact support to manage your subscription.' }), {
+        status: 501,
         headers: { 'Content-Type': 'application/json' },
       });
     }

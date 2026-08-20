@@ -32,6 +32,7 @@ export {
   saveToDisk,
   createCheckoutSession,
   getCheckoutSessionBySessionId,
+  getCheckoutSessionByMolliePaymentId,
   updateCheckoutSession,
   getCheckoutSessionByEmail,
   getNotificationChannels,

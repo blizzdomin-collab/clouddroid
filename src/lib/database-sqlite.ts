@@ -31,6 +31,7 @@ db.exec(`
     two_factor_backup_codes TEXT,
     two_factor_enabled INTEGER NOT NULL DEFAULT 0,
     dodo_customer_id TEXT,
+    mollie_customer_id TEXT,
     registration_ip TEXT,
     registration_user_agent TEXT,
     suspended INTEGER NOT NULL DEFAULT 0,
@@ -121,6 +122,8 @@ db.exec(`
     temp_password TEXT,
     ip_address TEXT,
     user_agent TEXT,
+    payment_gateway TEXT NOT NULL DEFAULT 'dodo',
+    mollie_payment_id TEXT,
     created_at TEXT NOT NULL
   );
 
@@ -211,10 +214,26 @@ function migrateSchema() {
     db.exec("ALTER TABLE users ADD COLUMN suspension_reason TEXT");
   }
 
+  const hasMollieCustomerId = userColumns.some((col) => col.name === 'mollie_customer_id');
+  if (!hasMollieCustomerId) {
+    db.exec("ALTER TABLE users ADD COLUMN mollie_customer_id TEXT");
+  }
+
   const instanceColumns = db.prepare("PRAGMA table_info(instances)").all() as any[];
   const hasUserId = instanceColumns.some((col) => col.name === 'user_id');
   if (!hasUserId) {
     db.exec("ALTER TABLE instances ADD COLUMN user_id TEXT NOT NULL DEFAULT ''");
+  }
+
+  const checkoutColumns = db.prepare("PRAGMA table_info(checkout_sessions)").all() as any[];
+  const hasPaymentGateway = checkoutColumns.some((col) => col.name === 'payment_gateway');
+  if (!hasPaymentGateway) {
+    db.exec("ALTER TABLE checkout_sessions ADD COLUMN payment_gateway TEXT NOT NULL DEFAULT 'dodo'");
+  }
+
+  const hasMolliePaymentId = checkoutColumns.some((col) => col.name === 'mollie_payment_id');
+  if (!hasMolliePaymentId) {
+    db.exec("ALTER TABLE checkout_sessions ADD COLUMN mollie_payment_id TEXT");
   }
 }
 
@@ -239,8 +258,8 @@ export function getUserById(id: string) {
 export function createUser(data: Omit<any, 'id' | 'created_at'>) {
   const now = new Date().toISOString();
   const id = `user_${String(Date.now()).slice(-3)}`;
-  db.prepare(`INSERT INTO users (id, email, password_hash, name, role, created_at, reset_token, reset_token_expiry, must_change_password, two_factor_secret, two_factor_backup_codes, two_factor_enabled, dodo_customer_id, registration_ip, registration_user_agent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-    id, data.email, data.password_hash, data.name, data.role || 'user', now, data.reset_token || null, data.reset_token_expiry || null, data.must_change_password ? 1 : 0, data.two_factor_secret || null, data.two_factor_backup_codes ? JSON.stringify(data.two_factor_backup_codes) : null, data.two_factor_enabled ? 1 : 0, data.dodo_customer_id || null, data.registration_ip || null, data.registration_user_agent || null
+  db.prepare(`INSERT INTO users (id, email, password_hash, name, role, created_at, reset_token, reset_token_expiry, must_change_password, two_factor_secret, two_factor_backup_codes, two_factor_enabled, dodo_customer_id, mollie_customer_id, registration_ip, registration_user_agent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    id, data.email, data.password_hash, data.name, data.role || 'user', now, data.reset_token || null, data.reset_token_expiry || null, data.must_change_password ? 1 : 0, data.two_factor_secret || null, data.two_factor_backup_codes ? JSON.stringify(data.two_factor_backup_codes) : null, data.two_factor_enabled ? 1 : 0, data.dodo_customer_id || null, data.mollie_customer_id || null, data.registration_ip || null, data.registration_user_agent || null
   );
   return getUserById(id);
 }
@@ -264,6 +283,7 @@ export function updateUser(id: string, updates: Partial<any>) {
   if (updates.two_factor_backup_codes !== undefined) { fields.push('two_factor_backup_codes = ?'); values.push(updates.two_factor_backup_codes ? JSON.stringify(updates.two_factor_backup_codes) : null); }
   if (updates.two_factor_enabled !== undefined) { fields.push('two_factor_enabled = ?'); values.push(updates.two_factor_enabled ? 1 : 0); }
   if (updates.dodo_customer_id !== undefined) { fields.push('dodo_customer_id = ?'); values.push(updates.dodo_customer_id); }
+  if (updates.mollie_customer_id !== undefined) { fields.push('mollie_customer_id = ?'); values.push(updates.mollie_customer_id); }
   if (updates.registration_ip !== undefined) { fields.push('registration_ip = ?'); values.push(updates.registration_ip); }
   if (updates.registration_user_agent !== undefined) { fields.push('registration_user_agent = ?'); values.push(updates.registration_user_agent); }
   if (updates.suspended !== undefined) { fields.push('suspended = ?'); values.push(updates.suspended ? 1 : 0); }
@@ -459,14 +479,18 @@ export function createAlert(data: Omit<any, 'id' | 'timestamp'>) {
 export function createCheckoutSession(data: Omit<any, 'id' | 'created_at'>) {
   const now = new Date().toISOString();
   const id = `cs_${String(Date.now()).slice(-3)}`;
-  db.prepare(`INSERT INTO checkout_sessions (id, session_id, email, plan, status, temp_password, ip_address, user_agent, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-    id, data.session_id, data.email, data.plan, data.status || 'pending', data.temp_password || null, data.ip_address || null, data.user_agent || null, now
+  db.prepare(`INSERT INTO checkout_sessions (id, session_id, email, plan, status, temp_password, ip_address, user_agent, payment_gateway, mollie_payment_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    id, data.session_id, data.email, data.plan, data.status || 'pending', data.temp_password || null, data.ip_address || null, data.user_agent || null, data.payment_gateway || 'dodo', data.mollie_payment_id || null, now
   );
   return db.prepare('SELECT * FROM checkout_sessions WHERE id = ?').get(id) as any;
 }
 
 export function getCheckoutSessionBySessionId(sessionId: string) {
   return db.prepare('SELECT * FROM checkout_sessions WHERE session_id = ?').get(sessionId) as any || null;
+}
+
+export function getCheckoutSessionByMolliePaymentId(paymentId: string) {
+  return db.prepare('SELECT * FROM checkout_sessions WHERE mollie_payment_id = ?').get(paymentId) as any || null;
 }
 
 export function updateCheckoutSession(id: string, updates: Partial<any>) {
@@ -479,6 +503,8 @@ export function updateCheckoutSession(id: string, updates: Partial<any>) {
   if (updates.temp_password !== undefined) { fields.push('temp_password = ?'); values.push(updates.temp_password); }
   if (updates.ip_address !== undefined) { fields.push('ip_address = ?'); values.push(updates.ip_address); }
   if (updates.user_agent !== undefined) { fields.push('user_agent = ?'); values.push(updates.user_agent); }
+  if (updates.payment_gateway !== undefined) { fields.push('payment_gateway = ?'); values.push(updates.payment_gateway); }
+  if (updates.mollie_payment_id !== undefined) { fields.push('mollie_payment_id = ?'); values.push(updates.mollie_payment_id); }
   if (!fields.length) return null;
   values.push(id);
   db.prepare(`UPDATE checkout_sessions SET ${fields.join(', ')} WHERE id = ?`).run(...values);
@@ -634,6 +660,7 @@ export interface User {
   two_factor_backup_codes: string[] | null;
   two_factor_enabled: boolean;
   dodo_customer_id: string | null;
+  mollie_customer_id: string | null;
   registration_ip: string | null;
   registration_user_agent: string | null;
   suspended: boolean;
@@ -684,6 +711,8 @@ export interface CheckoutSession {
   temp_password: string | null;
   ip_address: string | null;
   user_agent: string | null;
+  payment_gateway: 'dodo' | 'mollie';
+  mollie_payment_id: string | null;
   created_at: string;
 }
 
