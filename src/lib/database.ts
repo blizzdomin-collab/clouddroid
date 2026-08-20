@@ -1,5 +1,7 @@
 export {
   hashPassword,
+  verifyPassword,
+  needsRehash,
   getUsers,
   getUserByEmail,
   getUserById,
@@ -9,7 +11,6 @@ export {
   provisionInstancesForUser,
   verifyResetToken,
   clearResetToken,
-  verifyPassword,
   getSubscriptions,
   getSubscriptionByUserId,
   createSubscription,

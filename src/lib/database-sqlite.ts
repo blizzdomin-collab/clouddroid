@@ -240,7 +240,28 @@ function migrateSchema() {
 migrateSchema();
 
 export function hashPassword(password: string): string {
-  return crypto.createHash('sha256').update(password).digest('hex');
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.pbkdf2Sync(password, salt, 100000, 32, 'sha256').toString('hex');
+  return `pbkdf2:100000:${salt}:${hash}`;
+}
+
+export function verifyPassword(password: string, hash: string): boolean {
+  if (hash.startsWith('pbkdf2:')) {
+    const parts = hash.split(':');
+    if (parts.length !== 4) return false;
+    const iterations = parseInt(parts[1], 10);
+    const salt = parts[2];
+    const expectedHash = parts[3];
+    const actualHash = crypto.pbkdf2Sync(password, salt, iterations, 32, 'sha256').toString('hex');
+    return crypto.timingSafeEqual(Buffer.from(expectedHash), Buffer.from(actualHash));
+  }
+
+  const legacyHash = crypto.createHash('sha256').update(password).digest('hex');
+  return crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(legacyHash));
+}
+
+export function needsRehash(hash: string): boolean {
+  return !hash.startsWith('pbkdf2:');
 }
 
 export function getUsers() {
@@ -332,10 +353,6 @@ export function verifyResetToken(token: string): { user: any | null; valid: bool
 
 export function clearResetToken(userId: string) {
   db.prepare('UPDATE users SET reset_token = NULL, reset_token_expiry = NULL WHERE id = ?').run(userId);
-}
-
-export function verifyPassword(password: string, hash: string): boolean {
-  return hashPassword(password) === hash;
 }
 
 export function getSubscriptions() {

@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getUserByEmail, verifyPassword, createAuditLog, createSession } from '../../../lib/database';
+import { getUserByEmail, verifyPassword, needsRehash, updateUser, hashPassword, createAuditLog, createSession } from '../../../lib/database';
 import { verifyTwoFactorCode } from '../../../lib/twofactor';
 import { LoginSchema, validate } from '../../../lib/validation';
 import { checkRequestSize } from '../../../lib/requestLimits';
@@ -78,6 +78,10 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
       });
+    }
+
+    if (needsRehash(user.password_hash)) {
+      updateUser(user.id, { password_hash: hashPassword(password) });
     }
 
     if (user.two_factor_enabled) {
