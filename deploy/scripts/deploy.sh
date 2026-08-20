@@ -29,7 +29,6 @@ git reset --hard "origin/$BRANCH"
   fi
 
   echo "[3/5] Building..."
-  rm -rf dist
   npm run build
 
 echo "[4/5] Ensuring data directory exists..."
