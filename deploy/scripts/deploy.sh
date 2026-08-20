@@ -44,5 +44,11 @@ fi
 
 pm2 save
 
+echo "[5b/5] Updating nginx config..."
+if [ -f "$APP_DIR/deploy/nginx.conf" ]; then
+  sudo -n cp "$APP_DIR/deploy/nginx.conf" /etc/nginx/sites-available/clouddroid || true
+  sudo -n nginx -t && sudo -n systemctl reload nginx || true
+fi
+
 echo "=== Deployment complete ==="
 pm2 status
