@@ -14,6 +14,7 @@ const sessionCookie = Astro.cookies.get('session');
 let isAuthenticated = false;
 let mustChangePassword = false;
 let currentUser: { email: string; name: string; role: string } | null = null;
+let unreadAlerts = 0;
 
 if (sessionCookie) {
   try {
@@ -28,6 +29,20 @@ if (sessionCookie) {
     }
   } catch {
     isAuthenticated = false;
+  }
+}
+
+if (isAuthenticated) {
+  try {
+    const alertsRes = await fetch(`${Astro.url.origin}/api/alerts?acknowledged=false&limit=1`, {
+      headers: { Cookie: `session=${sessionCookie?.value}` },
+    });
+    if (alertsRes.ok) {
+      const alertsData = await alertsRes.json();
+      unreadAlerts = alertsData.summary?.unacknowledged || 0;
+    }
+  } catch {
+    unreadAlerts = 0;
   }
 }
 
@@ -99,9 +114,16 @@ if (mustChangePassword && !Astro.url.pathname.startsWith('/change-password')) {
             <span class="font-medium">Compliance</span>
           </a>
           <a href="/dashboard/alerts" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
+            <div class="relative">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              {unreadAlerts > 0 && (
+                <span class="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                  {unreadAlerts > 9 ? '9+' : unreadAlerts}
+                </span>
+              )}
+            </div>
             <span class="font-medium">Alerts</span>
           </a>
           <a href="/dashboard/activity" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-white/5 hover:text-white transition-colors">

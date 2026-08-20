@@ -55,6 +55,19 @@ if (sessionCookie) {
             </div>
           </div>
 
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+              <div class="text-sm text-slate mb-1">Dodo Payments Users</div>
+              <div class="text-3xl font-bold text-navy">{stats.paymentGateways?.dodo?.users || 0}</div>
+              <div class="text-xs text-slate mt-1">Revenue: ${(stats.paymentGateways?.dodo?.revenue || 0).toFixed(2)}</div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+              <div class="text-sm text-slate mb-1">Mollie Users</div>
+              <div class="text-3xl font-bold text-navy">{stats.paymentGateways?.mollie?.users || 0}</div>
+              <div class="text-xs text-slate mt-1">Revenue: €{(stats.paymentGateways?.mollie?.revenue || 0).toFixed(2)}</div>
+            </div>
+          </div>
+
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
               <div class="px-6 py-4 border-b border-slate-200">

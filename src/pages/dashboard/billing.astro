@@ -2,9 +2,13 @@
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
 
 const sessionCookie = Astro.cookies.get('session');
-let currentUser: { email: string; name: string; role: string } | null = null;
+let currentUser: { email: string; name: string; role: string; mollie_customer_id?: string | null; dodo_customer_id?: string | null } | null = null;
 let subscription: any = null;
 let invoices: any[] = [];
+let instances: any[] = [];
+let paymentGateway: 'dodo' | 'mollie' = 'dodo';
+let cancelSuccess = false;
+let cancelError = '';
 
 if (sessionCookie) {
   try {
@@ -18,6 +22,7 @@ if (sessionCookie) {
       if (subRes.ok) {
         const data = await subRes.json();
         subscription = data.subscription;
+        paymentGateway = data.paymentGateway || 'dodo';
       }
       const invRes = await fetch(`${Astro.url.origin}/api/billing/invoices`, {
         headers: { Cookie: cookieHeader },
@@ -25,6 +30,13 @@ if (sessionCookie) {
       if (invRes.ok) {
         const data = await invRes.json();
         invoices = data.invoices || [];
+      }
+      const instRes = await fetch(`${Astro.url.origin}/api/monitoring/instances`, {
+        headers: { Cookie: cookieHeader },
+      });
+      if (instRes.ok) {
+        const data = await instRes.json();
+        instances = data.instances || [];
       }
     }
   } catch {
@@ -65,11 +77,24 @@ if (sessionCookie) {
                 <span>Auto-renew</span>
                 <span class="text-navy font-medium">{subscription.cancel_at_period_end ? 'No' : 'Yes'}</span>
               </div>
-              <div class="pt-4">
-                <button id="portalBtn" class="inline-flex items-center gap-2 bg-navy text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-navy-light transition-colors">
-                  Manage Subscription
-                </button>
+              <div class="flex items-center justify-between">
+                <span>Payment method</span>
+                <span class="text-navy font-medium">{paymentGateway === 'mollie' ? 'Mollie (iDEAL, Bancontact, Card)' : 'Dodo Payments (Card, Apple Pay, Google Pay)'}</span>
               </div>
+              <div class="pt-4 flex items-center gap-3">
+                {paymentGateway === 'dodo' && (
+                  <button id="portalBtn" class="inline-flex items-center gap-2 bg-navy text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-navy-light transition-colors">
+                    Manage Subscription
+                  </button>
+                )}
+                {subscription.status === 'active' && !subscription.cancel_at_period_end && (
+                  <button id="cancelBtn" class="inline-flex items-center gap-2 border border-red-300 text-red-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors">
+                    Cancel Subscription
+                  </button>
+                )}
+              </div>
+              {cancelSuccess && <p class="text-sm text-green-600 mt-2">Subscription cancellation scheduled successfully.</p>}
+              {cancelError && <p class="text-sm text-red-600 mt-2">{cancelError}</p>}
             </div>
           </div>
         </div>
@@ -79,18 +104,65 @@ if (sessionCookie) {
             <h2 class="text-lg font-semibold text-navy">Payment Method</h2>
           </div>
           <div class="p-6">
-            <p class="text-sm text-slate mb-4">Payment is processed securely by Dodo Payments and Mollie.</p>
-            <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
-              <div class="w-12 h-8 bg-navy/5 rounded flex items-center justify-center">
-                <span class="text-xs font-medium text-navy">VISA</span>
+            <p class="text-sm text-slate mb-4">Payment is processed securely by {paymentGateway === 'mollie' ? 'Mollie' : 'Dodo Payments and Mollie'}.</p>
+            {paymentGateway === 'mollie' ? (
+              <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                <div class="w-12 h-8 bg-navy/5 rounded flex items-center justify-center">
+                  <span class="text-xs font-medium text-navy">MOLLIE</span>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-navy">Mollie</div>
+                  <div class="text-xs text-slate">iDEAL, Bancontact, Card</div>
+                </div>
               </div>
-              <div>
-                <div class="text-sm font-medium text-navy">Visa ending in 4242</div>
-                <div class="text-xs text-slate">Expires 12/2027</div>
+            ) : (
+              <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                <div class="w-12 h-8 bg-navy/5 rounded flex items-center justify-center">
+                  <span class="text-xs font-medium text-navy">DODO</span>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-navy">Dodo Payments</div>
+                  <div class="text-xs text-slate">Card, Apple Pay, Google Pay</div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {instances.length > 0 && (
+          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200">
+              <h2 class="text-lg font-semibold text-navy">Your Instances</h2>
+            </div>
+            <div class="p-6">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                <div class="bg-slate-50 rounded-lg p-4">
+                  <div class="text-xs text-slate mb-1">Total</div>
+                  <div class="text-xl font-bold text-navy">{instances.length}</div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4">
+                  <div class="text-xs text-slate mb-1">Running</div>
+                  <div class="text-xl font-bold text-green-700">{instances.filter((i: any) => i.status === 'running').length}</div>
+                </div>
+                <div class="bg-yellow-50 rounded-lg p-4">
+                  <div class="text-xs text-slate mb-1">Warnings</div>
+                  <div class="text-xl font-bold text-yellow-700">{instances.filter((i: any) => i.status === 'warning').length}</div>
+                </div>
+              </div>
+              <div class="space-y-2">
+                {instances.slice(0, 5).map((inst: any) => (
+                  <div class="flex items-center justify-between text-sm">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full {inst.status === 'running' ? 'bg-green-500' : inst.status === 'warning' ? 'bg-yellow-500' : 'bg-slate-400'}"></span>
+                      <span class="text-navy font-medium">{inst.name}</span>
+                    </div>
+                    <span class="text-slate">{inst.platform} • {inst.ram} GB</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
           <div class="px-6 py-4 border-b border-slate-200">
@@ -147,7 +219,7 @@ if (sessionCookie) {
       </div>
     )}
   </div>
-  {subscription && (
+  {subscription && paymentGateway === 'dodo' && (
     <script>
       document.getElementById('portalBtn')?.addEventListener('click', async () => {
         try {
@@ -160,6 +232,30 @@ if (sessionCookie) {
           }
         } catch {
           alert('Failed to open customer portal');
+        }
+      });
+    </script>
+  )}
+  {subscription && (
+    <script>
+      document.getElementById('cancelBtn')?.addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to cancel your subscription? You will retain access until the end of your current billing period.')) {
+          return;
+        }
+        try {
+          const res = await fetch('/api/billing/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cancelAtPeriodEnd: true }),
+          });
+          const data = await res.json();
+          if (data.success) {
+            window.location.reload();
+          } else {
+            alert(data.error || 'Failed to cancel subscription');
+          }
+        } catch {
+          alert('Failed to cancel subscription');
         }
       });
     </script>

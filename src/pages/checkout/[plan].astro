@@ -83,10 +83,11 @@ if (!selectedPlan) {
               </label>
               <div class="grid grid-cols-2 gap-3">
                 <label class="cursor-pointer">
-                  <input type="radio" name="gateway" value="dodo" checked class="sr-only peer" />
+                  <input type="radio" name="gateway" value="dodo" class="sr-only peer" />
                   <div class="border border-slate-200 rounded-lg p-4 peer-checked:border-navy peer-checked:bg-navy/5 transition-all">
                     <div class="text-sm font-medium text-navy">Dodo Payments</div>
                     <div class="text-xs text-slate">Card, Apple Pay, Google Pay</div>
+                    <div class="text-xs text-slate mt-1">USD pricing</div>
                   </div>
                 </label>
                 <label class="cursor-pointer">
@@ -94,9 +95,23 @@ if (!selectedPlan) {
                   <div class="border border-slate-200 rounded-lg p-4 peer-checked:border-navy peer-checked:bg-navy/5 transition-all">
                     <div class="text-sm font-medium text-navy">Mollie</div>
                     <div class="text-xs text-slate">iDEAL, Bancontact, Card</div>
+                    <div class="text-xs text-slate mt-1">EUR pricing</div>
                   </div>
                 </label>
               </div>
+            </div>
+            <div id="checkout-summary" class="hidden bg-slate-50 rounded-lg p-4 border border-slate-200">
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <div class="text-sm font-medium text-navy">Order Summary</div>
+                  <div class="text-xs text-slate mt-1" id="summary-gateway"></div>
+                </div>
+                <div class="text-right">
+                  <div class="text-sm font-medium text-navy" id="summary-price"></div>
+                  <div class="text-xs text-slate" id="summary-currency"></div>
+                </div>
+              </div>
+              <div class="text-xs text-slate mt-2 pt-2 border-t border-slate-200" id="summary-plan"></div>
             </div>
             <button
               type="submit"
@@ -136,11 +151,42 @@ if (!selectedPlan) {
   </div>
   <script>
     const form = document.getElementById('checkout-form');
+    const summary = document.getElementById('checkout-summary');
+    const summaryGateway = document.getElementById('summary-gateway');
+    const summaryPrice = document.getElementById('summary-price');
+    const summaryCurrency = document.getElementById('summary-currency');
+    const gatewayInputs = form?.querySelectorAll('input[name="gateway"]');
+
+    gatewayInputs?.forEach((input) => {
+      input.addEventListener('change', () => {
+        if (!summary || !summaryGateway || !summaryPrice || !summaryCurrency || !summaryPlan) return;
+        const gateway = input.value;
+        const planId = form?.getAttribute('data-plan');
+        const planConfig: Record<string, { name: string; price: number; molliePrice: string; specs: string[] }> = {
+          developer: { name: 'Developer', price: 49, molliePrice: '49.00', specs: ['4 GB RAM', '32 GB Storage', '1 Instance'] },
+          professional: { name: 'Professional', price: 149, molliePrice: '149.00', specs: ['8 GB RAM', '64 GB Storage', '4 Instances'] },
+          team: { name: 'Team', price: 399, molliePrice: '399.00', specs: ['16 GB RAM', '128 GB Storage', '12 Instances'] },
+        };
+        const selectedPlan = planId ? planConfig[planId] : null;
+        if (selectedPlan) {
+          summary.classList.remove('hidden');
+          summaryGateway.textContent = gateway === 'mollie' ? 'Mollie' : 'Dodo Payments';
+          summaryPrice.textContent = gateway === 'mollie' ? `€${selectedPlan.molliePrice}` : `$${selectedPlan.price}`;
+          summaryCurrency.textContent = gateway === 'mollie' ? 'EUR' : 'USD';
+          summaryPlan.textContent = `${selectedPlan.name} Plan · ${selectedPlan.specs.join(', ')}`;
+        }
+      });
+    });
+
     form?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = (form as HTMLFormElement).email.value;
-      const gateway = (form as HTMLFormElement).gateway?.value || 'dodo';
+      const gateway = (form as HTMLFormElement).gateway?.value;
       const button = form?.querySelector('button[type="submit"]');
+      if (!gateway) {
+        alert('Please select a payment method before continuing.');
+        return;
+      }
       if (button) {
         button.disabled = true;
         button.innerHTML = '<span class="inline-flex items-center gap-2"><svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Processing...</span>';

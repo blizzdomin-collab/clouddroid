@@ -49,6 +49,7 @@ export {
   getInstancesByUserId,
   getSubscriptionsByUserId,
   getInvoicesByUserId,
+  completeCheckout,
 } from './database-sqlite';
 
 export type {

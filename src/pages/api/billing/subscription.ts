@@ -29,7 +29,7 @@ export const GET: APIRoute = async ({ cookies }) => {
     }
 
     const subscription = getSubscriptionByUserId(user.id);
-    return new Response(JSON.stringify({ subscription }), {
+    return new Response(JSON.stringify({ subscription, paymentGateway: user.mollie_customer_id ? 'mollie' : 'dodo' }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

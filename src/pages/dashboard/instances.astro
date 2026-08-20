@@ -71,10 +71,21 @@ const instances = instancesData.instances || [];
                   </div>
                 </td>
                 <td class="px-6 py-4">
-                  <span id={`status-${inst.id}`} class="inline-flex items-center gap-1.5 text-xs text-green-600 bg-green-50 px-3 py-1 rounded-full">
-                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                    {inst.status}
-                  </span>
+                  {(() => {
+                    const status = inst.status;
+                    const colorMap: Record<string, { text: string; bg: string; dot: string }> = {
+                      running: { text: 'text-green-700', bg: 'bg-green-50', dot: 'bg-green-500' },
+                      stopped: { text: 'text-slate-700', bg: 'bg-slate-100', dot: 'bg-slate-400' },
+                      warning: { text: 'text-yellow-700', bg: 'bg-yellow-50', dot: 'bg-yellow-500' },
+                    };
+                    const colors = colorMap[status] || colorMap.running;
+                    return (
+                      <span id={`status-${inst.id}`} class={`inline-flex items-center gap-1.5 text-xs ${colors.text} ${colors.bg} px-3 py-1 rounded-full`}>
+                        <span class={`w-1.5 h-1.5 ${colors.dot} rounded-full`}></span>
+                        {status}
+                      </span>
+                    );
+                  })()}
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-2">

@@ -63,7 +63,7 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
       });
     }
 
-    const { email, password, code } = validation.data;
+    const { email, password, code, rememberMe } = validation.data;
 
     if (!email || !password) {
       return new Response(JSON.stringify({ error: 'Email and password are required' }), {
@@ -113,12 +113,13 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
       user_agent: request.headers.get('user-agent') || null,
     });
 
+    const maxAge = rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24 * 7;
     cookies.set('session', JSON.stringify({ email: user.email, authenticated: true, name: user.name, role: user.role, must_change_password: user.must_change_password, sessionId: sessionRecord.id }), {
       path: '/',
       httpOnly: true,
       secure: import.meta.env.PROD,
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge,
     });
 
     createAuditLog({

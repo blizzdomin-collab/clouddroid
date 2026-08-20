@@ -62,6 +62,29 @@ export const GET: APIRoute = async ({ cookies }) => {
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 5);
 
+    const dodoUsers = users.filter((u) => u.dodo_customer_id).length;
+    const mollieUsers = users.filter((u) => u.mollie_customer_id).length;
+
+    const dodoRevenue = invoices
+      .filter((inv) => inv.status === 'paid')
+      .filter((inv) => {
+        const sub = subscriptions.find((s) => s.id === inv.subscription_id);
+        if (!sub) return false;
+        const user = users.find((u) => u.id === sub.user_id);
+        return user?.dodo_customer_id;
+      })
+      .reduce((sum, inv) => sum + inv.amount, 0);
+
+    const mollieRevenue = invoices
+      .filter((inv) => inv.status === 'paid')
+      .filter((inv) => {
+        const sub = subscriptions.find((s) => s.id === inv.subscription_id);
+        if (!sub) return false;
+        const user = users.find((u) => u.id === sub.user_id);
+        return user?.mollie_customer_id;
+      })
+      .reduce((sum, inv) => sum + inv.amount, 0);
+
     return new Response(
       JSON.stringify({
         overview: {
@@ -70,6 +93,10 @@ export const GET: APIRoute = async ({ cookies }) => {
           activeSubscriptions: activeSubscriptions.length,
           totalRevenue,
           pendingInvoices: invoices.filter((inv) => inv.status === 'pending').length,
+        },
+        paymentGateways: {
+          dodo: { users: dodoUsers, revenue: dodoRevenue },
+          mollie: { users: mollieUsers, revenue: mollieRevenue },
         },
         userGrowth,
         revenueByDay,

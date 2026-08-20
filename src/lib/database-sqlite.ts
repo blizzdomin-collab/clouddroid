@@ -597,6 +597,110 @@ export function deleteSession(id: string) {
   return result.changes > 0;
 }
 
+export function completeCheckout({
+  email,
+  plan,
+  amount,
+  currency,
+  gateway,
+  tempPassword,
+  customerId,
+  checkoutSessionId,
+}: {
+  email: string;
+  plan: string;
+  amount: number;
+  currency: string;
+  gateway: 'dodo' | 'mollie';
+  tempPassword?: string;
+  customerId?: string;
+  checkoutSessionId?: string;
+}) {
+  const now = new Date().toISOString();
+  const periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+  let user = getUserByEmail(email);
+  if (!user) {
+    const finalPassword = tempPassword || crypto.randomBytes(12).toString('hex');
+    user = createUser({
+      email,
+      password_hash: hashPassword(finalPassword),
+      name: email.split('@')[0],
+      role: 'user',
+      reset_token: null,
+      reset_token_expiry: null,
+      must_change_password: true,
+      dodo_customer_id: gateway === 'dodo' ? customerId || null : null,
+      mollie_customer_id: gateway === 'mollie' ? customerId || null : null,
+    });
+
+    const subscription = createSubscription({
+      user_id: user.id,
+      plan,
+      status: 'active',
+      amount,
+      currency,
+      current_period_start: now,
+      current_period_end: periodEnd,
+      cancel_at_period_end: false,
+    });
+
+    createInvoice({
+      user_id: user.id,
+      subscription_id: subscription.id,
+      amount,
+      currency,
+      status: 'paid',
+      due_date: now,
+      paid_at: now,
+    });
+
+    createAuditLog({
+      event: 'User Created via Checkout',
+      severity: 'info',
+      instance_id: null,
+      user_id: user.id,
+      details: `User account created for ${email} after successful ${plan} subscription via ${gateway === 'mollie' ? 'Mollie' : 'Dodo Payments'}`,
+      action: 'user_create',
+    });
+
+    provisionInstancesForUser(user.id, plan);
+    return { user, subscription, created: true };
+  }
+
+  const subscription = createSubscription({
+    user_id: user.id,
+    plan,
+    status: 'active',
+    amount,
+    currency,
+    current_period_start: now,
+    current_period_end: periodEnd,
+    cancel_at_period_end: false,
+  });
+
+  createInvoice({
+    user_id: user.id,
+    subscription_id: subscription.id,
+    amount,
+    currency,
+    status: 'paid',
+    due_date: now,
+    paid_at: now,
+  });
+
+  createAuditLog({
+    event: 'Subscription Renewed via Checkout',
+    severity: 'info',
+    instance_id: null,
+    user_id: user.id,
+    details: `Subscription renewed for ${email} for ${plan} plan via ${gateway === 'mollie' ? 'Mollie' : 'Dodo Payments'}`,
+    action: 'subscription_renew',
+  });
+
+  return { user, subscription, created: false };
+}
+
 export function deleteSessionsByUserId(userId: string) {
   const result = db.prepare('DELETE FROM sessions WHERE user_id = ?').run(userId);
   return result.changes > 0;

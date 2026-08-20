@@ -1,7 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getCheckoutSessionBySessionId, getUserByEmail, createUser, createSubscription, createInvoice, createAuditLog, hashPassword, provisionInstancesForUser } from '../../lib/database';
-import crypto from 'crypto';
+import { getCheckoutSessionBySessionId, completeCheckout } from '../../lib/database';
 
 export const prerender = false;
 
@@ -12,19 +11,24 @@ let tempPassword = '';
 let planName = '';
 let errorMessage = '';
 let paymentSuccess = false;
-let gateway = 'dodo';
+let gateway: 'dodo' | 'mollie' = 'dodo';
 
 if (sessionId) {
   const checkoutSession = getCheckoutSessionBySessionId(sessionId);
   if (checkoutSession) {
-    gateway = checkoutSession.payment_gateway || 'dodo';
+    gateway = checkoutSession.payment_gateway === 'mollie' ? 'mollie' : 'dodo';
   }
 
   if (checkoutSession && checkoutSession.status === 'pending') {
-    if (gateway === 'mollie') {
-      const mollieApiKey = import.meta.env.MOLLIE_API_KEY;
-      if (mollieApiKey) {
-        try {
+    try {
+      let paymentStatus: string | null = null;
+      let amount = 0;
+      let currency = 'USD';
+      let customerId: string | null = null;
+
+      if (gateway === 'mollie') {
+        const mollieApiKey = import.meta.env.MOLLIE_API_KEY;
+        if (mollieApiKey) {
           const environment = import.meta.env.MOLLIE_ENVIRONMENT || 'live';
           const baseUrl = environment === 'test' ? 'https://api.mollie.nl' : 'https://api.mollie.com';
           const paymentRes = await fetch(`${baseUrl}/v2/payments/${sessionId}`, {
@@ -36,79 +40,15 @@ if (sessionId) {
 
           if (paymentRes.ok) {
             const paymentData = await paymentRes.json();
-            const paymentStatus = paymentData.status;
-
-            if (paymentStatus === 'paid' || paymentStatus === 'completed') {
-              paymentSuccess = true;
-              const customerEmail = checkoutSession.email;
-              const plan = checkoutSession.plan;
-              const amount = parseFloat(paymentData.amount?.value || '0');
-              tempPassword = checkoutSession.temp_password || '';
-
-              let user = getUserByEmail(customerEmail);
-              if (!user) {
-                const finalPassword = tempPassword || crypto.randomBytes(12).toString('hex');
-                user = createUser({
-                  email: customerEmail,
-                  password_hash: hashPassword(finalPassword),
-                  name: customerEmail.split('@')[0],
-                  role: 'user',
-                  reset_token: null,
-                  reset_token_expiry: null,
-                  must_change_password: true,
-                  mollie_customer_id: paymentData.customerId || null,
-                });
-
-                const subscription = createSubscription({
-                  user_id: user.id,
-                  plan,
-                  status: 'active',
-                  amount,
-                  currency: paymentData.amount?.currency === 'EUR' ? 'EUR' : 'USD',
-                  current_period_start: new Date().toISOString(),
-                  current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-                  cancel_at_period_end: false,
-                });
-
-                createInvoice({
-                  user_id: user.id,
-                  subscription_id: subscription.id,
-                  amount,
-                  currency: paymentData.amount?.currency === 'EUR' ? 'EUR' : 'USD',
-                  status: 'paid',
-                  due_date: new Date().toISOString(),
-                  paid_at: new Date().toISOString(),
-                });
-
-                createAuditLog({
-                  event: 'User Created via Checkout',
-                  severity: 'info',
-                  instance_id: null,
-                  user_id: user.id,
-                  details: `User account created for ${customerEmail} after successful ${plan} subscription via Mollie`,
-                  action: 'user_create',
-                });
-
-                provisionInstancesForUser(user.id, plan);
-
-                userCreated = true;
-                userEmail = customerEmail;
-                planName = plan;
-              } else {
-                userEmail = customerEmail;
-                planName = checkoutSession.plan;
-                userCreated = true;
-              }
-            }
+            paymentStatus = paymentData.status;
+            amount = parseFloat(paymentData.amount?.value || '0');
+            currency = paymentData.amount?.currency || 'EUR';
+            customerId = paymentData.customerId || null;
           }
-        } catch (e) {
-          errorMessage = 'Unable to verify payment status. Please contact support.';
         }
-      }
-    } else {
-      const dodoApiKey = import.meta.env.DODO_PAYMENTS_API_KEY;
-      if (dodoApiKey) {
-        try {
+      } else {
+        const dodoApiKey = import.meta.env.DODO_PAYMENTS_API_KEY;
+        if (dodoApiKey) {
           const sessionRes = await fetch(`https://api.dodopayments.com/v1/checkout-sessions/${sessionId}`, {
             headers: {
               'Authorization': `Bearer ${dodoApiKey}`,
@@ -118,74 +58,37 @@ if (sessionId) {
 
           if (sessionRes.ok) {
             const sessionData = await sessionRes.json();
-            const paymentStatus = sessionData.payment_status || sessionData.status;
-
-            if (paymentStatus === 'paid' || paymentStatus === 'complete') {
-              paymentSuccess = true;
-              const customerEmail = checkoutSession.email;
-              const plan = checkoutSession.plan;
-              const amount = sessionData.amount_total || sessionData.items?.[0]?.price_data?.unit_amount || 0;
-              tempPassword = checkoutSession.temp_password || '';
-
-              let user = getUserByEmail(customerEmail);
-              if (!user) {
-                const finalPassword = tempPassword || crypto.randomBytes(12).toString('hex');
-                user = createUser({
-                  email: customerEmail,
-                  password_hash: hashPassword(finalPassword),
-                  name: customerEmail.split('@')[0],
-                  role: 'user',
-                  reset_token: null,
-                  reset_token_expiry: null,
-                  must_change_password: true,
-                });
-
-                const subscription = createSubscription({
-                  user_id: user.id,
-                  plan,
-                  status: 'active',
-                  amount: amount / 100,
-                  currency: 'USD',
-                  current_period_start: new Date().toISOString(),
-                  current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-                  cancel_at_period_end: false,
-                });
-
-                createInvoice({
-                  user_id: user.id,
-                  subscription_id: subscription.id,
-                  amount: amount / 100,
-                  currency: 'USD',
-                  status: 'paid',
-                  due_date: new Date().toISOString(),
-                  paid_at: new Date().toISOString(),
-                });
-
-                createAuditLog({
-                  event: 'User Created via Checkout',
-                  severity: 'info',
-                  instance_id: null,
-                  user_id: user.id,
-                  details: `User account created for ${customerEmail} after successful ${plan} subscription`,
-                  action: 'user_create',
-                });
-
-                provisionInstancesForUser(user.id, plan);
-
-                userCreated = true;
-                userEmail = customerEmail;
-                planName = plan;
-              } else {
-                userEmail = customerEmail;
-                planName = checkoutSession.plan;
-                userCreated = true;
-              }
-            }
+            paymentStatus = sessionData.payment_status || sessionData.status;
+            amount = (sessionData.amount_total || 0) / 100;
+            currency = 'USD';
+            customerId = sessionData.customer?.id || null;
           }
-        } catch (e) {
-          errorMessage = 'Unable to verify payment status. Please contact support.';
         }
       }
+
+      if (paymentStatus === 'paid' || paymentStatus === 'completed') {
+        paymentSuccess = true;
+        const customerEmail = checkoutSession.email;
+        const plan = checkoutSession.plan;
+        tempPassword = checkoutSession.temp_password || '';
+
+        const result = completeCheckout({
+          email: customerEmail,
+          plan,
+          amount,
+          currency,
+          gateway,
+          tempPassword,
+          customerId,
+          checkoutSessionId: checkoutSession.id,
+        });
+
+        userCreated = result.created;
+        userEmail = customerEmail;
+        planName = plan;
+      }
+    } catch (e) {
+      errorMessage = 'Unable to verify payment status. Please contact support.';
     }
   } else if (checkoutSession && checkoutSession.status === 'completed') {
     userEmail = checkoutSession.email;
@@ -264,14 +167,14 @@ if (sessionId) {
           </>
         ) : (
           <>
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h1 class="text-2xl font-bold text-navy mb-4">Subscription Initiated</h1>
+            <h1 class="text-2xl font-bold text-navy mb-4">Payment Processing</h1>
             <p class="text-slate mb-6">
-              Thank you for subscribing to CloudDroid. Your cloud Android workspace is being provisioned.
+              Your payment is being processed. This page will update automatically once the payment is confirmed.
             </p>
             {errorMessage && <p class="text-sm text-red-600 mb-4">{errorMessage}</p>}
             <p class="text-sm text-slate mb-8">

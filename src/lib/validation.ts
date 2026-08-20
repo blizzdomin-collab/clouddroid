@@ -4,6 +4,7 @@ export const LoginSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(1, 'Password is required'),
   code: z.string().length(6, '2FA code must be 6 digits').optional(),
+  rememberMe: z.boolean().optional(),
 });
 
 export const RegisterSchema = z.object({
