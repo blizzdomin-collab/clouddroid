@@ -35,12 +35,8 @@ jobs:
               echo "Redis not found. Install it manually on VPS or enable passwordless sudo for deploy user."
             fi
             if command -v systemctl >/dev/null 2>&1; then
-              systemctl enable redis-server || true
-              systemctl restart redis-server || true
-            fi
-            if command -v systemctl >/dev/null 2>&1; then
-              systemctl enable redis-server || true
-              systemctl restart redis-server || true
+              sudo -n systemctl enable redis-server || true
+              sudo -n systemctl restart redis-server || true
             fi
 
             echo "[3] Building..."
