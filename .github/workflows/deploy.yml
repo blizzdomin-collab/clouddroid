@@ -39,16 +39,30 @@ jobs:
               sudo -n systemctl restart redis-server || true
             fi
 
-            echo "[3] Building..."
+            echo "[3] Cleaning old build artifacts..."
             rm -rf dist
+            rm -rf .astro
+
+            echo "[4] Building..."
             npm run build
 
-            echo "[4] Ensuring data directory exists..."
+            echo "[5] Verifying build output..."
+            if [ ! -f "dist/server/entry.mjs" ]; then
+              echo "ERROR: Build failed - dist/server/entry.mjs not found"
+              exit 1
+            fi
+
+            echo "[6] Ensuring data directory exists..."
             mkdir -p .data
 
-            echo "[5] Restarting app..."
+            echo "[7] Restarting app..."
             pm2 reload deploy/ecosystem.config.cjs --update-env || pm2 start deploy/ecosystem.config.cjs
             pm2 save
 
-            echo "=== Deployment complete ==="
+            echo "=== Waiting for PM2 to stabilize..."
+            sleep 5
+
+            echo "=== Verifying PM2 status..."
             pm2 status
+
+            echo "=== Deployment complete ==="
