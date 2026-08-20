@@ -51,6 +51,7 @@ export {
   getSubscriptionsByUserId,
   getInvoicesByUserId,
   completeCheckout,
+  createContactSubmission,
 } from './database-sqlite';
 
 export type {
@@ -64,4 +65,5 @@ export type {
   CheckoutSession,
   NotificationChannel,
   Session,
+  ContactSubmission,
 } from './database-sqlite';

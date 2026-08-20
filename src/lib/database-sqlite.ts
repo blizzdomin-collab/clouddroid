@@ -147,6 +147,17 @@ db.exec(`
     last_used_at TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS contact_submissions (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    message TEXT NOT NULL,
+    ip_address TEXT,
+    user_agent TEXT,
+    created_at TEXT NOT NULL
+  );
+
   CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
   CREATE INDEX IF NOT EXISTS idx_instances_status ON instances(status);
   CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);
@@ -727,6 +738,15 @@ export function saveToDisk() {
   // SQLite persists automatically; no-op for compatibility
 }
 
+export function createContactSubmission(data: { name: string; email: string; subject: string; message: string; ipAddress?: string | null; userAgent?: string | null }) {
+  const now = new Date().toISOString();
+  const id = `contact_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  db.prepare(`INSERT INTO contact_submissions (id, name, email, subject, message, ip_address, user_agent, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    id, data.name, data.email, data.subject, data.message, data.ipAddress || null, data.userAgent || null, now
+  );
+  return { id, name: data.name, email: data.email, subject: data.subject, message: data.message, created_at: now };
+}
+
 export interface Instance {
   id: string;
   user_id: string;
@@ -856,5 +876,17 @@ export interface Session {
   created_at: string;
   last_used_at: string;
 }
+
+export interface ContactSubmission {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  ip_address: string | null;
+  user_agent: string | null;
+  created_at: string;
+}
+
 
 export default db;

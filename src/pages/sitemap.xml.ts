@@ -13,6 +13,7 @@ const pages = [
   { url: '/business', changefreq: 'monthly', priority: 0.7, lastmod: '2026-08-21' },
   { url: '/pricing', changefreq: 'weekly', priority: 0.9, lastmod: '2026-08-21' },
   { url: '/faq', changefreq: 'weekly', priority: 0.7, lastmod: '2026-08-21' },
+  { url: '/contact', changefreq: 'monthly', priority: 0.6, lastmod: '2026-08-21' },
   { url: '/api-docs', changefreq: 'weekly', priority: 0.8, lastmod: '2026-08-21' },
   { url: '/legal/terms', changefreq: 'monthly', priority: 0.5, lastmod: '2026-08-21' },
   { url: '/legal/privacy', changefreq: 'monthly', priority: 0.5, lastmod: '2026-08-21' },
