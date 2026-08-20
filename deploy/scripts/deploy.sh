@@ -12,6 +12,7 @@ cd "$APP_DIR"
 
 echo "[1/5] Pulling latest code..."
 git config --global --add safe.directory "$APP_DIR"
+sudo chown -R $USER:$USER "$APP_DIR" || true
 git fetch origin
 git reset --hard "origin/$BRANCH"
 
