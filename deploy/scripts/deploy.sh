@@ -17,7 +17,7 @@ git fetch origin
 git reset --hard "origin/$BRANCH"
 
   echo "[2/5] Installing dependencies..."
-  npm install --production=false
+  npm install --production=false --unsafe-perm
 
   echo "[2b/5] Ensuring Redis is available..."
   if ! command -v redis-server >/dev/null 2>&1; then
