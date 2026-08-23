@@ -7,6 +7,7 @@ import Layout from '../layouts/Layout.astro';
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <h1 class="text-4xl font-bold text-navy mb-4">Security Whitepaper</h1>
       <p class="text-slate text-lg">Architecture, controls, and operational practices for CloudDroid.</p>
+      <p class="text-sm text-slate mt-2">Effective date: 23 August 2026. Last updated: 23 August 2026.</p>
     </div>
   </div>
   <div class="py-16 bg-white">
@@ -70,7 +71,26 @@ import Layout from '../layouts/Layout.astro';
 
       <section>
         <h2 class="text-2xl font-bold text-navy mb-4">7. Incident Response</h2>
-        <p class="text-slate mb-4">Security events are logged and reviewable. Customers can report issues to support@clouddroid.eu. Responsible disclosure is requested for vulnerability reports.</p>
+        <p class="text-slate mb-4">CloudDroid maintains a structured incident response process for security events:</p>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+          <div>
+            <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Detection & Triage</div>
+            <div class="text-sm text-slate">Security events are detected through automated monitoring, alerting, and customer reports. Events are triaged within 4 hours to determine severity and impact.</div>
+          </div>
+          <div>
+            <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Containment</div>
+            <div class="text-sm text-slate">Affected systems are isolated and the scope of the incident is contained to prevent further impact. Immediate steps are taken to secure customer data.</div>
+          </div>
+          <div>
+            <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Communication</div>
+            <div class="text-sm text-slate">Affected customers are notified within 24-72 hours of confirmed incidents. Regulatory notifications are made within 72 hours where required by law.</div>
+          </div>
+          <div>
+            <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Post-Incident Review</div>
+            <div class="text-sm text-slate">After resolution, a post-incident review is conducted to identify root causes and implement preventive measures. Lessons learned are documented and shared with the security team.</div>
+          </div>
+        </div>
+        <p class="text-slate mt-4">Customers can report security issues to <a href="mailto:security@clouddroid.eu" class="text-navy underline">security@clouddroid.eu</a> or <a href="mailto:support@clouddroid.eu" class="text-navy underline">support@clouddroid.eu</a>. Responsible disclosure is requested for vulnerability reports.</p>
       </section>
 
       <section>

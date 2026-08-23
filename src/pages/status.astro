@@ -125,13 +125,13 @@ const statusText = overallStatus === 'operational' ? 'All Systems Operational' :
   <script>
     const form = document.getElementById('status-subscribe');
     const result = document.getElementById('status-subscribe-result');
-    form?.addEventListener('submit', async (e) => {
+    form?.addEventListener('submit', async function(e) {
       e.preventDefault();
-      const email = (form as HTMLFormElement).email.value;
+      const email = form.email.value;
       if (!email) return;
-      result!.textContent = 'Status page is currently read-only. Subscribe to updates via our newsletter or contact support@clouddroid.eu for incident notifications.';
-      result!.className = 'mt-3 text-sm text-slate';
-      result!.classList.remove('hidden');
+      result.textContent = 'Status page is currently read-only. Subscribe to updates via our newsletter or contact support@clouddroid.eu for incident notifications.';
+      result.className = 'mt-3 text-sm text-slate';
+      result.classList.remove('hidden');
     });
   </script>
 </Layout>

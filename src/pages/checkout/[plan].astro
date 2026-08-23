@@ -68,6 +68,7 @@ if (!selectedPlan) {
                 <div class="text-right">
                   <div class="text-3xl font-bold text-navy">${selectedPlan.price}</div>
                   <div class="text-sm text-slate">/{selectedPlan.interval}</div>
+                  <div class="text-xs text-slate mt-1">Excl. applicable taxes and VAT</div>
                 </div>
               </div>
               <ul class="space-y-3">
@@ -246,11 +247,11 @@ if (!selectedPlan) {
     const gatewayInputs = form?.querySelectorAll('input[name="gateway"]');
 
     gatewayInputs?.forEach((input) => {
-      input.addEventListener('change', () => {
+      input.addEventListener('change', function() {
         if (!summary || !summaryGateway || !summaryPrice || !summaryCurrency || !summaryPlan) return;
         const gateway = input.value;
         const planId = form?.getAttribute('data-plan');
-        const planConfig: Record<string, { name: string; price: number; molliePrice: string; specs: string[] }> = {
+        const planConfig = {
           developer: { name: 'Developer', price: 49, molliePrice: '49.00', specs: ['4 GB RAM', '32 GB Storage', '1 Instance'] },
           professional: { name: 'Professional', price: 149, molliePrice: '149.00', specs: ['8 GB RAM', '64 GB Storage', '4 Instances'] },
           team: { name: 'Team', price: 399, molliePrice: '399.00', specs: ['16 GB RAM', '128 GB Storage', '12 Instances'] },
@@ -259,17 +260,17 @@ if (!selectedPlan) {
         if (selectedPlan) {
           summary.classList.remove('hidden');
           summaryGateway.textContent = gateway === 'mollie' ? 'Mollie' : 'Dodo Payments';
-          summaryPrice.textContent = gateway === 'mollie' ? `€${selectedPlan.molliePrice}` : `$${selectedPlan.price}`;
+          summaryPrice.textContent = gateway === 'mollie' ? '€' + selectedPlan.molliePrice : '$' + selectedPlan.price;
           summaryCurrency.textContent = gateway === 'mollie' ? 'EUR' : 'USD';
-          summaryPlan.textContent = `${selectedPlan.name} Plan · ${selectedPlan.specs.join(', ')}`;
+          summaryPlan.textContent = selectedPlan.name + ' Plan · ' + selectedPlan.specs.join(', ');
         }
       });
     });
 
-    form?.addEventListener('submit', async (e) => {
+    form?.addEventListener('submit', async function(e) {
       e.preventDefault();
-      const email = (form as HTMLFormElement).email.value;
-      const gateway = (form as HTMLFormElement).gateway?.value;
+      const email = form.email.value;
+      const gateway = form.gateway ? form.gateway.value : '';
       const button = form?.querySelector('button[type="submit"]');
       if (!gateway) {
         alert('Please select a payment method before continuing.');

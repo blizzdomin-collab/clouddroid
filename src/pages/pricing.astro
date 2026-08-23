@@ -19,10 +19,11 @@ const annualPrices = {
         <button id="monthly-toggle" class="px-4 py-2 rounded-lg text-sm font-medium bg-navy text-white transition-colors">Monthly</button>
         <button id="annual-toggle" class="px-4 py-2 rounded-lg text-sm font-medium text-slate hover:text-navy transition-colors">Annual <span class="text-xs text-green-600 font-semibold">Save 20%</span></button>
       </div>
+      <p class="text-xs text-slate mt-3">Prices exclude applicable taxes and VAT. VAT will be calculated and displayed at checkout where required by law.</p>
     </div>
   </div>
 
-  <div id="pricing-section">
+  <div id="pricing-section" data-annual='{"developer":{"annual":470,"monthly":49},"professional":{"annual":1430,"monthly":149},"team":{"annual":3830,"monthly":399}}'>
     <Pricing />
   </div>
 
@@ -88,15 +89,26 @@ const annualPrices = {
     </div>
   </div>
 
+  <div class="py-16 bg-slate-light">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-bold text-navy mb-4">Need a Custom Solution?</h2>
+      <p class="text-lg text-slate mb-8">Enterprise pricing, dedicated infrastructure, and custom SLA guarantees. Talk to our sales team.</p>
+      <a href="/contact" class="inline-flex items-center justify-center bg-navy text-white px-8 py-4 rounded-lg font-semibold hover:bg-navy-light transition-colors">
+        Contact Sales
+      </a>
+    </div>
+  </div>
+
   <script>
     const monthlyToggle = document.getElementById('monthly-toggle');
     const annualToggle = document.getElementById('annual-toggle');
     const pricingSection = document.getElementById('pricing-section');
+    const annualPrices = pricingSection ? JSON.parse(pricingSection.getAttribute('data-annual') || '{}') : {};
 
-    const updatePricing = (isAnnual: boolean) => {
+    const updatePricing = function(isAnnual) {
       if (!pricingSection) return;
       const cards = pricingSection.querySelectorAll('.grid > div');
-      cards.forEach((card, index) => {
+      cards.forEach(function(card, index) {
         const plans = ['developer', 'professional', 'team'];
         const plan = plans[index];
         if (!plan || !annualPrices[plan]) return;
@@ -104,7 +116,7 @@ const annualPrices = {
         const priceEl = card.querySelector('.text-4xl');
         const intervalEl = card.querySelector('.text-slate');
         if (priceEl && intervalEl) {
-          priceEl.textContent = isAnnual ? `$${annualPrices[plan].annual}` : `$${annualPrices[plan].monthly}`;
+          priceEl.textContent = isAnnual ? '$' + annualPrices[plan].annual : '$' + annualPrices[plan].monthly;
           intervalEl.textContent = isAnnual ? '/year' : '/month';
         }
 
@@ -112,12 +124,12 @@ const annualPrices = {
         if (ctaLink) {
           const currentHref = ctaLink.getAttribute('href') || '';
           const planName = currentHref.split('/')[2];
-          ctaLink.setAttribute('href', isAnnual ? `/checkout/${planName}?annual=true` : `/checkout/${planName}`);
+          ctaLink.setAttribute('href', isAnnual ? '/checkout/' + planName + '?annual=true' : '/checkout/' + planName);
         }
       });
     };
 
-    monthlyToggle?.addEventListener('click', () => {
+    monthlyToggle?.addEventListener('click', function() {
       monthlyToggle.classList.add('bg-navy', 'text-white');
       monthlyToggle.classList.remove('text-slate');
       annualToggle?.classList.remove('bg-navy', 'text-white');
@@ -125,7 +137,7 @@ const annualPrices = {
       updatePricing(false);
     });
 
-    annualToggle?.addEventListener('click', () => {
+    annualToggle?.addEventListener('click', function() {
       annualToggle.classList.add('bg-navy', 'text-white');
       annualToggle.classList.remove('text-slate');
       monthlyToggle?.classList.remove('bg-navy', 'text-white');

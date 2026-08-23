@@ -147,10 +147,11 @@ if (!isAuthenticated) {
         document.getElementById('warning-events')!.textContent = String(data.summary.warnings);
         document.getElementById('info-events')!.textContent = String(data.summary.info);
 
-        const tableBody = document.getElementById('audit-table')!;
+        const tableBody = document.getElementById('audit-table');
         tableBody.innerHTML = data.logs
           .map(
-            (log: any) => `
+            function(log) {
+              return `
           <tr>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate">${new Date(log.timestamp).toLocaleString()}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy">${log.event}</td>
@@ -168,7 +169,8 @@ if (!isAuthenticated) {
             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate">${log.action}</td>
             <td class="px-6 py-4 text-sm text-slate">${log.details}</td>
           </tr>
-        `
+        `;
+            }
           )
           .join('');
       } catch (error) {

@@ -7,6 +7,7 @@ import Layout from '../layouts/Layout.astro';
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <h1 class="text-4xl font-bold text-navy mb-4">Business Information</h1>
       <p class="text-slate text-lg">Legal entity details, ownership structure, and compliance information for merchant onboarding and enterprise due diligence.</p>
+      <p class="text-sm text-slate mt-2">Effective date: 23 August 2026. Last updated: 23 August 2026.</p>
     </div>
   </div>
 
@@ -26,11 +27,15 @@ import Layout from '../layouts/Layout.astro';
               <div class="text-sm font-semibold text-navy">23389702</div>
             </div>
             <div>
-              <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Legal Form</div>
-              <div class="text-sm font-semibold text-navy">Limited Liability Company</div>
+              <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">VAT ID (DIČ)</div>
+              <div class="text-sm font-semibold text-navy">CZ23389702</div>
             </div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Legal Form</div>
+              <div class="text-sm text-navy">Limited Liability Company</div>
+            </div>
             <div>
               <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Registered Address</div>
               <div class="text-sm text-navy">Soukenická 877/9<br>Ostrava, 702 00<br>Czech Republic</div>
@@ -59,7 +64,7 @@ import Layout from '../layouts/Layout.astro';
             <ul class="list-disc pl-5 text-sm text-navy space-y-1">
               <li>Cloud-hosted Android workspaces</li>
               <li>QA automation and app testing environments</li>
-              <li>ADB access and CI/CD integrations</li>
+              <li>ADB access and CI/CD support</li>
               <li>Session recording and audit logging</li>
               <li>Compliance-ready access controls</li>
             </ul>
@@ -100,6 +105,14 @@ import Layout from '../layouts/Layout.astro';
             <div>
               <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Support Email</div>
               <div class="text-sm text-navy">support@clouddroid.eu</div>
+            </div>
+            <div>
+              <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">DPO / Privacy Contact</div>
+              <div class="text-sm text-navy">dpo@clouddroid.eu</div>
+            </div>
+            <div>
+              <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Phone</div>
+              <div class="text-sm text-navy">+420 734 210 456</div>
             </div>
             <div>
               <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Compliance Contact</div>
@@ -160,9 +173,15 @@ import Layout from '../layouts/Layout.astro';
       <section>
         <h2 class="text-2xl font-bold text-navy mb-6">Operational Overview</h2>
         <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-4">
-          <div>
-            <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Infrastructure</div>
-            <div class="text-sm text-navy">CloudDroid operates on cloud infrastructure with containerized Android workspaces. All data is encrypted in transit (TLS 1.3) and at rest (AES-256).</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Founded</div>
+              <div class="text-sm text-navy">2024</div>
+            </div>
+            <div>
+              <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Infrastructure</div>
+              <div class="text-sm text-navy">CloudDroid operates on cloud infrastructure with containerized Android workspaces. All data is encrypted in transit (TLS 1.3) and at rest (AES-256).</div>
+            </div>
           </div>
           <div>
             <div class="text-xs font-medium text-slate uppercase tracking-wider mb-1">Uptime</div>
