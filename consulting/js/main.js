@@ -49,66 +49,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Contact form handling
-    const contactForm = document.getElementById('contact-form');
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const submitBtn = contactForm.querySelector('button[type="submit"]');
-            const formStatus = document.getElementById('form-status');
-
-            // Basic validation
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const message = document.getElementById('message').value.trim();
-
-            if (!name || !email || !message) {
-                formStatus.textContent = 'Please fill in all required fields.';
-                formStatus.className = 'mt-3 text-sm text-center form-error';
-                formStatus.classList.remove('hidden');
-                return;
-            }
-
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                formStatus.textContent = 'Please enter a valid email address.';
-                formStatus.className = 'mt-3 text-sm text-center form-error';
-                formStatus.classList.remove('hidden');
-                return;
-            }
-
-            // Show loading state
-            submitBtn.classList.add('btn-loading');
-            submitBtn.disabled = true;
-
-            // Simulate form submission (replace with actual endpoint)
-            setTimeout(function() {
-                submitBtn.classList.remove('btn-loading');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Message Sent';
-                submitBtn.classList.remove('bg-navy-900', 'hover:bg-navy-800');
-                submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-
-                formStatus.textContent = 'Thank you for your enquiry. We will respond within 2 business days.';
-                formStatus.className = 'mt-3 text-sm text-center form-success';
-                formStatus.classList.remove('hidden');
-
-                // Reset form
-                contactForm.reset();
-
-                // Reset button after 5 seconds
-                setTimeout(function() {
-                    submitBtn.textContent = 'Send Enquiry';
-                    submitBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-                    submitBtn.classList.add('bg-navy-900', 'hover:bg-navy-800');
-                    formStatus.classList.add('hidden');
-                }, 5000);
-            }, 1500);
-        });
-    }
-
     // Header scroll effect
     const header = document.querySelector('header');
     let lastScroll = 0;
