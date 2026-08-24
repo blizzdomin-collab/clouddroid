@@ -17,11 +17,14 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 ```
 ├── src/
 │   ├── layouts/
-│   │   ├── Layout.astro          # Root layout with Inter font, OG meta
+│   │   ├── Layout.astro          # Root layout with Inter font, OG meta, JSON-LD
 │   │   └── DashboardLayout.astro # Authenticated dashboard shell
 │   ├── pages/
 │   │   ├── index.astro           # Marketing homepage
 │   │   ├── about.astro           # About page
+│   │   ├── pricing.astro         # Pricing page with annual toggle
+│   │   ├── faq.astro             # Frequently asked questions
+│   │   ├── contact.astro         # Contact form + info
 │   │   ├── status.astro          # System status / uptime
 │   │   ├── business.astro        # KYB/business verification info
 │   │   ├── security.astro        # Security overview
@@ -61,6 +64,7 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 │   │   └── api/                  # API routes
 │   │       ├── auth/             # Login, logout, register, password reset, 2FA, activity, sessions
 │   │       ├── checkout.ts       # Dodo Payments + Mollie checkout session
+│   │       ├── contact.ts        # Contact form submission
 │   │       ├── webhooks/         # Dodo Payments + Mollie webhooks
 │   │       ├── instances/        # Instance CRUD + actions + detail
 │   │       ├── monitoring/       # Metrics, collect, charts
