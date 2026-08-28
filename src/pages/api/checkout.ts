@@ -100,7 +100,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       const response = await fetch(`${baseUrl}/v1/checkouts`, {
         method: 'POST',
         headers: {
-          'Authorization': `apikey ${paynowApiKey}`,
+          'Authorization': `Bearer ${paynowApiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
