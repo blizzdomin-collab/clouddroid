@@ -108,7 +108,17 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 ├── .env.example                  # Environment variables template
 ├── astro.config.mjs              # Astro + Tailwind + Node adapter
 ├── package.json
-└── clouddroid-master-blueprint.md # Compliance/KYB master blueprint
+├── clouddroid-master-blueprint.md # Compliance/KYB master blueprint
+└── consulting/                   # Static consulting site for consulting.clouddroid.eu
+    ├── index.html                # Landing page
+    ├── contact.html              # Contact page with mailto form
+    ├── terms.html                # Terms & Conditions
+    ├── privacy.html              # Privacy Policy
+    ├── refund.html               # Refund & Cancellation Policy
+    ├── css/
+    │   └── styles.css
+    └── js/
+        └── main.js
 ```
 
 ## 🧞 Commands
@@ -148,6 +158,15 @@ Production runs on VPS with:
 - Let's Encrypt SSL (`clouddroid.eu`)
 
 Auto-deploy via GitHub Actions on push to `main`.
+
+## 🌐 Consulting Subdomain
+
+Static B2B consulting site hosted on `consulting.clouddroid.eu`:
+- Company: PRIME CONSULTING GROUP LTD (No. 16993940)
+- Services: FinOps audits, IT budget strategy, cloud financial management
+- Legal pages: Terms & Conditions, Privacy Policy, Refund Policy
+- Nginx serves static files from `/var/www/clouddroid/consulting`
+- SSL via Let's Encrypt
 
 ## 📄 License
 

@@ -91,4 +91,19 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href);
     }
+
+    // Cookie consent banner
+    const cookieBanner = document.getElementById('cookie-banner');
+    const cookieAccept = document.getElementById('cookie-accept');
+
+    if (cookieBanner && cookieAccept) {
+        if (!localStorage.getItem('cookieConsent')) {
+            cookieBanner.classList.remove('hidden');
+        }
+
+        cookieAccept.addEventListener('click', function() {
+            localStorage.setItem('cookieConsent', 'accepted');
+            cookieBanner.classList.add('hidden');
+        });
+    }
 });

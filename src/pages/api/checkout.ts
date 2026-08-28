@@ -85,6 +85,71 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       });
     }
 
+    if (gateway === 'paynow') {
+      const paynowApiKey = import.meta.env.PAYNOW_API_KEY;
+      if (!paynowApiKey) {
+        return new Response(JSON.stringify({ error: 'Payment configuration error' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      const environment = import.meta.env.PAYNOW_ENVIRONMENT || 'live';
+      const baseUrl = environment === 'test' ? 'https://api.sandbox.paynow.gg' : 'https://api.paynow.gg';
+
+      const response = await fetch(`${baseUrl}/v1/checkouts`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${paynowApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          product_cart: [
+            {
+              product_id: selectedPlan.productId,
+              quantity: 1,
+            },
+          ],
+          customer: {
+            email: customerEmail,
+          },
+          return_url: import.meta.env.PAYNOW_RETURN_URL || 'https://clouddroid.eu/checkout/success',
+          metadata: {
+            plan: selectedPlan.name,
+            email: customerEmail,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        return new Response(JSON.stringify({ error: 'Failed to create PayNow checkout', details: error }), {
+          status: response.status,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      const session = await response.json();
+      const tempPassword = crypto.randomBytes(12).toString('hex');
+
+      createCheckoutSession({
+        session_id: session.id || session.checkout_id,
+        email: customerEmail,
+        plan: selectedPlan.name,
+        status: 'pending',
+        temp_password: tempPassword,
+        ip_address: ipAddress,
+        user_agent: userAgent,
+        payment_gateway: 'paynow',
+        paynow_payment_id: session.id || session.checkout_id,
+      });
+
+      return new Response(JSON.stringify({ checkout_url: session.checkout_url || session.url, sessionId: session.id || session.checkout_id, gateway: 'paynow' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const dodoApiKey = import.meta.env.DODO_PAYMENTS_API_KEY;
     if (!dodoApiKey) {
       return new Response(JSON.stringify({ error: 'Payment configuration error' }), {
