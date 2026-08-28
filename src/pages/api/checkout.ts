@@ -98,38 +98,40 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       const baseUrl = environment === 'test' ? 'https://api.sandbox.paynow.gg' : 'https://api.paynow.gg';
       const storeId = '596937251510820864';
 
-      const customerResponse = await fetch(`${baseUrl}/v1/store/customer/auth`, {
+      const customerResponse = await fetch(`${baseUrl}/v1/stores/${storeId}/customers`, {
         method: 'POST',
         headers: {
-          'x-paynow-store-id': storeId,
+          'Authorization': `apikey ${paynowApiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          platform: 'paynow_name',
-          id: customerEmail,
+          name: customerEmail,
+          metadata: {
+            email: customerEmail,
+            plan: selectedPlan.name,
+          },
         }),
       });
 
       if (!customerResponse.ok) {
         const errorText = await customerResponse.text();
-        console.error('PayNow customer auth failed:', customerResponse.status, errorText);
+        console.error('PayNow customer creation failed:', customerResponse.status, errorText);
         return new Response(JSON.stringify({ error: 'Failed to create PayNow customer', details: errorText }), {
           status: customerResponse.status,
           headers: { 'Content-Type': 'application/json' },
         });
       }
 
-      const customerData = await customerResponse.json();
-      const customerToken = customerData.customer_token;
+      const customer = await customerResponse.json();
 
-      const response = await fetch(`${baseUrl}/v1/checkouts`, {
+      const response = await fetch(`${baseUrl}/v1/stores/${storeId}/checkouts`, {
         method: 'POST',
         headers: {
-          'Authorization': `Customer ${customerToken}`,
-          'x-paynow-store-id': storeId,
+          'Authorization': `apikey ${paynowApiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          customer_id: customer.id,
           lines: [
             {
               product_id: selectedPlan.paynowProductId,
@@ -137,6 +139,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
             },
           ],
           return_url: import.meta.env.PAYNOW_RETURN_URL || 'https://clouddroid.eu/checkout/success',
+          metadata: {
+            plan: selectedPlan.name,
+            email: customerEmail,
+          },
         }),
       });
 
@@ -162,6 +168,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         user_agent: userAgent,
         payment_gateway: 'paynow',
         paynow_payment_id: session.id,
+        paynow_customer_id: customer.id,
       });
 
       return new Response(JSON.stringify({ checkout_url: session.url, sessionId: session.id, gateway: 'paynow' }), {
