@@ -33,6 +33,7 @@ db.exec(`
     dodo_customer_id TEXT,
     mollie_customer_id TEXT,
     paynow_customer_id TEXT,
+    easytransac_client_id TEXT,
     registration_ip TEXT,
     registration_user_agent TEXT,
     suspended INTEGER NOT NULL DEFAULT 0,
@@ -127,6 +128,7 @@ db.exec(`
     mollie_payment_id TEXT,
     paynow_payment_id TEXT,
     paynow_customer_id TEXT,
+    easytransac_tid TEXT,
     created_at TEXT NOT NULL
   );
 
@@ -264,6 +266,16 @@ function migrateSchema() {
   if (!hasPaynowCustomerIdUser) {
     db.exec("ALTER TABLE users ADD COLUMN paynow_customer_id TEXT");
   }
+
+  const hasEasyTransacClientId = userColumns.some((col) => col.name === 'easytransac_client_id');
+  if (!hasEasyTransacClientId) {
+    db.exec("ALTER TABLE users ADD COLUMN easytransac_client_id TEXT");
+  }
+
+  const hasEasyTransacTid = checkoutColumns.some((col) => col.name === 'easytransac_tid');
+  if (!hasEasyTransacTid) {
+    db.exec("ALTER TABLE checkout_sessions ADD COLUMN easytransac_tid TEXT");
+  }
 }
 
 migrateSchema();
@@ -308,8 +320,8 @@ export function getUserById(id: string) {
 export function createUser(data: Omit<any, 'id' | 'created_at'>) {
   const now = new Date().toISOString();
   const id = `user_${String(Date.now()).slice(-3)}`;
-  db.prepare(`INSERT INTO users (id, email, password_hash, name, role, created_at, reset_token, reset_token_expiry, must_change_password, two_factor_secret, two_factor_backup_codes, two_factor_enabled, dodo_customer_id, mollie_customer_id, registration_ip, registration_user_agent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-    id, data.email, data.password_hash, data.name, data.role || 'user', now, data.reset_token || null, data.reset_token_expiry || null, data.must_change_password ? 1 : 0, data.two_factor_secret || null, data.two_factor_backup_codes ? JSON.stringify(data.two_factor_backup_codes) : null, data.two_factor_enabled ? 1 : 0, data.dodo_customer_id || null, data.mollie_customer_id || null, data.registration_ip || null, data.registration_user_agent || null
+  db.prepare(`INSERT INTO users (id, email, password_hash, name, role, created_at, reset_token, reset_token_expiry, must_change_password, two_factor_secret, two_factor_backup_codes, two_factor_enabled, dodo_customer_id, mollie_customer_id, paynow_customer_id, easytransac_client_id, registration_ip, registration_user_agent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    id, data.email, data.password_hash, data.name, data.role || 'user', now, data.reset_token || null, data.reset_token_expiry || null, data.must_change_password ? 1 : 0, data.two_factor_secret || null, data.two_factor_backup_codes ? JSON.stringify(data.two_factor_backup_codes) : null, data.two_factor_enabled ? 1 : 0, data.dodo_customer_id || null, data.mollie_customer_id || null, data.paynow_customer_id || null, data.easytransac_client_id || null, data.registration_ip || null, data.registration_user_agent || null
   );
   return getUserById(id);
 }
@@ -334,6 +346,8 @@ export function updateUser(id: string, updates: Partial<any>) {
   if (updates.two_factor_enabled !== undefined) { fields.push('two_factor_enabled = ?'); values.push(updates.two_factor_enabled ? 1 : 0); }
   if (updates.dodo_customer_id !== undefined) { fields.push('dodo_customer_id = ?'); values.push(updates.dodo_customer_id); }
   if (updates.mollie_customer_id !== undefined) { fields.push('mollie_customer_id = ?'); values.push(updates.mollie_customer_id); }
+  if (updates.paynow_customer_id !== undefined) { fields.push('paynow_customer_id = ?'); values.push(updates.paynow_customer_id); }
+  if (updates.easytransac_client_id !== undefined) { fields.push('easytransac_client_id = ?'); values.push(updates.easytransac_client_id); }
   if (updates.registration_ip !== undefined) { fields.push('registration_ip = ?'); values.push(updates.registration_ip); }
   if (updates.registration_user_agent !== undefined) { fields.push('registration_user_agent = ?'); values.push(updates.registration_user_agent); }
   if (updates.suspended !== undefined) { fields.push('suspended = ?'); values.push(updates.suspended ? 1 : 0); }

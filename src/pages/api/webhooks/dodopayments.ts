@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getCheckoutSessionBySessionId, updateCheckoutSession, getUserByEmail, createUser, createSubscription, createInvoice, createAuditLog, provisionInstancesForUser } from '../../../lib/database';
+import { getCheckoutSessionBySessionId, updateCheckoutSession, getUserByEmail, createUser, createSubscription, updateSubscription, createInvoice, createAuditLog, provisionInstancesForUser, getSubscriptionByUserId } from '../../../lib/database';
 import crypto from 'crypto';
 
 function verifyDodoSignature(payload: string, signature: string, secret: string): boolean {
@@ -32,11 +32,9 @@ export const POST: APIRoute = async ({ request }) => {
     if (event.type === 'checkout.session.completed') {
       const sessionId = event.data?.id;
       const customerId = event.data?.customer?.id;
-      const customerEmail = event.data?.customer?.email;
       const planName = event.data?.items?.[0]?.price_data?.product_data?.name || 'Unknown';
-      const amount = event.data?.items?.[0]?.price_data?.unit_amount || 0;
 
-      if (!sessionId || !customerEmail) {
+      if (!sessionId) {
         return new Response(JSON.stringify({ error: 'Missing session data' }), {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
@@ -60,9 +58,13 @@ export const POST: APIRoute = async ({ request }) => {
 
       updateCheckoutSession(checkoutSession.id, { status: 'completed' });
 
+      const customerEmail = event.data?.customer?.email || checkoutSession.email;
+      const plan = checkoutSession.plan;
+      const amount = (event.data?.amount_total || event.data?.items?.[0]?.price_data?.unit_amount || 0) / 100;
+      const tempPassword = checkoutSession.temp_password || crypto.randomBytes(12).toString('hex');
+
       let user = getUserByEmail(customerEmail);
       if (!user) {
-        const tempPassword = checkoutSession.temp_password || crypto.randomBytes(12).toString('hex');
         user = createUser({
           email: customerEmail,
           password_hash: crypto.createHash('sha256').update(tempPassword).digest('hex'),
@@ -76,18 +78,11 @@ export const POST: APIRoute = async ({ request }) => {
           registration_user_agent: checkoutSession.user_agent,
         });
 
-        const planMap: Record<string, string> = {
-          'CloudDroid Developer Plan': 'Developer',
-          'CloudDroid Professional Plan': 'Professional',
-          'CloudDroid Team Plan': 'Team',
-        };
-        const plan = planMap[planName] || 'Professional';
-
         const subscription = createSubscription({
           user_id: user.id,
           plan,
           status: 'active',
-          amount: amount / 100,
+          amount,
           currency: 'USD',
           current_period_start: new Date().toISOString(),
           current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
@@ -97,7 +92,7 @@ export const POST: APIRoute = async ({ request }) => {
         createInvoice({
           user_id: user.id,
           subscription_id: subscription.id,
-          amount: amount / 100,
+          amount,
           currency: 'USD',
           status: 'paid',
           due_date: new Date().toISOString(),
@@ -109,11 +104,59 @@ export const POST: APIRoute = async ({ request }) => {
           severity: 'info',
           instance_id: null,
           user_id: user.id,
-          details: `User account created for ${customerEmail} after successful ${planName} subscription`,
+          details: `User account created for ${customerEmail} after successful ${plan} purchase`,
           action: 'user_create',
         });
 
         provisionInstancesForUser(user.id, plan);
+      } else {
+        const existingSubscription = getSubscriptionByUserId(user.id);
+        const now = new Date().toISOString();
+        const periodEnd = existingSubscription && new Date(existingSubscription.current_period_end) > new Date()
+          ? new Date(new Date(existingSubscription.current_period_end).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString()
+          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+        if (existingSubscription) {
+          updateSubscription(existingSubscription.id, {
+            status: 'active',
+            current_period_start: now,
+            current_period_end: periodEnd,
+          });
+        } else {
+          createSubscription({
+            user_id: user.id,
+            plan,
+            status: 'active',
+            amount,
+            currency: 'USD',
+            current_period_start: now,
+            current_period_end: periodEnd,
+            cancel_at_period_end: false,
+          });
+        }
+
+        if (customerId && !user.dodo_customer_id) {
+          updateUser(user.id, { dodo_customer_id: customerId });
+        }
+
+        createInvoice({
+          user_id: user.id,
+          subscription_id: existingSubscription?.id || null,
+          amount,
+          currency: 'USD',
+          status: 'paid',
+          due_date: now,
+          paid_at: now,
+        });
+
+        createAuditLog({
+          event: 'Subscription Renewed via Checkout',
+          severity: 'info',
+          instance_id: null,
+          user_id: user.id,
+          details: `Access extended for ${customerEmail} for ${plan} plan via Dodo Payments`,
+          action: 'subscription_renew',
+        });
       }
 
       return new Response(JSON.stringify({ received: true, userCreated: !getUserByEmail(customerEmail) }), {

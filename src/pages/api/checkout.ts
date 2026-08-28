@@ -2,6 +2,15 @@ import type { APIRoute } from 'astro';
 import { createCheckoutSession } from '../../lib/database';
 import crypto from 'crypto';
 
+function generateEasyTransacSignature(params: Record<string, string | number>, apiKey: string): string {
+  const filtered = Object.entries(params)
+    .filter(([key]) => key.toLowerCase() !== 'signature')
+    .sort(([a], [b]) => a.toLowerCase().localeCompare(b.toLowerCase()));
+
+  const chain = filtered.map(([, value]) => String(value)).join('$');
+  return crypto.createHash('sha1').update(`${chain}$${apiKey}`).digest('hex');
+}
+
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
     const { planId, customerEmail, gateway = 'dodo' } = await request.json();
@@ -10,15 +19,94 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const userAgent = request.headers.get('user-agent') || null;
 
     const planConfig: Record<string, { name: string; productId: string; mollieAmount: string; paynowProductId: string }> = {
-      developer: { name: 'Developer', productId: 'pdt_0Nl5L3f80oqubD1vFBGeV', mollieAmount: '49.00', paynowProductId: '596937594697154560' },
-      professional: { name: 'Professional', productId: 'pdt_0Nl5Kr9NhpcLZ7C5KJFOo', mollieAmount: '149.00', paynowProductId: '596937714155134976' },
-      team: { name: 'Team', productId: 'pdt_0Nl5K2bcCSXCritV0N8lN', mollieAmount: '399.00', paynowProductId: '596937843687821312' },
+      developer: { name: 'Developer', productId: 'pdt_0NlcRNFMskyRt5vwC8roH', mollieAmount: '49.00', paynowProductId: '596937594697154560' },
+      professional: { name: 'Professional', productId: 'pdt_0NlxI8ewOVrMkKN3SNXvY', mollieAmount: '149.00', paynowProductId: '596937714155134976' },
+      team: { name: 'Team', productId: 'pdt_0Nlqwcv5UpGxDeEtIEt6X', mollieAmount: '399.00', paynowProductId: '596937843687821312' },
     };
 
     const selectedPlan = planConfig[planId];
     if (!selectedPlan) {
       return new Response(JSON.stringify({ error: 'Invalid plan' }), {
         status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (gateway === 'easytransac') {
+      const easytransacApiKey = import.meta.env.EASYTRANSAC_API_KEY;
+      if (!easytransacApiKey) {
+        return new Response(JSON.stringify({ error: 'Payment configuration error' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      const environment = import.meta.env.EASYTRANSAC_ENVIRONMENT || 'live';
+      const baseUrl = environment === 'test' ? 'https://sandbox.easytransac.com/api' : 'https://www.easytransac.com/api';
+      const amountInCents = Math.round(selectedPlan.mollieAmount * 100);
+      const orderId = `clouddroid_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+      const params: Record<string, string | number> = {
+        Amount: amountInCents,
+        ClientIP: ipAddress || '127.0.0.1',
+        Email: customerEmail,
+        ReturnUrl: import.meta.env.EASYTRANSAC_RETURN_URL || 'https://clouddroid.eu/checkout/success',
+        CancelUrl: import.meta.env.EASYTRANSAC_CANCEL_URL || 'https://clouddroid.eu/pricing',
+        OrderId: orderId,
+        Description: `CloudDroid ${selectedPlan.name} Plan`,
+        Language: 'ENG',
+      };
+
+      const signature = generateEasyTransacSignature(params, easytransacApiKey);
+      params.Signature = signature;
+
+      const formBody = new URLSearchParams();
+      for (const [key, value] of Object.entries(params)) {
+        formBody.append(key, String(value));
+      }
+
+      const response = await fetch(`${baseUrl}/payment/page`, {
+        method: 'POST',
+        headers: {
+          'EASYTRANSAC-API-KEY': easytransacApiKey,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formBody.toString(),
+      });
+
+      const responseText = await response.text();
+      let paymentResult: any = {};
+      try {
+        paymentResult = JSON.parse(responseText);
+      } catch {
+        paymentResult = { raw: responseText };
+      }
+
+      if (!response.ok || paymentResult.Code !== 0) {
+        const errorDetails = paymentResult.Error || paymentResult.raw || responseText;
+        return new Response(JSON.stringify({ error: 'Failed to create EasyTransac payment page', details: errorDetails }), {
+          status: response.status,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      const result = paymentResult.Result || {};
+      const tempPassword = crypto.randomBytes(12).toString('hex');
+
+      createCheckoutSession({
+        session_id: result.RequestId || orderId,
+        email: customerEmail,
+        plan: selectedPlan.name,
+        status: 'pending',
+        temp_password: tempPassword,
+        ip_address: ipAddress,
+        user_agent: userAgent,
+        payment_gateway: 'easytransac',
+        easytransac_tid: result.Tid || null,
+      });
+
+      return new Response(JSON.stringify({ checkout_url: result.PageUrl, sessionId: result.RequestId || orderId, gateway: 'easytransac' }), {
+        status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
     }

@@ -1,6 +1,16 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCheckoutSessionBySessionId, completeCheckout, getUserByEmail } from '../../lib/database';
+import crypto from 'crypto';
+
+function generateEasyTransacSignature(params: Record<string, string | number>, apiKey: string): string {
+  const filtered = Object.entries(params)
+    .filter(([key]) => key.toLowerCase() !== 'signature')
+    .sort(([a], [b]) => a.toLowerCase().localeCompare(b.toLowerCase()));
+
+  const chain = filtered.map(([, value]) => String(value)).join('$');
+  return crypto.createHash('sha1').update(`${chain}$${apiKey}`).digest('hex');
+}
 
 export const prerender = false;
 
@@ -11,12 +21,15 @@ let tempPassword = '';
 let planName = '';
 let errorMessage = '';
 let paymentSuccess = false;
-let gateway: 'dodo' | 'mollie' = 'dodo';
+let gateway: 'dodo' | 'mollie' | 'paynow' | 'easytransac' = 'dodo';
+let isRenewal = false;
+let paidAmount = 0;
+let paidCurrency = 'USD';
 
 if (sessionId) {
   const checkoutSession = getCheckoutSessionBySessionId(sessionId);
   if (checkoutSession) {
-    gateway = checkoutSession.payment_gateway === 'mollie' ? 'mollie' : 'dodo';
+    gateway = checkoutSession.payment_gateway === 'mollie' ? 'mollie' : checkoutSession.payment_gateway === 'paynow' ? 'paynow' : checkoutSession.payment_gateway === 'easytransac' ? 'easytransac' : 'dodo';
   }
 
   if (checkoutSession && checkoutSession.status === 'pending') {
@@ -46,6 +59,57 @@ if (sessionId) {
             customerId = paymentData.customerId || null;
           }
         }
+      } else if (gateway === 'paynow') {
+        const paynowApiKey = import.meta.env.PAYNOW_API_KEY;
+        if (paynowApiKey) {
+          const environment = import.meta.env.PAYNOW_ENVIRONMENT || 'live';
+          const baseUrl = environment === 'test' ? 'https://api.sandbox.paynow.gg' : 'https://api.paynow.gg';
+          const storeId = '596937251510820864';
+          const sessionRes = await fetch(`${baseUrl}/v1/stores/${storeId}/checkouts/${sessionId}`, {
+            headers: {
+              'Authorization': `apikey ${paynowApiKey}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (sessionRes.ok) {
+            const sessionData = await sessionRes.json();
+            paymentStatus = sessionData.status || sessionData.payment_status;
+            amount = parseFloat(sessionData.amount || sessionData.total_amount || '0');
+            currency = sessionData.currency || 'USD';
+            customerId = sessionData.customer?.id || null;
+          }
+        }
+      } else if (gateway === 'easytransac') {
+        const easytransacApiKey = import.meta.env.EASYTRANSAC_API_KEY;
+        if (easytransacApiKey) {
+          const environment = import.meta.env.EASYTRANSAC_ENVIRONMENT || 'live';
+          const baseUrl = environment === 'test' ? 'https://sandbox.easytransac.com/api' : 'https://www.easytransac.com/api';
+
+          const statusParams = new URLSearchParams();
+          statusParams.append('RequestId', sessionId);
+          statusParams.append('Language', 'ENG');
+          const statusSignature = generateEasyTransacSignature(Object.fromEntries(statusParams), easytransacApiKey);
+          statusParams.append('Signature', statusSignature);
+
+          const statusRes = await fetch(`${baseUrl}/payment/status`, {
+            method: 'POST',
+            headers: {
+              'EASYTRANSAC-API-KEY': easytransacApiKey,
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: statusParams.toString(),
+          });
+
+          if (statusRes.ok) {
+            const statusData = await statusRes.json();
+            const result = statusData.Result || {};
+            paymentStatus = result.Status || result.status || '';
+            amount = parseFloat(result.Amount || result.amount || '0');
+            currency = result.Currency || result.currency || 'EUR';
+            customerId = result.ClientId || result.clientId || null;
+          }
+        }
       } else {
         const dodoApiKey = import.meta.env.DODO_PAYMENTS_API_KEY;
         if (dodoApiKey) {
@@ -68,9 +132,14 @@ if (sessionId) {
 
       if (paymentStatus === 'paid' || paymentStatus === 'completed') {
         paymentSuccess = true;
+        paidAmount = amount;
+        paidCurrency = currency;
         const customerEmail = checkoutSession.email;
         const plan = checkoutSession.plan;
         tempPassword = checkoutSession.temp_password || '';
+
+        const existingUser = getUserByEmail(customerEmail);
+        isRenewal = !!existingUser;
 
         const result = completeCheckout({
           email: customerEmail,
@@ -98,12 +167,13 @@ if (sessionId) {
     if (user) {
       userCreated = true;
       paymentSuccess = true;
+      isRenewal = true;
     }
   }
 }
 ---
 
-<Layout title="Checkout Success - CloudDroid" description="Your CloudDroid subscription has been activated">
+<Layout title="Checkout Success - CloudDroid" description="Your CloudDroid purchase has been activated">
   <div class="min-h-screen bg-slate-light flex items-center justify-center py-16">
     <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
@@ -116,10 +186,12 @@ if (sessionId) {
             </div>
             <h1 class="text-2xl font-bold text-navy mb-4">Welcome to CloudDroid!</h1>
             <p class="text-slate mb-6">
-              Your <span class="font-semibold text-navy">{planName}</span> subscription is now active. Your dashboard account has been created and your cloud Android workspaces are being provisioned.
+              Your <span class="font-semibold text-navy">{planName}</span> plan is now active. Your dashboard account has been created and your cloud Android workspaces are being provisioned.
             </p>
             <div class="bg-slate-50 rounded-lg p-4 mb-6 text-left">
-              <p class="text-sm font-medium text-navy mb-2">Your login credentials:</p>
+              <p class="text-sm font-medium text-navy mb-2">Payment details</p>
+              <p class="text-sm text-slate mb-1"><span class="font-medium">Amount:</span> {paidCurrency === 'EUR' ? '€' : '$'}{paidAmount.toFixed(2)}</p>
+               <p class="text-sm text-slate mb-1"><span class="font-medium">Method:</span> {gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : 'Dodo Payments'}</p>
               <p class="text-sm text-slate mb-1"><span class="font-medium">Email:</span> {userEmail}</p>
               {tempPassword && (
                 <p class="text-sm text-slate mb-1">
@@ -136,27 +208,22 @@ if (sessionId) {
               Go to Dashboard
             </a>
           </>
-        ) : paymentSuccess && userEmail ? (
+        ) : paymentSuccess && isRenewal ? (
           <>
             <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h1 class="text-2xl font-bold text-navy mb-4">Subscription Active</h1>
+            <h1 class="text-2xl font-bold text-navy mb-4">Access Extended</h1>
             <p class="text-slate mb-6">
-              Your <span class="font-semibold text-navy">{planName}</span> subscription is now active. You can log in with your existing account.
+              Your <span class="font-semibold text-navy">{planName}</span> plan has been extended. You can continue using your existing account.
             </p>
             <div class="bg-slate-50 rounded-lg p-4 mb-6 text-left">
-              <p class="text-sm font-medium text-navy mb-2">Your account:</p>
+              <p class="text-sm font-medium text-navy mb-2">Payment details</p>
+              <p class="text-sm text-slate mb-1"><span class="font-medium">Amount:</span> {paidCurrency === 'EUR' ? '€' : '$'}{paidAmount.toFixed(2)}</p>
+               <p class="text-sm text-slate mb-1"><span class="font-medium">Method:</span> {gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : 'Dodo Payments'}</p>
               <p class="text-sm text-slate mb-1"><span class="font-medium">Email:</span> {userEmail}</p>
-              {tempPassword && (
-                <p class="text-sm text-slate mb-1">
-                  <span class="font-medium">Temporary password:</span>{' '}
-                  <code class="bg-white px-2 py-1 rounded border border-slate-200">{tempPassword}</code>
-                </p>
-              )}
-              <p class="text-xs text-slate mt-2">Please save this password and change it after logging in.</p>
             </div>
             <a
               href="/login"
@@ -178,7 +245,7 @@ if (sessionId) {
             </p>
             {errorMessage && <p class="text-sm text-red-600 mb-4">{errorMessage}</p>}
             <p class="text-sm text-slate mb-8">
-              Securely processed by {gateway === 'mollie' ? 'Mollie' : 'Dodo Payments'}.
+              Securely processed by {gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : 'Dodo Payments'}.
             </p>
             <a
               href="/"

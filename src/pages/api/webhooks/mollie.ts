@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getCheckoutSessionByMolliePaymentId, updateCheckoutSession, getUserByEmail, createUser, createSubscription, createInvoice, createAuditLog, provisionInstancesForUser } from '../../../lib/database';
+import { getCheckoutSessionByMolliePaymentId, updateCheckoutSession, getUserByEmail, createUser, createSubscription, updateSubscription, createInvoice, createAuditLog, provisionInstancesForUser, getSubscriptionByUserId, updateUser } from '../../../lib/database';
 import crypto from 'crypto';
 
 function verifyMollieSignature(payload: string, signatureHeader: string, secret: string): boolean {
@@ -120,9 +120,13 @@ export const POST: APIRoute = async ({ request }) => {
       updateCheckoutSession(checkoutSession.id, { status: 'completed' });
 
       const email = customerEmail || checkoutSession.email;
+      const plan = checkoutSession.plan;
+      const amountValue = amount || parseFloat(checkoutSession.amount || '0');
+      const currencyValue = currency || 'EUR';
+      const tempPassword = checkoutSession.temp_password || crypto.randomBytes(12).toString('hex');
+
       let user = getUserByEmail(email);
       if (!user) {
-        const tempPassword = checkoutSession.temp_password || crypto.randomBytes(12).toString('hex');
         user = createUser({
           email,
           password_hash: crypto.createHash('sha256').update(tempPassword).digest('hex'),
@@ -136,14 +140,12 @@ export const POST: APIRoute = async ({ request }) => {
           registration_user_agent: checkoutSession.user_agent,
         });
 
-        const plan = checkoutSession.plan;
-
         const subscription = createSubscription({
           user_id: user.id,
           plan,
           status: 'active',
-          amount,
-          currency: currency === 'EUR' ? 'EUR' : 'USD',
+          amount: amountValue,
+          currency: currencyValue,
           current_period_start: new Date().toISOString(),
           current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
           cancel_at_period_end: false,
@@ -152,8 +154,8 @@ export const POST: APIRoute = async ({ request }) => {
         createInvoice({
           user_id: user.id,
           subscription_id: subscription.id,
-          amount,
-          currency: currency === 'EUR' ? 'EUR' : 'USD',
+          amount: amountValue,
+          currency: currencyValue,
           status: 'paid',
           due_date: new Date().toISOString(),
           paid_at: new Date().toISOString(),
@@ -164,11 +166,59 @@ export const POST: APIRoute = async ({ request }) => {
           severity: 'info',
           instance_id: null,
           user_id: user.id,
-          details: `User account created for ${email} after successful ${checkoutSession.plan} subscription via Mollie`,
+          details: `User account created for ${email} after successful ${plan} purchase via Mollie`,
           action: 'user_create',
         });
 
         provisionInstancesForUser(user.id, plan);
+      } else {
+        const existingSubscription = getSubscriptionByUserId(user.id);
+        const now = new Date().toISOString();
+        const periodEnd = existingSubscription && new Date(existingSubscription.current_period_end) > new Date()
+          ? new Date(new Date(existingSubscription.current_period_end).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString()
+          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+        if (existingSubscription) {
+          updateSubscription(existingSubscription.id, {
+            status: 'active',
+            current_period_start: now,
+            current_period_end: periodEnd,
+          });
+        } else {
+          createSubscription({
+            user_id: user.id,
+            plan,
+            status: 'active',
+            amount: amountValue,
+            currency: currencyValue,
+            current_period_start: now,
+            current_period_end: periodEnd,
+            cancel_at_period_end: false,
+          });
+        }
+
+        if (mollieCustomerId && !user.mollie_customer_id) {
+          updateUser(user.id, { mollie_customer_id: mollieCustomerId });
+        }
+
+        createInvoice({
+          user_id: user.id,
+          subscription_id: existingSubscription?.id || null,
+          amount: amountValue,
+          currency: currencyValue,
+          status: 'paid',
+          due_date: now,
+          paid_at: now,
+        });
+
+        createAuditLog({
+          event: 'Subscription Renewed via Checkout',
+          severity: 'info',
+          instance_id: null,
+          user_id: user.id,
+          details: `Access extended for ${email} for ${plan} plan via Mollie`,
+          action: 'subscription_renew',
+        });
       }
 
       return new Response(JSON.stringify({ received: true, userCreated: !getUserByEmail(email) }), {
