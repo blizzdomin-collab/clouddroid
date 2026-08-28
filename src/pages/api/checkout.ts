@@ -96,23 +96,22 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
       const environment = import.meta.env.PAYNOW_ENVIRONMENT || 'live';
       const baseUrl = environment === 'test' ? 'https://api.sandbox.paynow.gg' : 'https://api.paynow.gg';
+      const storeId = '596938077507686400';
 
-      const response = await fetch(`${baseUrl}/v1/checkouts`, {
+      const response = await fetch(`${baseUrl}/v1/stores/${storeId}/checkouts`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${paynowApiKey}`,
+          'Authorization': `APIKey ${paynowApiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          product_cart: [
+          customer_id: '596957825259806720',
+          lines: [
             {
               product_id: selectedPlan.paynowProductId,
               quantity: 1,
             },
           ],
-          customer: {
-            email: customerEmail,
-          },
           return_url: import.meta.env.PAYNOW_RETURN_URL || 'https://clouddroid.eu/checkout/success',
           metadata: {
             plan: selectedPlan.name,
@@ -134,7 +133,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       const tempPassword = crypto.randomBytes(12).toString('hex');
 
       createCheckoutSession({
-        session_id: session.id || session.checkout_id,
+        session_id: session.id,
         email: customerEmail,
         plan: selectedPlan.name,
         status: 'pending',
@@ -142,10 +141,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         ip_address: ipAddress,
         user_agent: userAgent,
         payment_gateway: 'paynow',
-        paynow_payment_id: session.id || session.checkout_id,
+        paynow_payment_id: session.id,
       });
 
-      return new Response(JSON.stringify({ checkout_url: session.checkout_url || session.url, sessionId: session.id || session.checkout_id, gateway: 'paynow' }), {
+      return new Response(JSON.stringify({ checkout_url: session.url, sessionId: session.id, gateway: 'paynow' }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
