@@ -96,7 +96,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
       const environment = import.meta.env.PAYNOW_ENVIRONMENT || 'live';
       const baseUrl = environment === 'test' ? 'https://api.sandbox.paynow.gg' : 'https://api.paynow.gg';
-      const storeId = '596938077507686400';
+      const storeId = '596937251510820864';
 
       const customerResponse = await fetch(`${baseUrl}/v1/store/customer/auth`, {
         method: 'POST',
@@ -105,7 +105,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          platform: 'paynow',
+          platform: 'paynow_name',
           id: customerEmail,
         }),
       });
