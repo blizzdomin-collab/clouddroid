@@ -126,6 +126,7 @@ db.exec(`
     payment_gateway TEXT NOT NULL DEFAULT 'dodo',
     mollie_payment_id TEXT,
     paynow_payment_id TEXT,
+    paynow_customer_id TEXT,
     created_at TEXT NOT NULL
   );
 
@@ -254,8 +255,13 @@ function migrateSchema() {
     db.exec("ALTER TABLE checkout_sessions ADD COLUMN paynow_payment_id TEXT");
   }
 
-  const hasPaynowCustomerId = userColumns.some((col) => col.name === 'paynow_customer_id');
+  const hasPaynowCustomerId = checkoutColumns.some((col) => col.name === 'paynow_customer_id');
   if (!hasPaynowCustomerId) {
+    db.exec("ALTER TABLE checkout_sessions ADD COLUMN paynow_customer_id TEXT");
+  }
+
+  const hasPaynowCustomerIdUser = userColumns.some((col) => col.name === 'paynow_customer_id');
+  if (!hasPaynowCustomerIdUser) {
     db.exec("ALTER TABLE users ADD COLUMN paynow_customer_id TEXT");
   }
 }
@@ -519,8 +525,8 @@ export function createAlert(data: Omit<any, 'id' | 'timestamp'>) {
 export function createCheckoutSession(data: Omit<any, 'id' | 'created_at'>) {
   const now = new Date().toISOString();
   const id = `cs_${String(Date.now()).slice(-3)}`;
-  db.prepare(`INSERT INTO checkout_sessions (id, session_id, email, plan, status, temp_password, ip_address, user_agent, payment_gateway, mollie_payment_id, paynow_payment_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-    id, data.session_id, data.email, data.plan, data.status || 'pending', data.temp_password || null, data.ip_address || null, data.user_agent || null, data.payment_gateway || 'dodo', data.mollie_payment_id || null, data.paynow_payment_id || null, now
+  db.prepare(`INSERT INTO checkout_sessions (id, session_id, email, plan, status, temp_password, ip_address, user_agent, payment_gateway, mollie_payment_id, paynow_payment_id, paynow_customer_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    id, data.session_id, data.email, data.plan, data.status || 'pending', data.temp_password || null, data.ip_address || null, data.user_agent || null, data.payment_gateway || 'dodo', data.mollie_payment_id || null, data.paynow_payment_id || null, data.paynow_customer_id || null, now
   );
   return db.prepare('SELECT * FROM checkout_sessions WHERE id = ?').get(id) as any;
 }
@@ -550,6 +556,7 @@ export function updateCheckoutSession(id: string, updates: Partial<any>) {
   if (updates.payment_gateway !== undefined) { fields.push('payment_gateway = ?'); values.push(updates.payment_gateway); }
   if (updates.mollie_payment_id !== undefined) { fields.push('mollie_payment_id = ?'); values.push(updates.mollie_payment_id); }
   if (updates.paynow_payment_id !== undefined) { fields.push('paynow_payment_id = ?'); values.push(updates.paynow_payment_id); }
+  if (updates.paynow_customer_id !== undefined) { fields.push('paynow_customer_id = ?'); values.push(updates.paynow_customer_id); }
   if (!fields.length) return null;
   values.push(id);
   db.prepare(`UPDATE checkout_sessions SET ${fields.join(', ')} WHERE id = ?`).run(...values);

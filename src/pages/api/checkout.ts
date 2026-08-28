@@ -98,6 +98,32 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       const baseUrl = environment === 'test' ? 'https://api.sandbox.paynow.gg' : 'https://api.paynow.gg';
       const storeId = '596938077507686400';
 
+      const customerResponse = await fetch(`${baseUrl}/v1/stores/${storeId}/customers`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `APIKey ${paynowApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          metadata: {
+            email: customerEmail,
+            plan: selectedPlan.name,
+          },
+        }),
+      });
+
+      if (!customerResponse.ok) {
+        const errorText = await customerResponse.text();
+        console.error('PayNow customer creation failed:', customerResponse.status, errorText);
+        return new Response(JSON.stringify({ error: 'Failed to create PayNow customer', details: errorText }), {
+          status: customerResponse.status,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      const customer = await customerResponse.json();
+      const customerId = customer.id;
+
       const response = await fetch(`${baseUrl}/v1/stores/${storeId}/checkouts`, {
         method: 'POST',
         headers: {
@@ -105,7 +131,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          customer_id: '596957825259806720',
+          customer_id: customerId,
           lines: [
             {
               product_id: selectedPlan.paynowProductId,
@@ -142,6 +168,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         user_agent: userAgent,
         payment_gateway: 'paynow',
         paynow_payment_id: session.id,
+        paynow_customer_id: customerId,
       });
 
       return new Response(JSON.stringify({ checkout_url: session.url, sessionId: session.id, gateway: 'paynow' }), {
