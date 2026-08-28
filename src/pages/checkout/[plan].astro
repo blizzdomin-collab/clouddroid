@@ -7,7 +7,7 @@ interface Props {
   plan: string;
 }
 
-const planConfig: Record<string, { name: string; price: number; interval: string; specs: string[]; description: string; mollieAmount: string }> = {
+const planConfig: Record<string, { name: string; price: number; interval: string; specs: string[]; description: string; mollieAmount: string; paynowAmount: string }> = {
   developer: {
     name: 'Developer',
     price: 49,
@@ -15,6 +15,7 @@ const planConfig: Record<string, { name: string; price: number; interval: string
     description: 'For individual developers and small projects',
     specs: ['4 GB RAM', '32 GB Storage', '1 Concurrent Instance', 'Email Support'],
     mollieAmount: '49.00',
+    paynowAmount: '49.00',
   },
   professional: {
     name: 'Professional',
@@ -23,6 +24,7 @@ const planConfig: Record<string, { name: string; price: number; interval: string
     description: 'For growing teams and production workloads',
     specs: ['8 GB RAM', '64 GB Storage', '4 Concurrent Instances', 'Priority Support', 'CI/CD Integrations'],
     mollieAmount: '149.00',
+    paynowAmount: '149.00',
   },
   team: {
     name: 'Team',
@@ -31,6 +33,7 @@ const planConfig: Record<string, { name: string; price: number; interval: string
     description: 'For organizations requiring maximum scale',
     specs: ['16 GB RAM', '128 GB Storage', '12 Concurrent Instances', '24/7 Dedicated Support', '99.9% Uptime SLA'],
     mollieAmount: '399.00',
+    paynowAmount: '399.00',
   },
 };
 
@@ -56,7 +59,7 @@ if (!selectedPlan) {
         <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
           <div class="bg-navy px-8 py-6">
             <h1 class="text-2xl font-bold text-white">Complete Your Subscription</h1>
-            <p class="text-slate-300 mt-1">Secure checkout powered by Dodo Payments and Mollie</p>
+            <p class="text-slate-300 mt-1">Secure checkout powered by Dodo Payments, Mollie, and PayNow</p>
           </div>
           <div class="p-8">
             <div class="mb-8">
@@ -182,6 +185,26 @@ if (!selectedPlan) {
                       </div>
                     </div>
                   </label>
+                  <label class="cursor-pointer relative">
+                    <input type="radio" name="gateway" value="paynow" class="sr-only peer" />
+                    <div class="border-2 border-slate-200 rounded-xl p-5 peer-checked:border-navy peer-checked:bg-navy/5 transition-all hover:border-slate-300">
+                      <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-navy/5 rounded-lg flex items-center justify-center">
+                          <svg class="w-6 h-6 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <div class="text-sm font-semibold text-navy">PayNow</div>
+                          <div class="text-xs text-slate">Card</div>
+                        </div>
+                      </div>
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium text-slate">GBP/EUR pricing</span>
+                        <span class="text-xs font-medium text-navy">£{selectedPlan.paynowAmount}/mo</span>
+                      </div>
+                    </div>
+                  </label>
                 </div>
               </div>
 
@@ -252,16 +275,26 @@ if (!selectedPlan) {
         const gateway = input.value;
         const planId = form?.getAttribute('data-plan');
         const planConfig = {
-          developer: { name: 'Developer', price: 49, molliePrice: '49.00', specs: ['4 GB RAM', '32 GB Storage', '1 Instance'] },
-          professional: { name: 'Professional', price: 149, molliePrice: '149.00', specs: ['8 GB RAM', '64 GB Storage', '4 Instances'] },
-          team: { name: 'Team', price: 399, molliePrice: '399.00', specs: ['16 GB RAM', '128 GB Storage', '12 Instances'] },
+          developer: { name: 'Developer', price: 49, molliePrice: '49.00', paynowPrice: '49.00', specs: ['4 GB RAM', '32 GB Storage', '1 Instance'] },
+          professional: { name: 'Professional', price: 149, molliePrice: '149.00', paynowPrice: '149.00', specs: ['8 GB RAM', '64 GB Storage', '4 Instances'] },
+          team: { name: 'Team', price: 399, molliePrice: '399.00', paynowPrice: '399.00', specs: ['16 GB RAM', '128 GB Storage', '12 Instances'] },
         };
         const selectedPlan = planId ? planConfig[planId] : null;
         if (selectedPlan) {
           summary.classList.remove('hidden');
-          summaryGateway.textContent = gateway === 'mollie' ? 'Mollie' : 'Dodo Payments';
-          summaryPrice.textContent = gateway === 'mollie' ? '€' + selectedPlan.molliePrice : '$' + selectedPlan.price;
-          summaryCurrency.textContent = gateway === 'mollie' ? 'EUR' : 'USD';
+          if (gateway === 'mollie') {
+            summaryGateway.textContent = 'Mollie';
+            summaryPrice.textContent = '€' + selectedPlan.molliePrice;
+            summaryCurrency.textContent = 'EUR';
+          } else if (gateway === 'paynow') {
+            summaryGateway.textContent = 'PayNow';
+            summaryPrice.textContent = '£' + selectedPlan.paynowPrice;
+            summaryCurrency.textContent = 'GBP';
+          } else {
+            summaryGateway.textContent = 'Dodo Payments';
+            summaryPrice.textContent = '$' + selectedPlan.price;
+            summaryCurrency.textContent = 'USD';
+          }
           summaryPlan.textContent = selectedPlan.name + ' Plan · ' + selectedPlan.specs.join(', ');
         }
       });

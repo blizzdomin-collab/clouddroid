@@ -2,7 +2,7 @@
 
 **Document Version:** 2.0  
 **Project Classification:** B2B SaaS / Cloud Infrastructure  
-**Objective:** 100% first-pass approval rate with stringent Merchant of Record (MoR) and Payment Gateway compliance teams (e.g., Dodo Payments, Stripe, Paddle, Mollie).
+**Objective:** 100% first-pass approval rate with stringent Merchant of Record (MoR) and Payment Gateway compliance teams (e.g., Dodo Payments, Stripe, Paddle, Mollie, PayNow).
 
 ---
 
@@ -53,8 +53,8 @@ Lack of transparency in pricing is the #1 reason for KYB rejection.
 *   **Clear Tiers:** 3 distinct tiers (e.g., Developer, Professional, Team).
 *   **Explicit Specs:** RAM, Storage, and Concurrent Instances must be defined per tier.
 *   **Zero Hidden Fees:** A bold statement near the checkout button: *"Simple monthly billing. Cancel anytime. No hidden setup fees."*
-*   **MoR Acknowledgment:** The checkout page must clearly state who is processing the payment (e.g., *"Securely processed by Dodo Payments and Mollie"*).
-*   **Gateway Selection:** Users can choose between Dodo Payments (USD, cards/Apple Pay/Google Pay) and Mollie (EUR, iDEAL/Bancontact/cards).
+*   **MoR Acknowledgment:** The checkout page must clearly state who is processing the payment (e.g., *"Securely processed by Dodo Payments, Mollie, and PayNow"*).
+*   **Gateway Selection:** Users can choose between Dodo Payments (USD, cards/Apple Pay/Google Pay), Mollie (EUR, iDEAL/Bancontact/cards), and PayNow (GBP/EUR, cards).
 
 ---
 
@@ -107,6 +107,7 @@ A publicly accessible list of all third-party subprocessors:
 
 *   Dodo Payments — payment processing, subscription management
 *   Mollie — payment processing (EU market)
+*   PayNow — payment processing (UK/EU market)
 *   Cloud Infrastructure Provider — hosting, compute, storage
 *   Redis — session storage, rate limiting
 *   Let's Encrypt — SSL/TLS certificates
@@ -210,12 +211,24 @@ Showcasing a robust backend builds trust.
 - Supported methods: iDEAL, Bancontact, Card
 - Currency: EUR
 
+## PayNow Setup
+
+- Webhook endpoint: `/api/webhooks/paynow`
+- Environment variables: `PAYNOW_API_KEY`, `PAYNOW_WEBHOOK_KEY`, `PAYNOW_ENVIRONMENT=live`, `PAYNOW_RETURN_URL=https://clouddroid.eu/checkout/success`
+- Management API endpoint: `/v1/stores/{storeId}/checkouts`
+- Store ID: `596938077507686400`
+- Product ID: `596937594697154560`
+- Auth format: `Authorization: apikey <token>`
+- Webhook signature: HMAC SHA256 with timestamp tolerance 5 minutes
+- Test customer ID: `596957825259806720`
+- Webhook events verified: `ON_ORDER_COMPLETED`, `ONDELIVERYITEMADDED`, `ONDELIVERYITEMACTIVATED`
+
 ---
 
 ## 8. Implementation Progress
 
 **Framework:** Astro 7.2 with Tailwind CSS v4  
-**Status:** Core marketing site scaffolded, build verified, APIs functional, Dodo Payments + Mollie checkout working in production
+**Status:** Core marketing site scaffolded, build verified, APIs functional, Dodo Payments + Mollie + PayNow checkout working in production
 
 ### Completed Components
 
@@ -245,9 +258,10 @@ Showcasing a robust backend builds trust.
 | Subprocessors List | `src/pages/legal/subprocessors.astro` | ✅ Done |
 | AML/CFT Policy | `src/pages/legal/aml.astro` | ✅ Done |
 | Checkout Flow | `src/pages/checkout/[plan].astro` | ✅ Done |
-| Checkout API | `src/pages/api/checkout.ts` | ✅ Done |
+| Checkout API | `src/pages/api/checkout.ts` | ✅ Done (Dodo + Mollie + PayNow) |
 | Webhook Handler | `src/pages/api/webhooks/dodopayments.ts` | ✅ Done |
 | Mollie Webhook Handler | `src/pages/api/webhooks/mollie.ts` | ✅ Done |
+| PayNow Webhook Handler | `src/pages/api/webhooks/paynow.ts` | ✅ Done |
 | Customer Portal | `src/pages/api/customer-portal.ts` | ✅ Done |
 | Monitoring Dashboard | `src/pages/monitoring/index.astro` | ✅ Done |
 | Monitoring API | `src/pages/api/monitoring/instances.ts` | ✅ Done |
@@ -272,6 +286,7 @@ Showcasing a robust backend builds trust.
 | Security Headers Middleware | `src/middleware.ts` | ✅ Done |
 | JSON-File Database | `src/lib/database.ts` | ✅ Done |
 | Database Schema | instances, audit_logs, alerts, users, subscriptions, metrics_history, invoices, checkout_sessions, notification_channels | ✅ Done |
+| PayNow Schema | `paynow_payment_id` in checkout_sessions, `paynow_customer_id` in users | ✅ Done |
 | Billing Page | `src/pages/dashboard/billing.astro` | ✅ Done |
 | Billing API | `src/pages/api/billing/subscription.ts` | ✅ Done |
 | User Management Page | `src/pages/dashboard/users.astro` | ✅ Done |
@@ -317,7 +332,7 @@ Showcasing a robust backend builds trust.
 - [x] Hero uses approved messaging only (no banned keywords)
 - [x] 3 transparent pricing tiers with explicit RAM/Storage/Instance specs
 - [x] "No hidden fees" and "Cancel anytime" messaging present
-- [x] MoR acknowledgment: "Securely processed by Dodo Payments and Mollie"
+- [x] MoR acknowledgment: "Securely processed by Dodo Payments, Mollie, and PayNow"
 - [x] Footer includes company name, physical address, support email, copyright, MoR disclaimer
 - [x] Legal pages created: `/legal/terms`, `/legal/privacy`, `/legal/aup`, `/legal/refund`
 - [x] AUP includes explicit prohibitions: DDoS, port scanning, spamming, crypto mining, 100% CPU scripts, click-fraud, card testing, identity theft
@@ -325,10 +340,10 @@ Showcasing a robust backend builds trust.
 - [x] Privacy policy includes GDPR/CCPA rights, data retention, no raw credit card storage statement
 - [x] Product showcase section added with dashboard mockup
 - [x] Partner logos replaced with SVG placeholders
-- [x] Checkout flow implemented with Dodo Payments + Mollie API integration
+- [x] Checkout flow implemented with Dodo Payments + Mollie + PayNow API integration
 - [x] Pricing CTAs link to `/checkout/{plan}` routes
 - [x] Checkout success/cancel pages created
-- [x] `.env.example` created for Dodo Payments + Mollie API keys
+- [x] `.env.example` created for Dodo Payments + Mollie + PayNow API keys
 - [x] Monitoring dashboard with CPU/memory/network metrics
 - [x] Automated anomaly detection for CPU >95% and traffic spikes
 - [x] Audit logging API with compliance event tracking
@@ -396,10 +411,12 @@ Showcasing a robust backend builds trust.
 - [x] Error pages (`404.astro`, `500.astro`)
 - [x] Dodo Payments customer ID stored in user records
 - [x] Mollie customer ID stored in user records
+- [x] PayNow customer ID stored in user records
 - [x] "Manage Subscription" button on billing page
 - [x] Production domain configured (`clouddroid.eu`)
 - [x] Dodo Payments checkout working in production (`POST /checkouts`)
 - [x] Mollie checkout working in production (`POST /v2/payments`)
+- [x] PayNow checkout working in production (`POST /v1/stores/{storeId}/checkouts`)
 - [x] Login history/activity page with paginated auth events
 - [x] Session management with active sessions list and revoke
 - [x] Instance detail page with metrics chart and action buttons
@@ -479,3 +496,4 @@ Showcasing a robust backend builds trust.
 54. ~~Fix nginx config for proper WebSocket handling~~ ✅ Completed
 55. ~~Fix deploy script with build verification~~ ✅ Completed
 56. ~~Stabilize asset filenames to prevent cache invalidation~~ ✅ Completed
+57. ~~Add PayNow payment gateway integration~~ ✅ Completed

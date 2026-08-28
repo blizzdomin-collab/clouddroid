@@ -9,10 +9,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const ipAddress = clientAddress || null;
     const userAgent = request.headers.get('user-agent') || null;
 
-    const planConfig: Record<string, { name: string; productId: string; mollieAmount: string }> = {
-      developer: { name: 'Developer', productId: 'pdt_0Nl5L3f80oqubD1vFBGeV', mollieAmount: '49.00' },
-      professional: { name: 'Professional', productId: 'pdt_0Nl5Kr9NhpcLZ7C5KJFOo', mollieAmount: '149.00' },
-      team: { name: 'Team', productId: 'pdt_0Nl5K2bcCSXCritV0N8lN', mollieAmount: '399.00' },
+    const planConfig: Record<string, { name: string; productId: string; mollieAmount: string; paynowProductId: string }> = {
+      developer: { name: 'Developer', productId: 'pdt_0Nl5L3f80oqubD1vFBGeV', mollieAmount: '49.00', paynowProductId: '596937594697154560' },
+      professional: { name: 'Professional', productId: 'pdt_0Nl5Kr9NhpcLZ7C5KJFOo', mollieAmount: '149.00', paynowProductId: '596937714155134976' },
+      team: { name: 'Team', productId: 'pdt_0Nl5K2bcCSXCritV0N8lN', mollieAmount: '399.00', paynowProductId: '596937843687821312' },
     };
 
     const selectedPlan = planConfig[planId];
@@ -106,7 +106,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         body: JSON.stringify({
           product_cart: [
             {
-              product_id: selectedPlan.productId,
+              product_id: selectedPlan.paynowProductId,
               quantity: 1,
             },
           ],

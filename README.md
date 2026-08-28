@@ -8,7 +8,7 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 - **Styling:** Tailwind CSS v4
 - **Database:** SQLite via `better-sqlite3` (`.data/clouddroid.db`)
 - **Cache/Realtime:** Redis (`ioredis`) + WebSocket server (`ws`)
-- **Payments:** Dodo Payments + Mollie
+- **Payments:** Dodo Payments + Mollie + PayNow
 - **Deployment:** PM2 + Nginx + Let's Encrypt SSL
 - **Auto-deploy:** GitHub Actions on push to `main`
 
@@ -63,9 +63,9 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 │   │   │   └── aml.astro
 │   │   └── api/                  # API routes
 │   │       ├── auth/             # Login, logout, register, password reset, 2FA, activity, sessions
-│   │       ├── checkout.ts       # Dodo Payments + Mollie checkout session
+│   │       ├── checkout.ts       # Dodo Payments + Mollie + PayNow checkout session
 │   │       ├── contact.ts        # Contact form submission
-│   │       ├── webhooks/         # Dodo Payments + Mollie webhooks
+│   │       ├── webhooks/         # Dodo Payments + Mollie + PayNow webhooks
 │   │       ├── instances/        # Instance CRUD + actions + detail
 │   │       ├── monitoring/       # Metrics, collect, charts
 │   │       ├── audit/            # Logs, export CSV
@@ -144,6 +144,10 @@ DODO_PAYMENTS_RETURN_URL=https://clouddroid.eu/checkout/success
 MOLLIE_API_KEY=your-mollie-api-key
 MOLLIE_ENVIRONMENT=live
 MOLLIE_RETURN_URL=https://clouddroid.eu/checkout/success
+PAYNOW_API_KEY=your-paynow-api-key
+PAYNOW_WEBHOOK_KEY=your-paynow-webhook-secret
+PAYNOW_ENVIRONMENT=live
+PAYNOW_RETURN_URL=https://clouddroid.eu/checkout/success
 REDIS_URL=redis://localhost:6379
 WS_PORT=4322
 ```
@@ -167,6 +171,34 @@ Static B2B consulting site hosted on `consulting.clouddroid.eu`:
 - Legal pages: Terms & Conditions, Privacy Policy, Refund Policy
 - Nginx serves static files from `/var/www/clouddroid/consulting`
 - SSL via Let's Encrypt
+
+## 💳 Payment Gateways
+
+### Dodo Payments
+- Webhook endpoint: `/api/webhooks/dodopayments`
+- Environment variables: `DODO_PAYMENTS_API_KEY`, `DODO_PAYMENTS_WEBHOOK_KEY`, `DODO_PAYMENTS_ENVIRONMENT=live_mode`, `DODO_PAYMENTS_RETURN_URL=https://clouddroid.eu/checkout/success`
+- Checkout endpoint: `POST /checkouts` with `product_cart`
+- Customer portal endpoint: `POST /customers/{customer_id}/customer-portal/session`
+- Subscribed events: checkout.session.completed, subscription.active, subscription.cancelled, subscription.renewed, payment.succeeded, payment.failed, refund.succeeded
+- Account status: Fully approved, live mode activated
+
+### Mollie
+- Webhook endpoint: `/api/webhooks/mollie`
+- Environment variables: `MOLLIE_API_KEY`, `MOLLIE_ENVIRONMENT=live`, `MOLLIE_RETURN_URL=https://clouddroid.eu/checkout/success`
+- Payments endpoint: `POST https://api.mollie.com/v2/payments`
+- Supported methods: iDEAL, Bancontact, Card
+- Currency: EUR
+
+### PayNow
+- Webhook endpoint: `/api/webhooks/paynow`
+- Environment variables: `PAYNOW_API_KEY`, `PAYNOW_WEBHOOK_KEY`, `PAYNOW_ENVIRONMENT=live`, `PAYNOW_RETURN_URL=https://clouddroid.eu/checkout/success`
+- Management API endpoint: `/v1/stores/{storeId}/checkouts`
+- Store ID: `596938077507686400`
+- Product ID: `596937594697154560`
+- Auth format: `Authorization: apikey <token>`
+- Webhook signature: HMAC SHA256 with timestamp tolerance 5 minutes
+- Test customer ID: `596957825259806720`
+- Webhook events verified: `ON_ORDER_COMPLETED`, `ONDELIVERYITEMADDED`, `ONDELIVERYITEMACTIVATED`
 
 ## 📄 License
 
