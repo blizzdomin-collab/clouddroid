@@ -200,8 +200,8 @@ if (!selectedPlan) {
                         </div>
                       </div>
                       <div class="flex items-center justify-between">
-                        <span class="text-xs font-medium text-slate">GBP/EUR pricing</span>
-                        <span class="text-xs font-medium text-navy">£{selectedPlan.paynowAmount}/mo</span>
+                        <span class="text-xs font-medium text-slate">USD pricing</span>
+                        <span class="text-xs font-medium text-navy">${selectedPlan.paynowAmount}/mo</span>
                       </div>
                     </div>
                   </label>
@@ -288,8 +288,8 @@ if (!selectedPlan) {
             summaryCurrency.textContent = 'EUR';
           } else if (gateway === 'paynow') {
             summaryGateway.textContent = 'PayNow';
-            summaryPrice.textContent = '£' + selectedPlan.paynowPrice;
-            summaryCurrency.textContent = 'GBP';
+            summaryPrice.textContent = '$' + selectedPlan.paynowPrice;
+            summaryCurrency.textContent = 'USD';
           } else {
             summaryGateway.textContent = 'Dodo Payments';
             summaryPrice.textContent = '$' + selectedPlan.price;
