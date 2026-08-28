@@ -122,8 +122,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       });
 
       if (!response.ok) {
-        const error = await response.text();
-        return new Response(JSON.stringify({ error: 'Failed to create PayNow checkout', details: error }), {
+        const errorText = await response.text();
+        console.error('PayNow checkout failed:', response.status, errorText);
+        return new Response(JSON.stringify({ error: 'Failed to create PayNow checkout', details: errorText }), {
           status: response.status,
           headers: { 'Content-Type': 'application/json' },
         });
