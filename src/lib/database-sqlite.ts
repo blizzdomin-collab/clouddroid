@@ -163,6 +163,16 @@ db.exec(`
     created_at TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS announcements (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    type TEXT NOT NULL DEFAULT 'info',
+    status TEXT NOT NULL DEFAULT 'active',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+
   CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
   CREATE INDEX IF NOT EXISTS idx_instances_status ON instances(status);
   CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);
@@ -275,6 +285,19 @@ function migrateSchema() {
   const hasEasyTransacTid = checkoutColumns.some((col) => col.name === 'easytransac_tid');
   if (!hasEasyTransacTid) {
     db.exec("ALTER TABLE checkout_sessions ADD COLUMN easytransac_tid TEXT");
+  }
+
+  const announcementColumns = db.prepare("PRAGMA table_info(announcements)").all() as any[];
+  if (announcementColumns.length === 0) {
+    db.exec(`CREATE TABLE announcements (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      message TEXT NOT NULL,
+      type TEXT NOT NULL DEFAULT 'info',
+      status TEXT NOT NULL DEFAULT 'active',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )`);
   }
 }
 
@@ -677,7 +700,7 @@ export function completeCheckout({
   plan: string;
   amount: number;
   currency: string;
-  gateway: 'dodo' | 'mollie' | 'paynow';
+  gateway: 'dodo' | 'mollie' | 'paynow' | 'easytransac';
   tempPassword?: string;
   customerId?: string;
   checkoutSessionId?: string;
@@ -699,6 +722,7 @@ export function completeCheckout({
       dodo_customer_id: gateway === 'dodo' ? customerId || null : null,
       mollie_customer_id: gateway === 'mollie' ? customerId || null : null,
       paynow_customer_id: gateway === 'paynow' ? customerId || null : null,
+      easytransac_client_id: gateway === 'easytransac' ? customerId || null : null,
     });
 
     const subscription = createSubscription({
@@ -727,7 +751,7 @@ export function completeCheckout({
       severity: 'info',
       instance_id: null,
       user_id: user.id,
-      details: `User account created for ${email} after successful ${plan} subscription via ${gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : 'Dodo Payments'}`,
+      details: `User account created for ${email} after successful ${plan} subscription via ${gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : 'Dodo Payments'}`,
       action: 'user_create',
     });
 
@@ -761,7 +785,7 @@ export function completeCheckout({
     severity: 'info',
     instance_id: null,
     user_id: user.id,
-    details: `Subscription renewed for ${email} for ${plan} plan via ${gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : 'Dodo Payments'}`,
+      details: `Subscription renewed for ${email} for ${plan} plan via ${gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : 'Dodo Payments'}`,
     action: 'subscription_renew',
   });
 
@@ -927,5 +951,61 @@ export interface ContactSubmission {
   created_at: string;
 }
 
+export interface Announcement {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'changelog' | 'maintenance' | 'feature';
+  status: 'active' | 'archived';
+  created_at: string;
+  updated_at: string;
+}
+
+export function getAnnouncements() {
+  return db.prepare('SELECT * FROM announcements ORDER BY created_at DESC').all() as Announcement[];
+}
+
+export function getAnnouncementById(id: string) {
+  return db.prepare('SELECT * FROM announcements WHERE id = ?').get(id) as Announcement | undefined;
+}
+
+export function createAnnouncement(data: { title: string; message: string; type: Announcement['type']; status?: Announcement['status'] }) {
+  const id = `ann_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const now = new Date().toISOString();
+  db.prepare(`INSERT INTO announcements (id, title, message, type, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)`).run(
+    id,
+    data.title,
+    data.message,
+    data.type,
+    data.status || 'active',
+    now,
+    now
+  );
+  return getAnnouncementById(id);
+}
+
+export function updateAnnouncement(id: string, data: { title?: string; message?: string; type?: Announcement['type']; status?: Announcement['status'] }) {
+  const existing = getAnnouncementById(id);
+  if (!existing) return null;
+
+  const fields: string[] = [];
+  const values: any[] = [];
+
+  if (data.title !== undefined) { fields.push('title = ?'); values.push(data.title); }
+  if (data.message !== undefined) { fields.push('message = ?'); values.push(data.message); }
+  if (data.type !== undefined) { fields.push('type = ?'); values.push(data.type); }
+  if (data.status !== undefined) { fields.push('status = ?'); values.push(data.status); }
+
+  fields.push("updated_at = ?");
+  values.push(new Date().toISOString(), id);
+
+  db.prepare(`UPDATE announcements SET ${fields.join(', ')} WHERE id = ?`).run(...values);
+  return getAnnouncementById(id);
+}
+
+export function deleteAnnouncement(id: string) {
+  const result = db.prepare('DELETE FROM announcements WHERE id = ?').run(id);
+  return result.changes > 0;
+}
 
 export default db;

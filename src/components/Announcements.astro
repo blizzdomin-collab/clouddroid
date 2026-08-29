@@ -1,0 +1,44 @@
+---
+interface Announcement {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'changelog' | 'maintenance' | 'feature';
+  status: 'active' | 'archived';
+  created_at: string;
+  updated_at: string;
+}
+
+const { announcements }: { announcements: Announcement[] } = Astro.props;
+---
+
+{announcements.length > 0 && (
+  <div class="mb-6 space-y-3">
+    {announcements.map((announcement) => (
+      <div class={`rounded-lg border p-4 ${
+        announcement.type === 'maintenance' ? 'bg-yellow-50 border-yellow-200' :
+        announcement.type === 'changelog' ? 'bg-blue-50 border-blue-200' :
+        announcement.type === 'feature' ? 'bg-green-50 border-green-200' :
+        'bg-slate-50 border-slate-200'
+      }`}>
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="text-sm font-semibold text-navy">{announcement.title}</h3>
+              <span class={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                announcement.type === 'maintenance' ? 'text-yellow-700 bg-yellow-100' :
+                announcement.type === 'changelog' ? 'text-blue-700 bg-blue-100' :
+                announcement.type === 'feature' ? 'text-green-700 bg-green-100' :
+                'text-slate-700 bg-slate-100'
+              }`}>
+                {announcement.type}
+              </span>
+            </div>
+            <p class="text-sm text-slate whitespace-pre-wrap">{announcement.message}</p>
+            <p class="text-xs text-slate mt-2">{new Date(announcement.created_at).toLocaleDateString()}</p>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+)}

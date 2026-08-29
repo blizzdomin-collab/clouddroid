@@ -1,8 +1,10 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 ---
 
 <Layout title="Terms of Service - CloudDroid" description="CloudDroid Terms of Service including Acceptable Use Policy">
+  <Breadcrumbs items={[{ label: 'Legal' }, { label: 'Terms of Service' }]} />
   <div class="bg-slate-light py-16">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <h1 class="text-4xl font-bold text-navy mb-4">Terms of Service</h1>

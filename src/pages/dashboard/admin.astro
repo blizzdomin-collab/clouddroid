@@ -1,5 +1,6 @@
 ---
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import { getUserByEmail } from '../../lib/database';
 
 const sessionCookie = Astro.cookies.get('session');
 let isAdmin = false;
@@ -9,13 +10,16 @@ let error: string | null = null;
 if (sessionCookie) {
   try {
     const session = JSON.parse(sessionCookie.value);
-    if (session.authenticated === true && session.role === 'admin') {
-      isAdmin = true;
-      const res = await fetch(`${Astro.url.origin}/api/admin/stats`);
-      if (res.ok) {
-        stats = await res.json();
-      } else {
-        error = 'Failed to load admin stats';
+    if (session.authenticated === true && session.email) {
+      const user = getUserByEmail(session.email);
+      if (user && user.role === 'admin') {
+        isAdmin = true;
+        const res = await fetch(`${Astro.url.origin}/api/admin/stats`);
+        if (res.ok) {
+          stats = await res.json();
+        } else {
+          error = 'Failed to load admin stats';
+        }
       }
     }
   } catch {
@@ -55,7 +59,7 @@ if (sessionCookie) {
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white rounded-xl border border-slate-200 p-6">
               <div class="text-sm text-slate mb-1">Dodo Payments Users</div>
               <div class="text-3xl font-bold text-navy">{stats.paymentGateways?.dodo?.users || 0}</div>
@@ -65,6 +69,16 @@ if (sessionCookie) {
               <div class="text-sm text-slate mb-1">Mollie Users</div>
               <div class="text-3xl font-bold text-navy">{stats.paymentGateways?.mollie?.users || 0}</div>
               <div class="text-xs text-slate mt-1">Revenue: €{(stats.paymentGateways?.mollie?.revenue || 0).toFixed(2)}</div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+              <div class="text-sm text-slate mb-1">PayNow Users</div>
+              <div class="text-3xl font-bold text-navy">{stats.paymentGateways?.paynow?.users || 0}</div>
+              <div class="text-xs text-slate mt-1">Revenue: ${(stats.paymentGateways?.paynow?.revenue || 0).toFixed(2)}</div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+              <div class="text-sm text-slate mb-1">EasyTransac Users</div>
+              <div class="text-3xl font-bold text-navy">{stats.paymentGateways?.easytransac?.users || 0}</div>
+              <div class="text-xs text-slate mt-1">Revenue: €{(stats.paymentGateways?.easytransac?.revenue || 0).toFixed(2)}</div>
             </div>
           </div>
 

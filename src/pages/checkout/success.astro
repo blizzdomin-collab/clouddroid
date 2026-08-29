@@ -165,9 +165,9 @@ if (sessionId) {
     tempPassword = checkoutSession.temp_password || '';
     const user = getUserByEmail(userEmail);
     if (user) {
-      userCreated = true;
       paymentSuccess = true;
-      isRenewal = true;
+      isRenewal = !user.must_change_password;
+      userCreated = user.must_change_password;
     }
   }
 }
@@ -256,6 +256,14 @@ if (sessionId) {
           </>
         )}
       </div>
-    </div>
   </div>
+</div>
+
+{!paymentSuccess && (
+  <script>
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
+  </script>
+)}
 </Layout>

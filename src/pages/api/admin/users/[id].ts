@@ -49,6 +49,8 @@ export const GET: APIRoute = async ({ params, cookies }) => {
       suspension_reason: user.suspension_reason,
       dodo_customer_id: user.dodo_customer_id,
       mollie_customer_id: user.mollie_customer_id,
+      paynow_customer_id: user.paynow_customer_id,
+      easytransac_client_id: user.easytransac_client_id,
       registration_ip: user.registration_ip,
       registration_user_agent: user.registration_user_agent,
       two_factor_enabled: Boolean(user.two_factor_enabled),

@@ -64,6 +64,8 @@ export const GET: APIRoute = async ({ cookies }) => {
 
     const dodoUsers = users.filter((u) => u.dodo_customer_id).length;
     const mollieUsers = users.filter((u) => u.mollie_customer_id).length;
+    const paynowUsers = users.filter((u) => u.paynow_customer_id).length;
+    const easytransacUsers = users.filter((u) => u.easytransac_client_id).length;
 
     const dodoRevenue = invoices
       .filter((inv) => inv.status === 'paid')
@@ -85,6 +87,26 @@ export const GET: APIRoute = async ({ cookies }) => {
       })
       .reduce((sum, inv) => sum + inv.amount, 0);
 
+    const paynowRevenue = invoices
+      .filter((inv) => inv.status === 'paid')
+      .filter((inv) => {
+        const sub = subscriptions.find((s) => s.id === inv.subscription_id);
+        if (!sub) return false;
+        const user = users.find((u) => u.id === sub.user_id);
+        return user?.paynow_customer_id;
+      })
+      .reduce((sum, inv) => sum + inv.amount, 0);
+
+    const easytransacRevenue = invoices
+      .filter((inv) => inv.status === 'paid')
+      .filter((inv) => {
+        const sub = subscriptions.find((s) => s.id === inv.subscription_id);
+        if (!sub) return false;
+        const user = users.find((u) => u.id === sub.user_id);
+        return user?.easytransac_client_id;
+      })
+      .reduce((sum, inv) => sum + inv.amount, 0);
+
     return new Response(
       JSON.stringify({
         overview: {
@@ -95,8 +117,10 @@ export const GET: APIRoute = async ({ cookies }) => {
           pendingInvoices: invoices.filter((inv) => inv.status === 'pending').length,
         },
         paymentGateways: {
-          dodo: { users: dodoUsers, revenue: dodoRevenue },
-          mollie: { users: mollieUsers, revenue: mollieRevenue },
+          dodo: { users: dodoUsers, revenue: dodoRevenue, currency: 'USD' },
+          mollie: { users: mollieUsers, revenue: mollieRevenue, currency: 'EUR' },
+          paynow: { users: paynowUsers, revenue: paynowRevenue, currency: 'USD' },
+          easytransac: { users: easytransacUsers, revenue: easytransacRevenue, currency: 'EUR' },
         },
         userGrowth,
         revenueByDay,

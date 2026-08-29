@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getCheckoutSessionBySessionId, getCheckoutSessionByEmail, updateCheckoutSession, getUserByEmail, createUser, createSubscription, updateSubscription, createInvoice, createAuditLog, provisionInstancesForUser, getSubscriptionByUserId } from '../../../lib/database';
+import { getCheckoutSessionBySessionId, getCheckoutSessionByEmail, updateCheckoutSession, getUserByEmail, createUser, createSubscription, updateSubscription, createInvoice, createAuditLog, provisionInstancesForUser, getSubscriptionByUserId, updateUser, hashPassword } from '../../../lib/database';
 import crypto from 'crypto';
 
 function verifyEasyTransacSignature(params: Record<string, string>, secret: string): boolean {
@@ -20,6 +20,7 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const easytransacWebhookKey = import.meta.env.EASYTRANSAC_WEBHOOK_KEY;
     if (!easytransacWebhookKey) {
+      console.error('EasyTransac webhook: EASYTRANSAC_WEBHOOK_KEY not configured');
       return new Response(JSON.stringify({ error: 'Webhook secret not configured' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
@@ -48,6 +49,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     if (!verifyEasyTransacSignature(params, easytransacWebhookKey)) {
+      console.error('EasyTransac webhook: Invalid signature', { notificationType: params.NotificationType, tid: params.Tid });
       return new Response(JSON.stringify({ error: 'Invalid signature' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
@@ -63,7 +65,18 @@ export const POST: APIRoute = async ({ request }) => {
     const currency = (params.Currency || params.currency || 'EUR').toUpperCase();
     const customerEmail = params.Email || params.email || '';
 
-    if (notificationType === 'transaction' && (status === 'captured' || status === 'pending')) {
+    console.log('EasyTransac webhook received:', { notificationType, status, tid, orderId, customerEmail });
+
+    if (notificationType === 'page' || notificationType === 'transaction') {
+      if (notificationType === 'page') {
+        console.log('EasyTransac page notification:', { requestId, orderId, status });
+      }
+      if (notificationType === 'transaction' && status !== 'captured' && status !== 'pending') {
+        return new Response(JSON.stringify({ received: true }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
       let checkoutSession = null;
 
       if (orderId) {
@@ -105,9 +118,10 @@ export const POST: APIRoute = async ({ request }) => {
 
       let user = getUserByEmail(email);
       if (!user) {
+        const finalPassword = checkoutSession.temp_password || crypto.randomBytes(12).toString('hex');
         user = createUser({
           email,
-          password_hash: crypto.createHash('sha256').update(tempPassword).digest('hex'),
+          password_hash: hashPassword(finalPassword),
           name: email.split('@')[0],
           role: 'user',
           reset_token: null,

@@ -1,0 +1,55 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="How It Works - CloudDroid" description="Learn how CloudDroid works: sign up, purchase access, create an instance, and connect via ADB in minutes.">
+  <div class="bg-slate-light py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl font-bold text-navy mb-4">How It Works</h1>
+      <p class="text-lg text-slate">Get started with CloudDroid in four simple steps.</p>
+    </div>
+  </div>
+
+  <div class="py-16 bg-white">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-slate-50 rounded-2xl border border-slate-200 p-8">
+          <div class="w-10 h-10 bg-navy text-white rounded-full flex items-center justify-center font-bold mb-4">1</div>
+          <h2 class="text-xl font-bold text-navy mb-2">Create an Account</h2>
+          <p class="text-slate">Sign up with your email address. No credit card required to create an account. You will receive a temporary password to log in.</p>
+        </div>
+
+        <div class="bg-slate-50 rounded-2xl border border-slate-200 p-8">
+          <div class="w-10 h-10 bg-navy text-white rounded-full flex items-center justify-center font-bold mb-4">2</div>
+          <h2 class="text-xl font-bold text-navy mb-2">Choose a Plan</h2>
+          <p class="text-slate">Select the Developer, Professional, or Team plan that fits your needs. Each plan is a one-time payment that grants access for a defined period.</p>
+        </div>
+
+        <div class="bg-slate-50 rounded-2xl border border-slate-200 p-8">
+          <div class="w-10 h-10 bg-navy text-white rounded-full flex items-center justify-center font-bold mb-4">3</div>
+          <h2 class="text-xl font-bold text-navy mb-2">Create an Instance</h2>
+          <p class="text-slate">After payment, log in to your dashboard and create a new Android instance. Choose your preferred Android version and region. Provisioning takes a few minutes.</p>
+        </div>
+
+        <div class="bg-slate-50 rounded-2xl border border-slate-200 p-8">
+          <div class="w-10 h-10 bg-navy text-white rounded-full flex items-center justify-center font-bold mb-4">4</div>
+          <h2 class="text-xl font-bold text-navy mb-2">Connect via ADB</h2>
+          <p class="text-slate">Use the provided ADB endpoint to connect your local tools. Install apps, run tests, automate workflows, or browse the Android environment remotely.</p>
+        </div>
+      </div>
+
+      <div class="mt-16 bg-navy rounded-2xl p-8 sm:p-12 text-center">
+        <h2 class="text-2xl sm:text-3xl font-bold text-white mb-4">Ready to get started?</h2>
+        <p class="text-slate-300 mb-8 max-w-2xl mx-auto">Create your account and choose a plan to launch your first cloud Android instance.</p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="/register" class="inline-flex items-center justify-center bg-white text-navy px-8 py-3 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
+            Create Account
+          </a>
+          <a href="/pricing" class="inline-flex items-center justify-center bg-navy-light text-white border border-slate-600 px-8 py-3 rounded-lg font-semibold hover:bg-navy transition-colors">
+            View Pricing
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

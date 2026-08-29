@@ -15,6 +15,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
     const { planId, customerEmail, gateway = 'dodo' } = await request.json();
 
+    if (!customerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
+      return new Response(JSON.stringify({ error: 'Valid email is required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const ipAddress = clientAddress || null;
     const userAgent = request.headers.get('user-agent') || null;
 

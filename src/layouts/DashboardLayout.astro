@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { getUserByEmail } from '../lib/database';
+import Announcements from '../components/Announcements.astro';
 
 interface Props {
   title?: string;
@@ -15,6 +16,7 @@ let isAuthenticated = false;
 let mustChangePassword = false;
 let currentUser: { email: string; name: string; role: string } | null = null;
 let unreadAlerts = 0;
+let announcements: any[] = [];
 
 if (sessionCookie) {
   try {
@@ -41,8 +43,17 @@ if (isAuthenticated) {
       const alertsData = await alertsRes.json();
       unreadAlerts = alertsData.summary?.unacknowledged || 0;
     }
+
+    const announcementsRes = await fetch(`${Astro.url.origin}/api/announcements`, {
+      headers: { Cookie: `session=${sessionCookie?.value}` },
+    });
+    if (announcementsRes.ok) {
+      const announcementsData = await announcementsRes.json();
+      announcements = announcementsData.announcements || [];
+    }
   } catch {
     unreadAlerts = 0;
+    announcements = [];
   }
 }
 
@@ -132,6 +143,12 @@ if (mustChangePassword && !Astro.url.pathname.startsWith('/change-password')) {
             </svg>
             <span class="font-medium">Activity</span>
           </a>
+          <a href="/dashboard/announcements" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+            </svg>
+            <span class="font-medium">Announcements</span>
+          </a>
           <a href="/dashboard/settings" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -180,6 +197,7 @@ if (mustChangePassword && !Astro.url.pathname.startsWith('/change-password')) {
         </div>
       </aside>
       <main class="flex-1 overflow-y-auto bg-slate-light dark:bg-navy">
+        <Announcements announcements={announcements} />
         <slot />
       </main>
     </div>

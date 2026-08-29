@@ -9,7 +9,25 @@ const annualPrices = {
 };
 ---
 
-<Layout title="Pricing - CloudDroid" description="Simple, transparent pricing for CloudDroid cloud Android workspaces. Monthly and annual billing options.">
+<Layout
+  title="Pricing - CloudDroid"
+  description="Simple, transparent pricing for CloudDroid cloud Android workspaces. Monthly and annual billing options."
+  jsonLd={{
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: 'CloudDroid Developer',
+    description: 'Cloud Android workspace for individual developers and small projects. 4 GB RAM, 32 GB storage, 1 concurrent instance.',
+    brand: { '@type': 'Brand', name: 'CloudDroid' },
+    offers: {
+      '@type': 'Offer',
+      price: '49.00',
+      priceCurrency: 'USD',
+      billingIncrement: 'P1M',
+      availability: 'https://schema.org/InStock',
+      url: `${Astro.url.origin}/checkout/developer`,
+    },
+  }}
+>
   <div class="bg-slate-light py-16">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h1 class="text-4xl font-bold text-navy mb-4">Pricing</h1>
@@ -89,6 +107,68 @@ const annualPrices = {
     </div>
   </div>
 
+  <div class="py-16 bg-white">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-navy mb-8 text-center">Compare Plans</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead>
+            <tr class="border-b border-slate-200">
+              <th class="py-3 pr-4 font-semibold text-navy">Feature</th>
+              <th class="py-3 px-4 font-semibold text-navy text-center">Developer</th>
+              <th class="py-3 px-4 font-semibold text-navy text-center">Professional</th>
+              <th class="py-3 px-4 font-semibold text-navy text-center">Team</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr>
+              <td class="py-3 pr-4 text-slate">RAM</td>
+              <td class="py-3 px-4 text-center text-slate">4 GB</td>
+              <td class="py-3 px-4 text-center text-slate">8 GB</td>
+              <td class="py-3 px-4 text-center text-slate">16 GB</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-4 text-slate">Storage</td>
+              <td class="py-3 px-4 text-center text-slate">32 GB</td>
+              <td class="py-3 px-4 text-center text-slate">64 GB</td>
+              <td class="py-3 px-4 text-center text-slate">128 GB</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-4 text-slate">Concurrent Instances</td>
+              <td class="py-3 px-4 text-center text-slate">1</td>
+              <td class="py-3 px-4 text-center text-slate">4</td>
+              <td class="py-3 px-4 text-center text-slate">12</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-4 text-slate">ADB Access</td>
+              <td class="py-3 px-4 text-center text-accent">Included</td>
+              <td class="py-3 px-4 text-center text-accent">Included</td>
+              <td class="py-3 px-4 text-center text-accent">Included</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-4 text-slate">CI/CD Integrations</td>
+              <td class="py-3 px-4 text-center text-slate-400">—</td>
+              <td class="py-3 px-4 text-center text-accent">Included</td>
+              <td class="py-3 px-4 text-center text-accent">Included</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-4 text-slate">Support</td>
+              <td class="py-3 px-4 text-center text-slate">Email</td>
+              <td class="py-3 px-4 text-center text-slate">Priority</td>
+              <td class="py-3 px-4 text-center text-slate">24/7 Dedicated</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-4 text-slate">Uptime SLA</td>
+              <td class="py-3 px-4 text-center text-slate-400">—</td>
+              <td class="py-3 px-4 text-center text-slate-400">—</td>
+              <td class="py-3 px-4 text-center text-accent">99.9%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <div class="py-16 bg-slate-light">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h2 class="text-3xl font-bold text-navy mb-4">Need a Custom Solution?</h2>
@@ -107,10 +187,9 @@ const annualPrices = {
 
     const updatePricing = function(isAnnual) {
       if (!pricingSection) return;
-      const cards = pricingSection.querySelectorAll('.grid > div');
-      cards.forEach(function(card, index) {
-        const plans = ['developer', 'professional', 'team'];
-        const plan = plans[index];
+      const cards = pricingSection.querySelectorAll('[data-plan]');
+      cards.forEach(function(card) {
+        const plan = card.getAttribute('data-plan');
         if (!plan || !annualPrices[plan]) return;
 
         const priceEl = card.querySelector('.text-4xl');
