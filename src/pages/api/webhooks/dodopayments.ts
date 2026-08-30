@@ -6,11 +6,23 @@ function verifyDodoSignature(payload: string, signatureHeader: string, timestamp
   const signedPayload = `${timestamp}.${payload}`;
   const expected = crypto.createHmac('sha256', secret).update(signedPayload).digest('base64');
   const signature = signatureHeader.replace(/^v1,/, '');
+  console.log('Dodo signature verification:', {
+    signatureLength: signature.length,
+    expectedLength: expected.length,
+    timestamp,
+    signedPayloadLength: signedPayload.length,
+    payloadLength: payload.length,
+    secretLength: secret.length,
+  });
   if (signature.length !== expected.length) {
     console.error('Dodo signature length mismatch:', signature.length, 'vs', expected.length);
     return false;
   }
-  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+  const isValid = crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+  if (!isValid) {
+    console.error('Dodo signature mismatch:', signature.slice(0, 20), 'vs', expected.slice(0, 20));
+  }
+  return isValid;
 }
 
 export const POST: APIRoute = async ({ request }) => {
