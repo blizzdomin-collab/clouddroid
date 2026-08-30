@@ -19,84 +19,84 @@ if (sessionCookie) {
 <DashboardLayout title="Settings - CloudDroid">
     <!-- Header -->
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-navy dark:text-slate-100 mb-1">Settings</h1>
+      <h1 class="text-2xl font-bold text-slate-100  mb-1">Settings</h1>
       <p class="text-slate dark:text-slate-400">Manage your account and preferences</p>
     </div>
 
     <div class="max-w-2xl space-y-4">
       <div class="card overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-          <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Profile Information</h2>
+        <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
+          <h2 class="text-lg font-semibold text-slate-100 ">Profile Information</h2>
         </div>
         <div class="p-6 space-y-4">
           <div>
             <label class="block text-sm font-medium text-slate dark:text-slate-400 mb-1">Name</label>
-            <div class="text-navy dark:text-slate-100 font-medium">{currentUser?.name || 'N/A'}</div>
+            <div class="text-slate-100  font-medium">{currentUser?.name || 'N/A'}</div>
           </div>
           <div>
             <label class="block text-sm font-medium text-slate dark:text-slate-400 mb-1">Email</label>
-            <div class="text-navy dark:text-slate-100 font-medium">{currentUser?.email || 'N/A'}</div>
+            <div class="text-slate-100  font-medium">{currentUser?.email || 'N/A'}</div>
           </div>
           <div>
             <label class="block text-sm font-medium text-slate dark:text-slate-400 mb-1">Role</label>
-            <div class="text-navy dark:text-slate-100 font-medium capitalize">{currentUser?.role || 'N/A'}</div>
+            <div class="text-slate-100  font-medium capitalize">{currentUser?.role || 'N/A'}</div>
           </div>
         </div>
       </div>
 
       <div class="card overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-          <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Security</h2>
+        <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
+          <h2 class="text-lg font-semibold text-slate-100 ">Security</h2>
         </div>
         <div class="p-6">
           <p class="text-sm text-slate dark:text-slate-400 mb-4">Change your password to keep your account secure.</p>
           <form id="password-form" class="space-y-4">
             <div>
-              <label for="current-password" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Current Password</label>
+              <label for="current-password" class="block text-sm font-medium text-slate-100  mb-1">Current Password</label>
               <input type="password" id="current-password" name="currentPassword" required class="input" />
             </div>
             <div>
-              <label for="new-password" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">New Password</label>
+              <label for="new-password" class="block text-sm font-medium text-slate-100  mb-1">New Password</label>
               <input type="password" id="new-password" name="newPassword" required minlength="8" class="input" />
             </div>
             <div>
-              <label for="confirm-password" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Confirm New Password</label>
+              <label for="confirm-password" class="block text-sm font-medium text-slate-100  mb-1">Confirm New Password</label>
               <input type="password" id="confirm-password" name="confirmPassword" required minlength="8" class="input" />
             </div>
-            <div id="password-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"></div>
-            <div id="password-success" class="hidden p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800"></div>
+            <div id="password-error" class="hidden p-3 bg-red-900/30 border border-red-800 rounded-lg text-sm text-red-800"></div>
+            <div id="password-success" class="hidden p-3 bg-green-900/30 border border-green-800 rounded-lg text-sm text-green-800"></div>
             <button type="submit" class="btn btn-accent">Update Password</button>
           </form>
         </div>
       </div>
 
       <div class="card overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-          <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Two-Factor Authentication</h2>
+        <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
+          <h2 class="text-lg font-semibold text-slate-100 ">Two-Factor Authentication</h2>
         </div>
         <div class="p-6">
           <div id="two-factor-status" class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-navy dark:text-slate-100">2FA Status</p>
+              <p class="text-sm font-medium text-slate-100 ">2FA Status</p>
               <p class="text-sm text-slate dark:text-slate-400 mt-1">Add an extra layer of security to your account.</p>
             </div>
-            <span id="two-factor-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate dark:text-slate-800">
+            <span id="two-factor-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-700 text-slate dark:text-slate-800">
               Disabled
             </span>
           </div>
 
           <div id="two-factor-setup" class="hidden mt-6 space-y-4">
-            <div class="bg-slate-50 rounded-lg p-4">
+            <div class="bg-slate-800 rounded-lg p-4">
               <p class="text-sm text-slate dark:text-slate-400 mb-2">Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)</p>
               <div id="qr-code" class="flex justify-center my-4"></div>
               <p class="text-xs text-slate dark:text-slate-400 mb-2">Or enter this secret manually:</p>
-              <code id="two-factor-secret" class="block text-center text-sm bg-white dark:bg-navy-light px-3 py-2 rounded border border-slate-200 dark:border-slate-700 font-mono"></code>
+              <code id="two-factor-secret" class="block text-center text-sm bg-navy-light dark:bg-navy-light px-3 py-2 rounded border border-slate-700 dark:border-slate-700 font-mono"></code>
             </div>
             <div>
-              <label for="two-factor-code" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Verification Code</label>
+              <label for="two-factor-code" class="block text-sm font-medium text-slate-100  mb-1">Verification Code</label>
               <input type="text" id="two-factor-code" maxlength="6" inputmode="numeric" class="input" placeholder="123456" />
             </div>
-            <div id="two-factor-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"></div>
+            <div id="two-factor-error" class="hidden p-3 bg-red-900/30 border border-red-800 rounded-lg text-sm text-red-800"></div>
             <div class="flex gap-3">
               <button type="button" id="enable-2fa-btn" class="btn btn-accent">Enable 2FA</button>
               <button type="button" id="cancel-2fa-btn" class="btn btn-ghost">Cancel</button>
@@ -104,20 +104,20 @@ if (sessionCookie) {
           </div>
 
           <div id="two-factor-enabled" class="hidden mt-6">
-            <p class="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 mb-4">Two-factor authentication is enabled for your account.</p>
+            <p class="text-sm text-green-700 bg-green-900/30 border border-green-800 rounded-lg p-3 mb-4">Two-factor authentication is enabled for your account.</p>
             <button type="button" id="disable-2fa-btn" class="btn btn-danger btn-sm">Disable 2FA</button>
           </div>
 
           <div id="disable-2fa-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div class="bg-white dark:bg-navy-light rounded-xl shadow-lg p-6 max-w-md w-full mx-4">
-              <h3 class="text-lg font-semibold text-navy dark:text-slate-100 mb-2">Disable Two-Factor Authentication</h3>
+            <div class="bg-navy-light dark:bg-navy-light rounded-xl shadow-lg p-6 max-w-md w-full mx-4">
+              <h3 class="text-lg font-semibold text-slate-100  mb-2">Disable Two-Factor Authentication</h3>
               <p class="text-sm text-slate dark:text-slate-400 mb-4">Enter your password to confirm disabling 2FA.</p>
               <form id="disable-2fa-form" class="space-y-4">
                 <div>
-                  <label for="disable-2fa-password" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Password</label>
+                  <label for="disable-2fa-password" class="block text-sm font-medium text-slate-100  mb-1">Password</label>
                   <input type="password" id="disable-2fa-password" required class="input" placeholder="Enter your password" />
                 </div>
-                <div id="disable-2fa-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"></div>
+                <div id="disable-2fa-error" class="hidden p-3 bg-red-900/30 border border-red-800 rounded-lg text-sm text-red-800"></div>
                 <div class="flex gap-3">
                   <button type="submit" class="btn btn-danger">Disable 2FA</button>
                   <button type="button" id="cancel-disable-2fa" class="btn btn-ghost">Cancel</button>
@@ -129,8 +129,8 @@ if (sessionCookie) {
       </div>
 
       <div class="card overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-          <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Notification Channels</h2>
+        <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
+          <h2 class="text-lg font-semibold text-slate-100 ">Notification Channels</h2>
         </div>
         <div class="p-6">
           <p class="text-sm text-slate dark:text-slate-400 mb-4">Configure how you receive alert notifications.</p>
@@ -138,11 +138,11 @@ if (sessionCookie) {
           <button type="button" id="add-channel-btn" class="btn btn-accent">Add Channel</button>
 
           <div id="add-channel-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div class="bg-white dark:bg-navy-light rounded-xl shadow-lg p-6 max-w-md w-full mx-4">
-              <h3 class="text-lg font-semibold text-navy dark:text-slate-100 mb-4">Add Notification Channel</h3>
+            <div class="bg-navy-light dark:bg-navy-light rounded-xl shadow-lg p-6 max-w-md w-full mx-4">
+              <h3 class="text-lg font-semibold text-slate-100  mb-4">Add Notification Channel</h3>
               <form id="add-channel-form" class="space-y-4">
                 <div>
-                  <label for="channel-type" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Channel Type</label>
+                  <label for="channel-type" class="block text-sm font-medium text-slate-100  mb-1">Channel Type</label>
                   <select id="channel-type" required class="select">
                     <option value="email">Email</option>
                     <option value="slack">Slack</option>
@@ -150,15 +150,15 @@ if (sessionCookie) {
                   </select>
                 </div>
                 <div>
-                  <label for="channel-name" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Channel Name</label>
+                  <label for="channel-name" class="block text-sm font-medium text-slate-100  mb-1">Channel Name</label>
                   <input type="text" id="channel-name" required class="input" placeholder="My channel" />
                 </div>
                 <div>
-                  <label for="channel-config" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Config</label>
+                  <label for="channel-config" class="block text-sm font-medium text-slate-100  mb-1">Config</label>
                   <textarea id="channel-config" rows="3" required class="input" placeholder='{"email": "you@example.com"}'></textarea>
                   <p class="text-xs text-slate dark:text-slate-400 mt-1">Enter JSON config, or for email/webhook just the value.</p>
                 </div>
-                <div id="add-channel-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"></div>
+                <div id="add-channel-error" class="hidden p-3 bg-red-900/30 border border-red-800 rounded-lg text-sm text-red-800"></div>
                 <div class="flex gap-3">
                   <button type="submit" class="btn btn-primary">Add Channel</button>
                   <button type="button" id="cancel-add-channel" class="btn btn-ghost">Cancel</button>
@@ -170,8 +170,8 @@ if (sessionCookie) {
       </div>
 
       <div class="card overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-          <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Appearance</h2>
+        <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
+          <h2 class="text-lg font-semibold text-slate-100 ">Appearance</h2>
         </div>
         <div class="p-6">
           <p class="text-sm text-slate dark:text-slate-400 mb-4">Toggle between light and dark mode.</p>
@@ -182,8 +182,8 @@ if (sessionCookie) {
       </div>
 
       <div class="card overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-          <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Session</h2>
+        <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
+          <h2 class="text-lg font-semibold text-slate-100 ">Session</h2>
         </div>
         <div class="p-6">
           <p class="text-sm text-slate dark:text-slate-400 mb-4">Your session will automatically expire after 7 days of inactivity.</p>
@@ -194,8 +194,8 @@ if (sessionCookie) {
       </div>
 
       <div class="card overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-          <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Active Sessions</h2>
+        <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
+          <h2 class="text-lg font-semibold text-slate-100 ">Active Sessions</h2>
         </div>
         <div class="p-6">
           <p class="text-sm text-slate dark:text-slate-400 mb-4">Manage your active sessions across devices.</p>
@@ -360,7 +360,7 @@ if (sessionCookie) {
           if (twoFactorStatus) twoFactorStatus.classList.remove('hidden');
           if (twoFactorBadge) {
             twoFactorBadge.textContent = 'Disabled';
-            twoFactorBadge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate dark:text-slate-800';
+            twoFactorBadge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-700 text-slate dark:text-slate-800';
           }
           if (passwordInput) passwordInput.value = '';
         } else {
@@ -386,9 +386,9 @@ if (sessionCookie) {
       const data = await res.json();
       if (data.success) {
         channelsContainer.innerHTML = data.channels.map((ch: { id: string; type: string; name: string; enabled: boolean }) => `
-          <div class="flex items-center justify-between bg-slate-50 rounded-lg p-3">
+          <div class="flex items-center justify-between bg-slate-800 rounded-lg p-3">
             <div>
-              <p class="text-sm font-medium text-navy dark:text-slate-100">${ch.name}</p>
+              <p class="text-sm font-medium text-slate-100 ">${ch.name}</p>
               <p class="text-xs text-slate dark:text-slate-400 capitalize">${ch.type}</p>
             </div>
             <div class="flex items-center gap-2">
@@ -486,7 +486,7 @@ if (sessionCookie) {
       if (!sessionsList) return;
       const res = await fetch('/api/auth/sessions');
       if (!res.ok) {
-        sessionsList.innerHTML = '<div class="text-sm text-red-600">Failed to load sessions</div>';
+        sessionsList.innerHTML = '<div class="text-sm text-red-400">Failed to load sessions</div>';
         return;
       }
       const data = await res.json();
@@ -498,9 +498,9 @@ if (sessionCookie) {
       }
 
       sessionsList.innerHTML = sessions.map((s: any) => `
-        <div class="flex items-center justify-between bg-slate-50 rounded-lg p-3">
+        <div class="flex items-center justify-between bg-slate-800 rounded-lg p-3">
           <div>
-            <p class="text-sm font-medium text-navy dark:text-slate-100">${s.user_agent || 'Unknown device'}</p>
+            <p class="text-sm font-medium text-slate-100 ">${s.user_agent || 'Unknown device'}</p>
             <p class="text-xs text-slate dark:text-slate-400">${s.ip_address || 'Unknown IP'} • Created ${new Date(s.created_at).toLocaleString()}</p>
           </div>
           <button type="button" data-session-id="${s.id}" class="revoke-session text-xs text-red-700 hover:text-red-800">Revoke</button>

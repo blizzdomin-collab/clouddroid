@@ -50,20 +50,20 @@ if (sessionCookie) {
 <DashboardLayout title="Billing - CloudDroid">
     <!-- Header -->
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-navy dark:text-slate-100 mb-1">Billing & Access</h1>
+      <h1 class="text-2xl font-bold text-slate-100  mb-1">Billing & Access</h1>
       <p class="text-slate dark:text-slate-400">Manage your access period and payment methods</p>
     </div>
 
     {subscription ? (
       <div class="max-w-2xl space-y-6">
         <div class="card overflow-hidden">
-          <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-            <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Current Plan</h2>
+          <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
+            <h2 class="text-lg font-semibold text-slate-100 ">Current Plan</h2>
           </div>
           <div class="p-6">
             <div class="flex items-center justify-between mb-4">
               <div>
-                <div class="text-2xl font-bold text-navy dark:text-slate-100">{subscription.plan}</div>
+                <div class="text-2xl font-bold text-slate-100 ">{subscription.plan}</div>
                 <div class="text-sm text-slate dark:text-slate-400">${subscription.amount} one-time payment</div>
               </div>
               <span class={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${isExpired ? 'text-red-700 bg-red-100' : 'text-green-700 bg-green-100'}`}>
@@ -73,11 +73,11 @@ if (sessionCookie) {
             <div class="space-y-2 text-sm text-slate dark:text-slate-400">
               <div class="flex items-center justify-between">
                 <span>Access period</span>
-                <span class="text-navy dark:text-slate-100 font-medium">{new Date(subscription.current_period_start).toLocaleDateString()} - {new Date(subscription.current_period_end).toLocaleDateString()}</span>
+                <span class="text-slate-100  font-medium">{new Date(subscription.current_period_start).toLocaleDateString()} - {new Date(subscription.current_period_end).toLocaleDateString()}</span>
               </div>
               <div class="flex items-center justify-between">
                 <span>Payment method</span>
-                <span class="text-navy dark:text-slate-100 font-medium">{paymentGateway === 'mollie' ? 'Mollie (iDEAL, Bancontact, Card)' : paymentGateway === 'paynow' ? 'PayNow (Card)' : 'Dodo Payments (Card, Apple Pay, Google Pay)'}</span>
+                <span class="text-slate-100  font-medium">{paymentGateway === 'mollie' ? 'Mollie (iDEAL, Bancontact, Card)' : paymentGateway === 'paynow' ? 'PayNow (Card)' : 'Dodo Payments (Card, Apple Pay, Google Pay)'}</span>
               </div>
               <div class="pt-4 flex items-center gap-3">
                 <a href="/#pricing" class={`btn ${isExpired ? 'btn-danger' : 'btn-primary'}`}>
@@ -85,47 +85,47 @@ if (sessionCookie) {
                 </a>
               </div>
               {isExpired && (
-                <p class="text-xs text-red-600 mt-2">Your access has expired. Purchase again with the same email to extend it by 30 days.</p>
+                <p class="text-xs text-red-400 mt-2">Your access has expired. Purchase again with the same email to extend it by 30 days.</p>
               )}
-              {renewSuccess && <p class="text-sm text-green-600 mt-2">Access extended successfully.</p>}
-              {renewError && <p class="text-sm text-red-600 mt-2">{renewError}</p>}
+              {renewSuccess && <p class="text-sm text-green-400 mt-2">Access extended successfully.</p>}
+              {renewError && <p class="text-sm text-red-400 mt-2">{renewError}</p>}
             </div>
           </div>
         </div>
 
         <div class="card overflow-hidden">
-          <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-            <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Payment Method</h2>
+          <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
+            <h2 class="text-lg font-semibold text-slate-100 ">Payment Method</h2>
           </div>
           <div class="p-6">
             <p class="text-sm text-slate dark:text-slate-400 mb-4">Payment is processed securely by {paymentGateway === 'mollie' ? 'Mollie' : paymentGateway === 'paynow' ? 'PayNow' : 'Dodo Payments and Mollie'}.</p>
             {paymentGateway === 'mollie' ? (
-              <div class="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+              <div class="flex items-center gap-4 p-4 bg-slate-800 dark:bg-slate-800 rounded-lg border border-slate-700 dark:border-slate-700">
                 <div class="w-12 h-8 bg-navy/5 rounded flex items-center justify-center">
-                  <span class="text-xs font-medium text-navy dark:text-slate-100">MOLLIE</span>
+                  <span class="text-xs font-medium text-slate-100 ">MOLLIE</span>
                 </div>
                 <div>
-                  <div class="text-sm font-medium text-navy dark:text-slate-100">Mollie</div>
+                  <div class="text-sm font-medium text-slate-100 ">Mollie</div>
                   <div class="text-xs text-slate dark:text-slate-400">iDEAL, Bancontact, Card</div>
                 </div>
               </div>
             ) : paymentGateway === 'paynow' ? (
-              <div class="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+              <div class="flex items-center gap-4 p-4 bg-slate-800 dark:bg-slate-800 rounded-lg border border-slate-700 dark:border-slate-700">
                 <div class="w-12 h-8 bg-navy/5 rounded flex items-center justify-center">
-                  <span class="text-xs font-medium text-navy dark:text-slate-100">PAYNOW</span>
+                  <span class="text-xs font-medium text-slate-100 ">PAYNOW</span>
                 </div>
                 <div>
-                  <div class="text-sm font-medium text-navy dark:text-slate-100">PayNow</div>
+                  <div class="text-sm font-medium text-slate-100 ">PayNow</div>
                   <div class="text-xs text-slate dark:text-slate-400">Card</div>
                 </div>
               </div>
             ) : (
-              <div class="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+              <div class="flex items-center gap-4 p-4 bg-slate-800 dark:bg-slate-800 rounded-lg border border-slate-700 dark:border-slate-700">
                 <div class="w-12 h-8 bg-navy/5 rounded flex items-center justify-center">
-                  <span class="text-xs font-medium text-navy dark:text-slate-100">DODO</span>
+                  <span class="text-xs font-medium text-slate-100 ">DODO</span>
                 </div>
                 <div>
-                  <div class="text-sm font-medium text-navy dark:text-slate-100">Dodo Payments</div>
+                  <div class="text-sm font-medium text-slate-100 ">Dodo Payments</div>
                   <div class="text-xs text-slate dark:text-slate-400">Card, Apple Pay, Google Pay</div>
                 </div>
               </div>
@@ -135,20 +135,20 @@ if (sessionCookie) {
 
         {instances.length > 0 && (
           <div class="card overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-              <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Your Instances</h2>
+            <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
+              <h2 class="text-lg font-semibold text-slate-100 ">Your Instances</h2>
             </div>
             <div class="p-6">
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-                <div class="bg-slate-50 dark:bg-slate-800 rounded-lg p-4">
+                <div class="bg-slate-800 dark:bg-slate-800 rounded-lg p-4">
                   <div class="text-xs text-slate dark:text-slate-400 mb-1">Total</div>
-                  <div class="text-xl font-bold text-navy dark:text-slate-100">{instances.length}</div>
+                  <div class="text-xl font-bold text-slate-100 ">{instances.length}</div>
                 </div>
-                <div class="bg-green-50 rounded-lg p-4">
+                <div class="bg-green-900/30 rounded-lg p-4">
                   <div class="text-xs text-slate dark:text-slate-400 mb-1">Running</div>
                   <div class="text-xl font-bold text-green-700">{instances.filter((i: any) => i.status === 'running').length}</div>
                 </div>
-                <div class="bg-yellow-50 rounded-lg p-4">
+                <div class="bg-yellow-900/30 rounded-lg p-4">
                   <div class="text-xs text-slate dark:text-slate-400 mb-1">Warnings</div>
                   <div class="text-xl font-bold text-yellow-700">{instances.filter((i: any) => i.status === 'warning').length}</div>
                 </div>
@@ -157,8 +157,8 @@ if (sessionCookie) {
                 {instances.slice(0, 5).map((inst: any) => (
                   <div class="flex items-center justify-between text-sm">
                     <div class="flex items-center gap-2">
-                      <span className={`inline-flex items-center ${inst.status === 'running' ? 'bg-green-500' : inst.status === 'warning' ? 'bg-yellow-500' : 'bg-slate-400'} rounded-full`}></span>
-                      <span class="text-navy dark:text-slate-100 font-medium">{inst.name}</span>
+                      <span className={`inline-flex items-center ${inst.status === 'running' ? 'bg-green-900/300' : inst.status === 'warning' ? 'bg-yellow-900/300' : 'bg-slate-400'} rounded-full`}></span>
+                      <span class="text-slate-100  font-medium">{inst.name}</span>
                     </div>
                     <span class="text-slate dark:text-slate-400">{inst.platform} • {inst.ram} GB</span>
                   </div>
@@ -169,14 +169,14 @@ if (sessionCookie) {
         )}
 
         <div class="card overflow-hidden">
-          <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-            <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Billing History</h2>
+          <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
+            <h2 class="text-lg font-semibold text-slate-100 ">Billing History</h2>
           </div>
           <div class="p-6">
             {invoices.length > 0 ? (
               <div class="overflow-x-auto">
                 <table class="w-full">
-                  <thead class="bg-slate-50 dark:bg-slate-800">
+                  <thead class="bg-slate-800 dark:bg-slate-800">
                     <tr>
                       <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Invoice</th>
                       <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Date</th>
@@ -187,7 +187,7 @@ if (sessionCookie) {
                   <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
                     {invoices.map((inv) => (
                       <tr>
-                        <td class="px-6 py-4 text-navy dark:text-slate-100 font-medium">{inv.id}</td>
+                        <td class="px-6 py-4 text-slate-100  font-medium">{inv.id}</td>
                         <td class="px-6 py-4 text-slate dark:text-slate-400">{new Date(inv.created_at).toLocaleDateString()}</td>
                         <td class="px-6 py-4 text-slate dark:text-slate-400">${inv.amount} {inv.currency}</td>
                         <td class="px-6 py-4">
@@ -210,11 +210,11 @@ if (sessionCookie) {
       <div class="max-w-2xl">
         <div class="card p-8 text-center">
           <div class="w-16 h-16 bg-navy/5 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-navy dark:text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-8 h-8 text-slate-100 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
             </svg>
           </div>
-          <h3 class="text-lg font-semibold text-navy dark:text-slate-100 mb-2">No Active Access</h3>
+          <h3 class="text-lg font-semibold text-slate-100  mb-2">No Active Access</h3>
           <p class="text-sm text-slate dark:text-slate-400 mb-6">You don't have active access. Choose a plan to get started.</p>
           <a href="/#pricing" class="btn btn-primary btn-lg">
             View Plans

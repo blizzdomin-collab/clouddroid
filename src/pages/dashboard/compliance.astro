@@ -12,7 +12,7 @@ const loading = false;
 <DashboardLayout title="Compliance - CloudDroid">
     <!-- Header -->
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-navy dark:text-slate-100 mb-1">Compliance</h1>
+      <h1 class="text-2xl font-bold text-slate-100  mb-1">Compliance</h1>
       <p class="text-slate dark:text-slate-400">Audit logs, policy violations, and compliance reporting</p>
     </div>
 
@@ -28,30 +28,30 @@ const loading = false;
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
       <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Total Events</div>
-        <div class="text-3xl font-bold text-navy dark:text-slate-100">{summary.total || 0}</div>
+        <div class="text-3xl font-bold text-slate-100 ">{summary.total || 0}</div>
       </div>
       <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Critical</div>
-        <div class="text-3xl font-bold text-red-600">{summary.critical || 0}</div>
+        <div class="text-3xl font-bold text-red-400">{summary.critical || 0}</div>
       </div>
       <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Warnings</div>
-        <div class="text-3xl font-bold text-yellow-600">{summary.warnings || 0}</div>
+        <div class="text-3xl font-bold text-yellow-400">{summary.warnings || 0}</div>
       </div>
       <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Info</div>
-        <div class="text-3xl font-bold text-blue-600">{summary.info || 0}</div>
+        <div class="text-3xl font-bold text-blue-400">{summary.info || 0}</div>
       </div>
     </div>
     </>
     )}
 
     <div class="card overflow-hidden mb-8">
-      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-        <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Audit Log</h2>
+      <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-100 ">Audit Log</h2>
         <button id="export-csv" class="btn btn-primary btn-sm">Export CSV</button>
       </div>
-      <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
+      <div class="p-4 border-b border-slate-700 dark:border-slate-700 bg-slate-800 dark:bg-slate-800">
         <div class="flex flex-wrap items-center gap-3">
           <select id="filter-severity" class="select">
             <option value="">All Severities</option>
@@ -68,7 +68,7 @@ const loading = false;
       </div>
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-slate-50 dark:bg-slate-800">
+          <thead class="bg-slate-800 dark:bg-slate-800">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Timestamp</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Event</th>
@@ -81,7 +81,7 @@ const loading = false;
               {logs.map((log) => (
                 <tr>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-slate dark:text-slate-400">{new Date(log.timestamp).toLocaleString()}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy dark:text-slate-100">{log.event}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-100 ">{log.event}</td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-blue-800 bg-blue-100">{log.severity}</span>
                   </td>
@@ -94,16 +94,16 @@ const loading = false;
         </div>
         {logs.length === 0 && (
           <div class="p-8 text-center">
-            <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-16 h-16 bg-blue-900/30 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-blue-400 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 class="text-lg font-semibold text-navy dark:text-slate-100 mb-2">No Audit Logs</h3>
+            <h3 class="text-lg font-semibold text-slate-100  mb-2">No Audit Logs</h3>
             <p class="text-sm text-slate dark:text-slate-400">No compliance events recorded yet.</p>
           </div>
         )}
-        <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+        <div class="px-6 py-4 border-t border-slate-700 dark:border-slate-700 flex items-center justify-between">
          <button id="prev-page" {pagination.offset === 0 ? 'disabled' : ''} class="btn btn-ghost btn-sm disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
          <span id="page-info" class="text-sm text-slate dark:text-slate-400">Showing {pagination.offset + 1}-{Math.min(pagination.offset + pagination.limit, pagination.total)} of {pagination.total}</span>
          <button id="next-page" {!pagination.hasMore ? 'disabled' : ''} class="btn btn-ghost btn-sm disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
@@ -112,55 +112,55 @@ const loading = false;
      </div>
 
     <div class="card overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-        <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Compliance Status</h2>
+      <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
+        <h2 class="text-lg font-semibold text-slate-100 ">Compliance Status</h2>
       </div>
       <div class="p-6">
         <div class="space-y-4">
-          <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+          <div class="flex items-center justify-between p-4 bg-green-900/30 rounded-lg border border-green-800">
             <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
               <div>
                 <div class="font-medium text-green-800">AUP Compliance</div>
-                <div class="text-sm text-green-600">All instances compliant with Acceptable Use Policy</div>
+                <div class="text-sm text-green-400">All instances compliant with Acceptable Use Policy</div>
               </div>
             </div>
             <span class="text-xs font-medium text-green-700 bg-green-100 px-3 py-1 rounded-full">Pass</span>
           </div>
-          <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+          <div class="flex items-center justify-between p-4 bg-green-900/30 rounded-lg border border-green-800">
             <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
               <div>
                 <div class="font-medium text-green-800">Data Isolation</div>
-                <div class="text-sm text-green-600">All instances strictly containerized with zero cross-talk</div>
+                <div class="text-sm text-green-400">All instances strictly containerized with zero cross-talk</div>
               </div>
             </div>
             <span class="text-xs font-medium text-green-700 bg-green-100 px-3 py-1 rounded-full">Pass</span>
           </div>
-          <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+          <div class="flex items-center justify-between p-4 bg-green-900/30 rounded-lg border border-green-800">
             <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
               <div>
                 <div class="font-medium text-green-800">Encryption</div>
-                <div class="text-sm text-green-600">TLS 1.3 for traffic, AES-256 for data at rest</div>
+                <div class="text-sm text-green-400">TLS 1.3 for traffic, AES-256 for data at rest</div>
               </div>
             </div>
             <span class="text-xs font-medium text-green-700 bg-green-100 px-3 py-1 rounded-full">Pass</span>
           </div>
-          <div class="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+          <div class="flex items-center justify-between p-4 bg-yellow-900/30 rounded-lg border border-yellow-800">
             <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               <div>
                 <div class="font-medium text-yellow-800">Automated Suspensions</div>
-                <div class="text-sm text-yellow-600">Monitoring active; 1 instance under review</div>
+                <div class="text-sm text-yellow-400">Monitoring active; 1 instance under review</div>
               </div>
             </div>
             <span class="text-xs font-medium text-yellow-700 bg-yellow-100 px-3 py-1 rounded-full">Review</span>
@@ -253,7 +253,7 @@ const loading = false;
         logsTable.innerHTML = logs.map((log) => `
           <tr>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate dark:text-slate-400">${new Date(log.timestamp).toLocaleString()}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy dark:text-slate-100">${log.event}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-100 ">${log.event}</td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-blue-800 bg-blue-100">${log.severity}</span>
             </td>

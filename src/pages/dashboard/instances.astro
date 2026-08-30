@@ -11,7 +11,7 @@ const loading = false;
     <!-- Header -->
     <div class="mb-6 flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-navy dark:text-slate-100 mb-1">Instances</h1>
+        <h1 class="text-2xl font-bold text-slate-100  mb-1">Instances</h1>
         <p class="text-slate dark:text-slate-400">Manage your cloud Android workspaces</p>
       </div>
       <button id="open-modal" class="btn btn-accent">
@@ -57,7 +57,7 @@ const loading = false;
     <div class="card overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-slate-50 dark:bg-slate-800">
+          <thead class="bg-slate-800 dark:bg-slate-800">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Name</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Platform</th>
@@ -73,12 +73,12 @@ const loading = false;
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-navy/5 rounded-lg flex items-center justify-center">
-                      <svg class="w-5 h-5 text-navy dark:text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-5 h-5 text-slate-100 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                       </svg>
                     </div>
                     <div>
-                      <div class="font-medium text-navy dark:text-slate-100">{inst.name}</div>
+                      <div class="font-medium text-slate-100 ">{inst.name}</div>
                       <div class="text-sm text-slate dark:text-slate-400">{inst.id}</div>
                     </div>
                   </div>
@@ -88,7 +88,7 @@ const loading = false;
                 <td class="px-6 py-4">
                   <div class="flex flex-wrap gap-1">
                     {(inst.tags || []).map((tag: string) => (
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700 dark:text-slate-400">{tag}</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-700 text-slate-700 dark:text-slate-400">{tag}</span>
                     ))}
                   </div>
                 </td>
@@ -96,9 +96,9 @@ const loading = false;
                   {(() => {
                     const status = inst.status;
                     const colorMap: Record<string, { text: string; bg: string; dot: string }> = {
-                      running: { text: 'text-green-700', bg: 'bg-green-50', dot: 'bg-green-500' },
-                      stopped: { text: 'text-slate-700 dark:text-slate-400', bg: 'bg-slate-100', dot: 'bg-slate-400' },
-                      warning: { text: 'text-yellow-700', bg: 'bg-yellow-50', dot: 'bg-yellow-500' },
+                      running: { text: 'text-green-700', bg: 'bg-green-900/30', dot: 'bg-green-900/300' },
+                      stopped: { text: 'text-slate-700 dark:text-slate-400', bg: 'bg-slate-700', dot: 'bg-slate-400' },
+                      warning: { text: 'text-yellow-700', bg: 'bg-yellow-900/30', dot: 'bg-yellow-900/300' },
                     };
                     const colors = colorMap[status] || colorMap.running;
                     return (
@@ -128,11 +128,11 @@ const loading = false;
     {instances.length === 0 && (
       <div class="card p-8 text-center">
         <div class="w-16 h-16 bg-navy/5 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-8 h-8 text-navy dark:text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-8 h-8 text-slate-100 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-navy dark:text-slate-100 mb-2">No instances yet</h3>
+        <h3 class="text-lg font-semibold text-slate-100  mb-2">No instances yet</h3>
         <p class="text-sm text-slate dark:text-slate-400 mb-6 max-w-sm mx-auto">You don't have any cloud Android workspaces. Create your first instance to get started.</p>
         <button id="open-modal-empty" class="btn btn-accent">
           New Instance
@@ -143,18 +143,18 @@ const loading = false;
     )}
 
   <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-    <div class="bg-white dark:bg-navy-light rounded-xl shadow-xl w-full max-w-md mx-4">
-      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-navy dark:text-slate-100">New Instance</h3>
-        <button id="close-modal" class="text-slate dark:text-slate-400 hover:text-navy dark:text-slate-100">✕</button>
+    <div class="bg-navy-light dark:bg-navy-light rounded-xl shadow-xl w-full max-w-md mx-4">
+      <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-slate-100 ">New Instance</h3>
+        <button id="close-modal" class="text-slate dark:text-slate-400 hover:text-slate-100 ">✕</button>
       </div>
       <form id="create-form" class="p-6 space-y-4">
         <div>
-          <label for="name" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Name</label>
+          <label for="name" class="block text-sm font-medium text-slate-100  mb-1">Name</label>
           <input type="text" id="name" name="name" required class="input" placeholder="QA-Test-Android-14" />
         </div>
         <div>
-          <label for="platform" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Platform</label>
+          <label for="platform" class="block text-sm font-medium text-slate-100  mb-1">Platform</label>
           <select id="platform" name="platform" required class="select">
             <option value="Android 14">Android 14</option>
             <option value="Android 13">Android 13</option>
@@ -163,11 +163,11 @@ const loading = false;
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label for="ram" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">RAM (GB)</label>
+            <label for="ram" class="block text-sm font-medium text-slate-100  mb-1">RAM (GB)</label>
             <input type="number" id="ram" name="ram" required min="1" max="32" class="input" placeholder="8" />
           </div>
           <div>
-            <label for="storage" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Storage (GB)</label>
+            <label for="storage" class="block text-sm font-medium text-slate-100  mb-1">Storage (GB)</label>
             <input type="number" id="storage" name="storage" required min="8" max="512" class="input" placeholder="64" />
           </div>
         </div>
@@ -180,22 +180,22 @@ const loading = false;
   </div>
 
   <div id="edit-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-    <div class="bg-white dark:bg-navy-light rounded-xl shadow-xl w-full max-w-md mx-4">
-      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-navy dark:text-slate-100">Edit Instance</h3>
-        <button id="close-edit-modal" class="text-slate dark:text-slate-400 hover:text-navy dark:text-slate-100">✕</button>
+    <div class="bg-navy-light dark:bg-navy-light rounded-xl shadow-xl w-full max-w-md mx-4">
+      <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-slate-100 ">Edit Instance</h3>
+        <button id="close-edit-modal" class="text-slate dark:text-slate-400 hover:text-slate-100 ">✕</button>
       </div>
       <form id="edit-form" class="p-6 space-y-4">
         <input type="hidden" id="edit-instance-id" />
         <div>
-          <label for="edit-tags" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Tags (comma-separated)</label>
+          <label for="edit-tags" class="block text-sm font-medium text-slate-100  mb-1">Tags (comma-separated)</label>
           <input type="text" id="edit-tags" class="input" placeholder="qa, test, production" />
         </div>
         <div>
-          <label for="edit-notes" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Notes</label>
+          <label for="edit-notes" class="block text-sm font-medium text-slate-100  mb-1">Notes</label>
           <textarea id="edit-notes" rows="3" class="input" placeholder="Instance notes..."></textarea>
         </div>
-        <div id="edit-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"></div>
+        <div id="edit-error" class="hidden p-3 bg-red-900/30 border border-red-800 rounded-lg text-sm text-red-800"></div>
         <div class="flex items-center justify-end gap-3 pt-2">
           <button type="button" id="cancel-edit-modal" class="btn btn-ghost">Cancel</button>
           <button type="submit" class="btn btn-primary">Save Changes</button>

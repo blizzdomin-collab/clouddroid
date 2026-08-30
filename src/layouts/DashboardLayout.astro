@@ -99,7 +99,7 @@ const currentPath = Astro.url.pathname;
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <title>{title}</title>
   </head>
-  <body class="antialiased bg-slate-light dark:bg-navy">
+  <body class="antialiased bg-navy text-slate">
     <div class="flex h-screen overflow-hidden">
       <!-- Mobile sidebar overlay -->
       <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden" onclick="document.getElementById('sidebar').classList.add('-translate-x-full');document.getElementById('sidebar-overlay').classList.add('hidden')"></div>
@@ -200,13 +200,13 @@ const currentPath = Astro.url.pathname;
       </aside>
 
       <!-- Main content -->
-      <main class="flex-1 overflow-y-auto bg-slate-light dark:bg-navy min-h-screen">
+      <main class="flex-1 overflow-y-auto bg-navy min-h-screen">
         <!-- Mobile header -->
-        <div class="lg:hidden flex items-center justify-between px-4 py-3 bg-white dark:bg-navy-light border-b border-slate-200 dark:border-slate-700">
-          <button id="open-sidebar" class="p-2 -ml-2 text-slate dark:text-slate-400 hover:text-navy dark:hover:text-slate-100">
+        <div class="lg:hidden flex items-center justify-between px-4 py-3 bg-navy-light border-b border-slate-700">
+          <button id="open-sidebar" class="p-2 -ml-2 text-slate hover:text-slate-100">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
-          <span class="font-semibold text-navy dark:text-slate-100">CloudDroid</span>
+          <span class="font-semibold text-slate-100">CloudDroid</span>
           <div class="w-8"></div>
         </div>
         <Announcements announcements={announcements} />

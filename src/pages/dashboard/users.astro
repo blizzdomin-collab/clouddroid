@@ -25,21 +25,21 @@ if (sessionCookie) {
 <DashboardLayout title="User Management - CloudDroid">
     <!-- Header -->
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-navy dark:text-slate-100 mb-1">User Management</h1>
+      <h1 class="text-2xl font-bold text-slate-100  mb-1">User Management</h1>
       <p class="text-slate dark:text-slate-400">Manage user accounts and permissions</p>
     </div>
 
     {isAdmin ? (
       <div class="card overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-navy dark:text-slate-100">All Users</h2>
+        <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-slate-100 ">All Users</h2>
           <button id="open-modal" class="btn btn-accent">
             Add User
           </button>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full">
-            <thead class="bg-slate-50 dark:bg-slate-800">
+            <thead class="bg-slate-800 dark:bg-slate-800">
               <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Name</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Email</th>
@@ -52,12 +52,12 @@ if (sessionCookie) {
             <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
               {users.map((user) => (
                 <tr>
-                  <td class="px-6 py-4 text-sm font-medium text-navy dark:text-slate-100">
+                  <td class="px-6 py-4 text-sm font-medium text-slate-100 ">
                     <a href={`/dashboard/users/${user.id}`} class="hover:underline">{user.name}</a>
                   </td>
                   <td class="px-6 py-4 text-sm text-slate dark:text-slate-400">{user.email}</td>
                   <td class="px-6 py-4">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-navy dark:text-slate-100 bg-navy/10 capitalize">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-slate-100  bg-navy/10 capitalize">
                       {user.role}
                     </span>
                   </td>
@@ -83,49 +83,49 @@ if (sessionCookie) {
         {users.length === 0 && (
           <div class="p-8 text-center">
             <div class="w-16 h-16 bg-navy/5 dark:bg-navy/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-navy dark:text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-8 h-8 text-slate-100 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             </div>
-            <h3 class="text-lg font-semibold text-navy dark:text-slate-100 mb-2">No Users Yet</h3>
+            <h3 class="text-lg font-semibold text-slate-100  mb-2">No Users Yet</h3>
             <p class="text-sm text-slate dark:text-slate-400">No user accounts have been created yet.</p>
           </div>
         )}
       </div>
       ) : (
       <div class="card p-8 text-center">
-        <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-navy dark:text-slate-100 mb-2">Access Denied</h3>
+        <h3 class="text-lg font-semibold text-slate-100  mb-2">Access Denied</h3>
         <p class="text-sm text-slate dark:text-slate-400">You need admin privileges to view this page.</p>
       </div>
     )}
 
   {isAdmin && (
     <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-      <div class="bg-white dark:bg-navy-light rounded-xl shadow-xl w-full max-w-md mx-4">
-        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-          <h3 class="text-lg font-semibold text-navy dark:text-slate-100">Add User</h3>
-          <button id="close-modal" class="text-slate dark:text-slate-400 hover:text-navy dark:text-slate-100">✕</button>
+      <div class="bg-navy-light dark:bg-navy-light rounded-xl shadow-xl w-full max-w-md mx-4">
+        <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700 flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-slate-100 ">Add User</h3>
+          <button id="close-modal" class="text-slate dark:text-slate-400 hover:text-slate-100 ">✕</button>
         </div>
         <form id="create-form" class="p-6 space-y-4">
           <div>
-            <label for="name" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Full Name</label>
+            <label for="name" class="block text-sm font-medium text-slate-100  mb-1">Full Name</label>
             <input type="text" id="name" name="name" required class="input" />
           </div>
           <div>
-            <label for="email" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Email</label>
+            <label for="email" class="block text-sm font-medium text-slate-100  mb-1">Email</label>
             <input type="email" id="email" name="email" required class="input" />
           </div>
           <div>
-            <label for="password" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Password</label>
+            <label for="password" class="block text-sm font-medium text-slate-100  mb-1">Password</label>
             <input type="password" id="password" name="password" required minlength="8" class="input" />
           </div>
           <div>
-            <label for="role" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Role</label>
+            <label for="role" class="block text-sm font-medium text-slate-100  mb-1">Role</label>
             <select id="role" name="role" class="select">
               <option value="user">User</option>
               <option value="admin">Admin</option>
