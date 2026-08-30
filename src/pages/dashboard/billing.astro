@@ -48,15 +48,15 @@ if (sessionCookie) {
 ---
 
 <DashboardLayout title="Billing - CloudDroid">
-  <div class="p-8">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-navy dark:text-slate-100 mb-2">Billing & Access</h1>
+    <!-- Header -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-navy dark:text-slate-100 mb-1">Billing & Access</h1>
       <p class="text-slate dark:text-slate-400">Manage your access period and payment methods</p>
     </div>
 
     {subscription ? (
       <div class="max-w-2xl space-y-6">
-        <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="card overflow-hidden">
           <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
             <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Current Plan</h2>
           </div>
@@ -80,7 +80,7 @@ if (sessionCookie) {
                 <span class="text-navy dark:text-slate-100 font-medium">{paymentGateway === 'mollie' ? 'Mollie (iDEAL, Bancontact, Card)' : paymentGateway === 'paynow' ? 'PayNow (Card)' : 'Dodo Payments (Card, Apple Pay, Google Pay)'}</span>
               </div>
               <div class="pt-4 flex items-center gap-3">
-                <a href="/#pricing" class={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isExpired ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-navy text-white hover:bg-navy-light'}`}>
+                <a href="/#pricing" class={`btn ${isExpired ? 'btn-danger' : 'btn-primary'}`}>
                   {isExpired ? 'Renew Access Now' : 'Renew Access'}
                 </a>
               </div>
@@ -93,7 +93,7 @@ if (sessionCookie) {
           </div>
         </div>
 
-        <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="card overflow-hidden">
           <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
             <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Payment Method</h2>
           </div>
@@ -134,7 +134,7 @@ if (sessionCookie) {
         </div>
 
         {instances.length > 0 && (
-          <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div class="card overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
               <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Your Instances</h2>
             </div>
@@ -157,7 +157,7 @@ if (sessionCookie) {
                 {instances.slice(0, 5).map((inst: any) => (
                   <div class="flex items-center justify-between text-sm">
                     <div class="flex items-center gap-2">
-                      <span class={`inline-flex items-center ${inst.status === 'running' ? 'bg-green-500' : inst.status === 'warning' ? 'bg-yellow-500' : 'bg-slate-400'} rounded-full`}></span>
+                      <span className={`inline-flex items-center ${inst.status === 'running' ? 'bg-green-500' : inst.status === 'warning' ? 'bg-yellow-500' : 'bg-slate-400'} rounded-full`}></span>
                       <span class="text-navy dark:text-slate-100 font-medium">{inst.name}</span>
                     </div>
                     <span class="text-slate dark:text-slate-400">{inst.platform} • {inst.ram} GB</span>
@@ -168,7 +168,7 @@ if (sessionCookie) {
           </div>
         )}
 
-        <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="card overflow-hidden">
           <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
             <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Billing History</h2>
           </div>
@@ -208,7 +208,7 @@ if (sessionCookie) {
       </div>
     ) : (
       <div class="max-w-2xl">
-        <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-8 text-center">
+        <div class="card p-8 text-center">
           <div class="w-16 h-16 bg-navy/5 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-8 h-8 text-navy dark:text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -216,11 +216,10 @@ if (sessionCookie) {
           </div>
           <h3 class="text-lg font-semibold text-navy dark:text-slate-100 mb-2">No Active Access</h3>
           <p class="text-sm text-slate dark:text-slate-400 mb-6">You don't have active access. Choose a plan to get started.</p>
-          <a href="/#pricing" class="inline-flex items-center gap-2 bg-navy text-white px-6 py-3 rounded-lg font-medium hover:bg-navy-light transition-colors">
+          <a href="/#pricing" class="btn btn-primary btn-lg">
             View Plans
           </a>
         </div>
       </div>
     )}
-  </div>
 </DashboardLayout>

@@ -6,52 +6,64 @@ const logsData = await logsRes.json();
 const logs = logsData.logs || [];
 const summary = logsData.summary || {};
 const pagination = logsData.pagination || {};
+const loading = false;
 ---
 
 <DashboardLayout title="Compliance - CloudDroid">
-  <div class="p-8">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-navy dark:text-slate-100 mb-2">Compliance</h1>
+    <!-- Header -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-navy dark:text-slate-100 mb-1">Compliance</h1>
       <p class="text-slate dark:text-slate-400">Audit logs, policy violations, and compliance reporting</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+    {loading ? (
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        {Array.from({ length: 4 }).map(() => (
+          <div class="card p-5"><Skeleton variant="text" count={2} /></div>
+        ))}
+      </div>
+    ) : (
+      <>
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Total Events</div>
         <div class="text-3xl font-bold text-navy dark:text-slate-100">{summary.total || 0}</div>
       </div>
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Critical</div>
         <div class="text-3xl font-bold text-red-600">{summary.critical || 0}</div>
       </div>
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Warnings</div>
         <div class="text-3xl font-bold text-yellow-600">{summary.warnings || 0}</div>
       </div>
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Info</div>
         <div class="text-3xl font-bold text-blue-600">{summary.info || 0}</div>
       </div>
     </div>
+    </>
+    )}
 
-    <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden mb-8">
+    <div class="card overflow-hidden mb-8">
       <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
         <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Audit Log</h2>
-        <button id="export-csv" class="text-sm text-navy dark:text-slate-100 hover:text-navy-light dark:hover:text-slate-300 font-medium">Export CSV</button>
+        <button id="export-csv" class="btn btn-primary btn-sm">Export CSV</button>
       </div>
       <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
         <div class="flex flex-wrap items-center gap-3">
-          <select id="filter-severity" class="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-white dark:bg-navy-light">
+          <select id="filter-severity" class="select">
             <option value="">All Severities</option>
             <option value="critical">Critical</option>
             <option value="warning">Warning</option>
             <option value="info">Info</option>
           </select>
-          <input type="date" id="filter-start-date" class="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-white dark:bg-navy-light" />
-          <input type="date" id="filter-end-date" class="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-white dark:bg-navy-light" />
-          <input type="text" id="filter-search" placeholder="Search logs..." class="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-white dark:bg-navy-light" />
-          <button id="apply-filters" class="text-sm bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">Apply</button>
-          <button id="clear-filters" class="text-sm text-slate dark:text-slate-400 hover:text-navy dark:text-slate-100 font-medium">Clear</button>
+          <input type="date" id="filter-start-date" class="select" />
+          <input type="date" id="filter-end-date" class="select" />
+          <input type="text" id="filter-search" placeholder="Search logs..." class="input" />
+          <button id="apply-filters" class="btn btn-primary">Apply</button>
+          <button id="clear-filters" class="btn btn-ghost">Clear</button>
         </div>
       </div>
       <div class="overflow-x-auto">
@@ -66,40 +78,40 @@ const pagination = logsData.pagination || {};
             </tr>
           </thead>
            <tbody id="logs-table" class="divide-y divide-slate-200 dark:divide-slate-700">
-             {logs.map((log) => (
-               <tr>
-                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate dark:text-slate-400">{new Date(log.timestamp).toLocaleString()}</td>
-                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy dark:text-slate-100">{log.event}</td>
-                 <td class="px-6 py-4 whitespace-nowrap">
-                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-blue-800 bg-blue-100">{log.severity}</span>
-                 </td>
-                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate dark:text-slate-400">{log.action}</td>
-                 <td class="px-6 py-4 text-sm text-slate dark:text-slate-400">{log.details}</td>
-               </tr>
-             ))}
-           </tbody>
-         </table>
+              {logs.map((log) => (
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-slate dark:text-slate-400">{new Date(log.timestamp).toLocaleString()}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy dark:text-slate-100">{log.event}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-blue-800 bg-blue-100">{log.severity}</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-slate dark:text-slate-400">{log.action}</td>
+                  <td class="px-6 py-4 text-sm text-slate dark:text-slate-400">{log.details}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {logs.length === 0 && (
+          <div class="p-8 text-center">
+            <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-navy dark:text-slate-100 mb-2">No Audit Logs</h3>
+            <p class="text-sm text-slate dark:text-slate-400">No compliance events recorded yet.</p>
+          </div>
+        )}
+        <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+         <button id="prev-page" {pagination.offset === 0 ? 'disabled' : ''} class="btn btn-ghost btn-sm disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
+         <span id="page-info" class="text-sm text-slate dark:text-slate-400">Showing {pagination.offset + 1}-{Math.min(pagination.offset + pagination.limit, pagination.total)} of {pagination.total}</span>
+         <button id="next-page" {!pagination.hasMore ? 'disabled' : ''} class="btn btn-ghost btn-sm disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
        </div>
-       {logs.length === 0 && (
-         <div class="p-8 text-center">
-           <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-             <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-             </svg>
-           </div>
-           <h3 class="text-lg font-semibold text-navy dark:text-slate-100 mb-2">No Audit Logs</h3>
-           <p class="text-sm text-slate dark:text-slate-400">No compliance events recorded yet.</p>
-         </div>
-       )}
-       <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
-        <button id="prev-page" {pagination.offset === 0 ? 'disabled' : ''} class="text-sm text-navy dark:text-slate-100 hover:text-navy-light dark:hover:text-slate-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
-        <span id="page-info" class="text-sm text-slate dark:text-slate-400">Showing {pagination.offset + 1}-{Math.min(pagination.offset + pagination.limit, pagination.total)} of {pagination.total}</span>
-        <button id="next-page" {!pagination.hasMore ? 'disabled' : ''} class="text-sm text-navy dark:text-slate-100 hover:text-navy-light dark:hover:text-slate-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
-      </div>
-      <div id="pagination-data" data-offset="{pagination.offset || 0}" data-limit="{pagination.limit || 10}" data-total="{pagination.total || 0}" data-has-more="{pagination.hasMore ? 'true' : 'false'}" class="hidden"></div>
-    </div>
+       <div id="pagination-data" data-offset="{pagination.offset || 0}" data-limit="{pagination.limit || 10}" data-total="{pagination.total || 0}" data-has-more="{pagination.hasMore ? 'true' : 'false'}" class="hidden"></div>
+     </div>
 
-    <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+    <div class="card overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
         <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Compliance Status</h2>
       </div>
@@ -156,7 +168,6 @@ const pagination = logsData.pagination || {};
         </div>
       </div>
     </div>
-  </div>
 
   <script>
     const prevBtn = document.getElementById('prev-page');

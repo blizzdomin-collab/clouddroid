@@ -1,0 +1,9 @@
+---
+const { variant = 'text', count = 1 } = Astro.props;
+---
+
+<div class="space-y-2">
+  {Array.from({ length: count }).map((_, i) => (
+    <div class={variant === 'title' ? 'skeleton-title' : variant === 'card' ? 'skeleton-card' : 'skeleton-text'} style={variant === 'text' ? `width: ${Math.max(40, 100 - i * 15)}%` : ''}></div>
+  ))}
+</div>

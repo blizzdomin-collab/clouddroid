@@ -17,13 +17,13 @@ if (sessionCookie) {
 ---
 
 <DashboardLayout title="Activity - CloudDroid">
-  <div class="p-8">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-navy dark:text-slate-100 mb-2">Activity</h1>
+    <!-- Header -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-navy dark:text-slate-100 mb-1">Activity</h1>
       <p class="text-slate dark:text-slate-400">Your recent login history and account activity</p>
     </div>
 
-    <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+    <div class="card overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
         <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Login History</h2>
       </div>
@@ -45,13 +45,12 @@ if (sessionCookie) {
         </table>
       </div>
       <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
-        <button id="prev-page" disabled class="text-sm text-navy dark:text-slate-100 hover:text-navy-light dark:hover:text-slate-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
+        <button id="prev-page" disabled class="btn btn-ghost btn-sm disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
         <span id="page-info" class="text-sm text-slate dark:text-slate-400">Loading...</span>
-        <button id="next-page" disabled class="text-sm text-navy dark:text-slate-100 hover:text-navy-light dark:hover:text-slate-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
+        <button id="next-page" disabled class="btn btn-ghost btn-sm disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
       </div>
       <div id="pagination-data" data-offset="0" data-limit="20" data-total="0" data-has-more="false" class="hidden"></div>
     </div>
-  </div>
 
   <script>
     const activityTable = document.getElementById('activity-table');

@@ -6,6 +6,7 @@ const instancesData = await instancesRes.json();
 const instances = instancesData.instances || [];
 const summary = instancesData.summary || {};
 const anomalies = instancesData.anomalies || [];
+const loading = false;
 
 const metricsPromises = instances.map((inst: any) =>
   fetch(`${Astro.url.origin}/api/monitoring/metrics?instance_id=${inst.id}&limit=20`).then((r) => r.json()).catch(() => ({ metrics: [] }))
@@ -17,13 +18,13 @@ const serializedMetrics = JSON.stringify(Array.from(metricsMap.entries()));
 ---
 
 <DashboardLayout title="Monitoring - CloudDroid">
-  <div class="p-8">
-    <div class="mb-8">
-      <div class="flex items-center justify-between mb-2">
-        <h1 class="text-3xl font-bold text-navy dark:text-slate-100 mb-2">Monitoring</h1>
+    <!-- Header -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-1">
+        <h1 class="text-2xl font-bold text-navy dark:text-slate-100">Monitoring</h1>
         <div class="flex items-center gap-3">
           <span id="last-updated" class="text-xs text-slate dark:text-slate-400">Last updated: Just now</span>
-          <button id="refresh-btn" class="text-sm text-navy dark:text-slate-100 hover:text-navy-light dark:hover:text-slate-300 font-medium flex items-center gap-1">
+          <button id="refresh-btn" class="text-sm text-navy dark:text-slate-100 hover:text-accent dark:hover:text-accent font-medium flex items-center gap-1">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
@@ -34,90 +35,44 @@ const serializedMetrics = JSON.stringify(Array.from(metricsMap.entries()));
       <p class="text-slate dark:text-slate-400">Real-time instance health and performance metrics</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+    {loading ? (
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        {Array.from({ length: 4 }).map(() => (
+          <div class="card p-5"><Skeleton variant="text" count={2} /></div>
+        ))}
+      </div>
+    ) : (
+      <>
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Total Instances</div>
         <div class="text-3xl font-bold text-navy dark:text-slate-100">{summary.total || 0}</div>
       </div>
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Running</div>
         <div class="text-3xl font-bold text-green-600">{summary.running || 0}</div>
       </div>
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Warnings</div>
         <div class="text-3xl font-bold text-yellow-600">{summary.warnings || 0}</div>
       </div>
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Anomalies</div>
         <div class="text-3xl font-bold text-red-600">{summary.anomalies || 0}</div>
       </div>
     </div>
+    </>
+    )}
 
-    {instances.map((inst: any) => {
-      const instMetrics = metricsMap.get(inst.id) || [];
-      const instAnomalies = anomalies.filter((a: any) => a.id === inst.id);
-      const hasAnomaly = instAnomalies.length > 0;
-      return (
-        <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden mb-8">
-          <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-            <div>
-              <h2 class="text-lg font-semibold text-navy dark:text-slate-100">{inst.name}</h2>
-              <p class="text-xs text-slate dark:text-slate-400">{inst.id} • Last checked: Just now</p>
-            </div>
-            <span class="inline-flex items-center gap-1.5 text-xs text-green-600 bg-green-50 px-3 py-1 rounded-full">
-              <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-              {inst.status}
-            </span>
-          </div>
-          <div class="p-6">
-            <div class="grid grid-cols-4 gap-4 mb-6">
-              <div class="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
-                <div class="text-xs text-slate dark:text-slate-400 mb-1">CPU</div>
-                <div class="text-lg font-semibold text-navy dark:text-slate-100">{inst.cpu}%</div>
-              </div>
-              <div class="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
-                <div class="text-xs text-slate dark:text-slate-400 mb-1">Memory</div>
-                <div class="text-lg font-semibold text-navy dark:text-slate-100">{inst.memory}%</div>
-              </div>
-              <div class="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
-                <div class="text-xs text-slate dark:text-slate-400 mb-1">Network In</div>
-                <div class="text-lg font-semibold text-navy dark:text-slate-100">{inst.network_in} Mbps</div>
-              </div>
-              <div class="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
-                <div class="text-xs text-slate dark:text-slate-400 mb-1">Network Out</div>
-                <div class="text-lg font-semibold text-navy dark:text-slate-100">{inst.network_out} Mbps</div>
-              </div>
-            </div>
-            <div class="mb-4">
-              <h3 class="text-sm font-medium text-navy dark:text-slate-100 mb-3">CPU & Memory History</h3>
-              <div class="relative h-64">
-                <canvas id={`chart-${inst.id}`} class="w-full h-full"></canvas>
-              </div>
-            </div>
-            {hasAnomaly && (
-              <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <div class="flex items-start gap-2">
-                  <svg class="w-4 h-4 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                  <div class="text-sm text-red-800">
-                    <strong>Anomalies detected:</strong>
-                    <ul class="mt-1 list-disc list-inside">
-                      {instAnomalies.flatMap((a: any) => a.alerts).map((alert: string) => (
-                        <li>{alert}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    })}
-
-    {instances.length === 0 && (
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-8 text-center">
+    {loading ? (
+      <div class="space-y-6">
+        {Array.from({ length: 2 }).map(() => (
+          <div class="card overflow-hidden p-6"><Skeleton variant="card" count={1} /></div>
+        ))}
+      </div>
+    ) : instances.length === 0 ? (
+      <div class="card p-8 text-center">
         <div class="w-16 h-16 bg-navy/5 dark:bg-navy/20 rounded-full flex items-center justify-center mx-auto mb-4">
           <svg class="w-8 h-8 text-navy dark:text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -126,8 +81,71 @@ const serializedMetrics = JSON.stringify(Array.from(metricsMap.entries()));
         <h3 class="text-lg font-semibold text-navy dark:text-slate-100 mb-2">No Instances to Monitor</h3>
         <p class="text-sm text-slate dark:text-slate-400">Create an instance to start monitoring its performance.</p>
       </div>
+    ) : (
+      instances.map((inst: any) => {
+        const instMetrics = metricsMap.get(inst.id) || [];
+        const instAnomalies = anomalies.filter((a: any) => a.id === inst.id);
+        const hasAnomaly = instAnomalies.length > 0;
+        return (
+          <div class="card overflow-hidden mb-8">
+            <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-semibold text-navy dark:text-slate-100">{inst.name}</h2>
+                <p class="text-xs text-slate dark:text-slate-400">{inst.id} • Last checked: Just now</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 text-xs text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                {inst.status}
+              </span>
+            </div>
+            <div class="p-6">
+              <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
+                  <div class="text-xs text-slate dark:text-slate-400 mb-1">CPU</div>
+                  <div class="text-lg font-semibold text-navy dark:text-slate-100">{inst.cpu}%</div>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
+                  <div class="text-xs text-slate dark:text-slate-400 mb-1">Memory</div>
+                  <div class="text-lg font-semibold text-navy dark:text-slate-100">{inst.memory}%</div>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
+                  <div class="text-xs text-slate dark:text-slate-400 mb-1">Network In</div>
+                  <div class="text-lg font-semibold text-navy dark:text-slate-100">{inst.network_in} Mbps</div>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
+                  <div class="text-xs text-slate dark:text-slate-400 mb-1">Network Out</div>
+                  <div class="text-lg font-semibold text-navy dark:text-slate-100">{inst.network_out} Mbps</div>
+                </div>
+              </div>
+              <div class="mb-4">
+                <h3 class="text-sm font-medium text-navy dark:text-slate-100 mb-3">CPU & Memory History</h3>
+                <div class="relative h-64">
+                  <canvas id={`chart-${inst.id}`} class="w-full h-full"></canvas>
+                </div>
+              </div>
+              {hasAnomaly && (
+                <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <div class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div class="text-sm text-red-800">
+                      <strong>Anomalies detected:</strong>
+                      <ul class="mt-1 list-disc list-inside">
+                        {instAnomalies.flatMap((a: any) => a.alerts).map((alert: string) => (
+                          <li>{alert}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })
     )}
-  </div>
+  </DashboardLayout>
 
   <script>
     const refreshBtn = document.getElementById('refresh-btn');

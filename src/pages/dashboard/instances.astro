@@ -4,35 +4,57 @@ import DashboardLayout from '../../layouts/DashboardLayout.astro';
 const instancesRes = await fetch(`${Astro.url.origin}/api/monitoring/instances`);
 const instancesData = await instancesRes.json();
 const instances = instancesData.instances || [];
+const loading = false;
 ---
 
 <DashboardLayout title="Instances - CloudDroid">
-  <div class="p-8">
-    <div class="mb-8 flex items-center justify-between">
+    <!-- Header -->
+    <div class="mb-6 flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-navy dark:text-slate-100 mb-2">Instances</h1>
+        <h1 class="text-2xl font-bold text-navy dark:text-slate-100 mb-1">Instances</h1>
         <p class="text-slate dark:text-slate-400">Manage your cloud Android workspaces</p>
       </div>
-      <button id="open-modal" class="bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">
+      <button id="open-modal" class="btn btn-accent">
         New Instance
       </button>
     </div>
 
-    <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-4 mb-6">
+    <!-- Filters -->
+    <div class="card p-4 mb-4">
       <div class="flex flex-wrap items-center gap-3">
-        <input type="text" id="search-instances" placeholder="Search instances..." class="flex-1 min-w-[200px] px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none text-sm" />
-        <select id="filter-status" class="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none text-sm">
+        <input type="text" id="search-instances" placeholder="Search instances..." class="input flex-1 min-w-[200px]" />
+        <select id="filter-status" class="select">
           <option value="">All Statuses</option>
           <option value="running">Running</option>
           <option value="stopped">Stopped</option>
           <option value="warning">Warning</option>
         </select>
-        <button id="apply-filters" class="bg-navy text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-navy-light transition-colors">Apply</button>
-        <button id="clear-filters" class="text-slate dark:text-slate-400 bg-slate-100 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors">Clear</button>
+        <button id="apply-filters" class="btn btn-primary">Apply</button>
+        <button id="clear-filters" class="btn btn-ghost">Clear</button>
       </div>
     </div>
 
-    <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+    {loading ? (
+      <div class="card overflow-hidden">
+        <div class="p-6 space-y-4">
+          <Skeleton variant="title" count={1} />
+          <div class="space-y-3">
+            {Array.from({ length: 5 }).map(() => (
+              <div class="flex items-center gap-4">
+                <Skeleton variant="card" count={1} />
+                <div class="flex-1 space-y-2">
+                  <Skeleton variant="text" count={1} />
+                  <Skeleton variant="text" count={1} style="width: 60%" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ) : (
+      <>
+    <!-- Table -->
+    <div class="card overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead class="bg-slate-50 dark:bg-slate-800">
@@ -89,11 +111,11 @@ const instances = instancesData.instances || [];
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-2">
-                    <button data-action="edit" data-id={inst.id} class="text-xs bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-400 px-2 py-1 rounded hover:bg-slate-100">Edit</button>
-                    <button data-action="start" data-id={inst.id} class="text-xs bg-green-50 text-green-700 px-2 py-1 rounded hover:bg-green-100">Start</button>
-                    <button data-action="stop" data-id={inst.id} class="text-xs bg-yellow-50 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-100">Stop</button>
-                    <button data-action="restart" data-id={inst.id} class="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded hover:bg-blue-100">Restart</button>
-                    <button data-action="delete" data-id={inst.id} class="text-xs bg-red-50 text-red-700 px-2 py-1 rounded hover:bg-red-100">Delete</button>
+                    <button data-action="edit" data-id={inst.id} class="btn btn-ghost btn-sm">Edit</button>
+                    <button data-action="start" data-id={inst.id} class="btn btn-primary btn-sm">Start</button>
+                    <button data-action="stop" data-id={inst.id} class="btn btn-ghost btn-sm">Stop</button>
+                    <button data-action="restart" data-id={inst.id} class="btn btn-ghost btn-sm">Restart</button>
+                    <button data-action="delete" data-id={inst.id} class="btn btn-danger btn-sm">Delete</button>
                   </div>
                 </td>
               </tr>
@@ -104,7 +126,7 @@ const instances = instancesData.instances || [];
     </div>
 
     {instances.length === 0 && (
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-8 text-center">
+      <div class="card p-8 text-center">
         <div class="w-16 h-16 bg-navy/5 rounded-full flex items-center justify-center mx-auto mb-4">
           <svg class="w-8 h-8 text-navy dark:text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -112,12 +134,13 @@ const instances = instancesData.instances || [];
         </div>
         <h3 class="text-lg font-semibold text-navy dark:text-slate-100 mb-2">No instances yet</h3>
         <p class="text-sm text-slate dark:text-slate-400 mb-6 max-w-sm mx-auto">You don't have any cloud Android workspaces. Create your first instance to get started.</p>
-        <button id="open-modal-empty" class="bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">
+        <button id="open-modal-empty" class="btn btn-accent">
           New Instance
         </button>
       </div>
     )}
-  </div>
+      </>
+    )}
 
   <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
     <div class="bg-white dark:bg-navy-light rounded-xl shadow-xl w-full max-w-md mx-4">
@@ -128,11 +151,11 @@ const instances = instancesData.instances || [];
       <form id="create-form" class="p-6 space-y-4">
         <div>
           <label for="name" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Name</label>
-          <input type="text" id="name" name="name" required class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" placeholder="QA-Test-Android-14" />
+          <input type="text" id="name" name="name" required class="input" placeholder="QA-Test-Android-14" />
         </div>
         <div>
           <label for="platform" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Platform</label>
-          <select id="platform" name="platform" required class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none">
+          <select id="platform" name="platform" required class="select">
             <option value="Android 14">Android 14</option>
             <option value="Android 13">Android 13</option>
             <option value="Android 12">Android 12</option>
@@ -141,16 +164,16 @@ const instances = instancesData.instances || [];
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label for="ram" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">RAM (GB)</label>
-            <input type="number" id="ram" name="ram" required min="1" max="32" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" placeholder="8" />
+            <input type="number" id="ram" name="ram" required min="1" max="32" class="input" placeholder="8" />
           </div>
           <div>
             <label for="storage" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Storage (GB)</label>
-            <input type="number" id="storage" name="storage" required min="8" max="512" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" placeholder="64" />
+            <input type="number" id="storage" name="storage" required min="8" max="512" class="input" placeholder="64" />
           </div>
         </div>
         <div class="flex items-center justify-end gap-3 pt-2">
-          <button type="button" id="cancel-modal" class="px-4 py-2 text-sm text-slate dark:text-slate-400 hover:text-navy dark:text-slate-100">Cancel</button>
-          <button type="submit" class="bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">Create Instance</button>
+          <button type="button" id="cancel-modal" class="btn btn-ghost">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Instance</button>
         </div>
       </form>
     </div>
@@ -166,16 +189,16 @@ const instances = instancesData.instances || [];
         <input type="hidden" id="edit-instance-id" />
         <div>
           <label for="edit-tags" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Tags (comma-separated)</label>
-          <input type="text" id="edit-tags" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" placeholder="qa, test, production" />
+          <input type="text" id="edit-tags" class="input" placeholder="qa, test, production" />
         </div>
         <div>
           <label for="edit-notes" class="block text-sm font-medium text-navy dark:text-slate-100 mb-1">Notes</label>
-          <textarea id="edit-notes" rows="3" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" placeholder="Instance notes..."></textarea>
+          <textarea id="edit-notes" rows="3" class="input" placeholder="Instance notes..."></textarea>
         </div>
         <div id="edit-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"></div>
         <div class="flex items-center justify-end gap-3 pt-2">
-          <button type="button" id="cancel-edit-modal" class="px-4 py-2 text-sm text-slate dark:text-slate-400 hover:text-navy dark:text-slate-100">Cancel</button>
-          <button type="submit" class="bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">Save Changes</button>
+          <button type="button" id="cancel-edit-modal" class="btn btn-ghost">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
         </div>
       </form>
     </div>
@@ -222,9 +245,10 @@ const instances = instancesData.instances || [];
       });
 
       if (res.ok) {
+        window.showToast('Instance created successfully', 'success');
         window.location.reload();
       } else {
-        alert('Failed to create instance');
+        window.showToast('Failed to create instance', 'error');
       }
     });
 
@@ -254,9 +278,10 @@ const instances = instancesData.instances || [];
 
         const res = await fetch(endpoints[action], { method: methods[action] });
         if (res.ok) {
+          window.showToast(`Instance ${action} successful`, 'success');
           window.location.reload();
         } else {
-          alert(`Failed to ${action} instance`);
+          window.showToast(`Failed to ${action} instance`, 'error');
         }
       });
     });
@@ -300,7 +325,7 @@ const instances = instancesData.instances || [];
 
         const res = await fetch(`/api/instances/${id}`);
         if (!res.ok) {
-          alert('Failed to load instance');
+          window.showToast('Failed to load instance', 'error');
           return;
         }
         const instance = await res.json();
@@ -343,6 +368,7 @@ const instances = instancesData.instances || [];
 
       if (res.ok) {
         hideEditModal();
+        window.showToast('Instance updated successfully', 'success');
         window.location.reload();
       } else {
         const errorEl = document.getElementById('edit-error');

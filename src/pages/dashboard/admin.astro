@@ -29,52 +29,51 @@ if (sessionCookie) {
 ---
 
 <DashboardLayout title="Admin Dashboard - CloudDroid">
-  <div class="p-8">
-    {isAdmin ? (
-      error ? (
-        <div class="bg-red-50 border border-red-200 rounded-xl p-6 text-red-800">{error}</div>
-      ) : stats ? (
-        <div class="space-y-8">
-          <div>
-            <h1 class="text-3xl font-bold text-navy dark:text-slate-100 mb-2">Admin Dashboard</h1>
+  {isAdmin ? (
+    error ? (
+      <div class="bg-red-50 border border-red-200 rounded-xl p-6 text-red-800">{error}</div>
+    ) : stats ? (
+      <div class="space-y-6">
+        <div>
+          <h1 class="text-2xl font-bold text-navy dark:text-slate-100 mb-1">Admin Dashboard</h1>
             <p class="text-slate dark:text-slate-400">Platform overview and key metrics</p>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <div class="card p-5">
               <div class="text-sm text-slate dark:text-slate-400 mb-1">Total Users</div>
               <div class="text-3xl font-bold text-navy dark:text-slate-100">{stats.overview.totalUsers}</div>
             </div>
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <div class="card p-5">
               <div class="text-sm text-slate dark:text-slate-400 mb-1">Total Instances</div>
               <div class="text-3xl font-bold text-navy dark:text-slate-100">{stats.overview.totalInstances}</div>
             </div>
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <div class="card p-5">
               <div class="text-sm text-slate dark:text-slate-400 mb-1">Active Subscriptions</div>
               <div class="text-3xl font-bold text-green-600">{stats.overview.activeSubscriptions}</div>
             </div>
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <div class="card p-5">
               <div class="text-sm text-slate dark:text-slate-400 mb-1">Total Revenue</div>
               <div class="text-3xl font-bold text-navy dark:text-slate-100">${stats.overview.totalRevenue.toFixed(2)}</div>
             </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <div class="card p-5">
               <div class="text-sm text-slate dark:text-slate-400 mb-1">Active Access</div>
               <div class="text-3xl font-bold text-green-600">{stats.overview.activeSubscriptions}</div>
             </div>
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <div class="card p-5">
               <div class="text-sm text-slate dark:text-slate-400 mb-1">Expiring in 7 days</div>
               <div class="text-3xl font-bold text-yellow-600">{stats.overview.expiringSoon}</div>
             </div>
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <div class="card p-5">
               <div class="text-sm text-slate dark:text-slate-400 mb-1">Expired</div>
               <div class="text-3xl font-bold text-red-600">{stats.overview.expiredSubscriptions}</div>
             </div>
           </div>
 
-          <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div class="card overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
               <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Expiring Soon (next 7 days)</h2>
             </div>
@@ -128,7 +127,7 @@ if (sessionCookie) {
               </div>
             </div>
 
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div class="card overflow-hidden">
               <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
                 <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Quick Actions</h2>
               </div>
@@ -150,22 +149,22 @@ if (sessionCookie) {
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <div class="card p-5">
               <div class="text-sm text-slate dark:text-slate-400 mb-1">Dodo Payments Users</div>
               <div class="text-3xl font-bold text-navy dark:text-slate-100">{stats.paymentGateways?.dodo?.users || 0}</div>
               <div class="text-xs text-slate dark:text-slate-400 mt-1">Revenue: ${(stats.paymentGateways?.dodo?.revenue || 0).toFixed(2)}</div>
             </div>
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <div class="card p-5">
               <div class="text-sm text-slate dark:text-slate-400 mb-1">Mollie Users</div>
               <div class="text-3xl font-bold text-navy dark:text-slate-100">{stats.paymentGateways?.mollie?.users || 0}</div>
               <div class="text-xs text-slate dark:text-slate-400 mt-1">Revenue: €{(stats.paymentGateways?.mollie?.revenue || 0).toFixed(2)}</div>
             </div>
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <div class="card p-5">
               <div class="text-sm text-slate dark:text-slate-400 mb-1">PayNow Users</div>
               <div class="text-3xl font-bold text-navy dark:text-slate-100">{stats.paymentGateways?.paynow?.users || 0}</div>
               <div class="text-xs text-slate dark:text-slate-400 mt-1">Revenue: ${(stats.paymentGateways?.paynow?.revenue || 0).toFixed(2)}</div>
             </div>
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <div class="card p-5">
               <div class="text-sm text-slate dark:text-slate-400 mb-1">EasyTransac Users</div>
               <div class="text-3xl font-bold text-navy dark:text-slate-100">{stats.paymentGateways?.easytransac?.users || 0}</div>
               <div class="text-xs text-slate dark:text-slate-400 mt-1">Revenue: €{(stats.paymentGateways?.easytransac?.revenue || 0).toFixed(2)}</div>
@@ -173,7 +172,7 @@ if (sessionCookie) {
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div class="card overflow-hidden">
               <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
                 <h2 class="text-lg font-semibold text-navy dark:text-slate-100">User Growth (Last 30 Days)</h2>
               </div>
@@ -184,7 +183,7 @@ if (sessionCookie) {
               </div>
             </div>
 
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div class="card overflow-hidden">
               <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
                 <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Revenue (Last 30 Days)</h2>
               </div>
@@ -196,7 +195,7 @@ if (sessionCookie) {
             </div>
           </div>
 
-          <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div class="card overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
               <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Instance Status</h2>
             </div>
@@ -218,7 +217,7 @@ if (sessionCookie) {
             </div>
           </div>
 
-          <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div class="card overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
               <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Revenue by Month</h2>
             </div>
@@ -244,7 +243,7 @@ if (sessionCookie) {
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div class="card overflow-hidden">
               <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
                 <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Recent Users</h2>
               </div>
@@ -276,7 +275,7 @@ if (sessionCookie) {
               </div>
             </div>
 
-            <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div class="card overflow-hidden">
               <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
                 <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Recent Invoices</h2>
               </div>
@@ -310,13 +309,13 @@ if (sessionCookie) {
                   </div>
                 ) : (
                   <p class="text-sm text-slate dark:text-slate-400">No invoices yet.</p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : null
-    ) : (
+                 )}
+               </div>
+             </div>
+           </div>
+         </div>
+     ) : null
+     ) : (
       <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-8 text-center">
         <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
           <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -327,7 +326,6 @@ if (sessionCookie) {
         <p class="text-sm text-slate dark:text-slate-400">You need admin privileges to view this page.</p>
       </div>
     )}
-  </div>
 
   {isAdmin && stats && (
     <script type="module">

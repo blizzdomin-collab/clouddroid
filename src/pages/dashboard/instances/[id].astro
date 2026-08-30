@@ -32,10 +32,10 @@ const serializedMetrics = JSON.stringify(instanceData?.metrics || []);
 ---
 
 <DashboardLayout title={`${instance.name} - CloudDroid`}>
-  <div class="p-8">
-    <div class="mb-8 flex items-center justify-between">
+    <!-- Header -->
+    <div class="mb-6 flex items-center justify-between">
       <div>
-        <div class="flex items-center gap-3 mb-2">
+        <div class="flex items-center gap-3 mb-1">
           <a href="/dashboard/instances" class="text-sm text-slate dark:text-slate-400 hover:text-navy dark:hover:text-slate-100 flex items-center gap-1">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -43,8 +43,8 @@ const serializedMetrics = JSON.stringify(instanceData?.metrics || []);
             Back to Instances
           </a>
         </div>
-    <h1 class="text-3xl font-bold text-navy dark:text-slate-100">{instance.name}</h1>
-    <p class="text-slate dark:text-slate-400">{instance.id} • {instance.platform}</p>
+        <h1 class="text-2xl font-bold text-navy dark:text-slate-100">{instance.name}</h1>
+        <p class="text-slate dark:text-slate-400">{instance.id} • {instance.platform}</p>
       </div>
       <span id="instance-status" class="inline-flex items-center gap-1.5 text-xs text-green-600 bg-green-50 px-3 py-1 rounded-full">
         <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
@@ -52,27 +52,28 @@ const serializedMetrics = JSON.stringify(instanceData?.metrics || []);
       </span>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">CPU</div>
         <div id="cpu-value" class="text-3xl font-bold text-navy dark:text-slate-100">{instance.cpu}%</div>
       </div>
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Memory</div>
         <div id="memory-value" class="text-3xl font-bold text-navy dark:text-slate-100">{instance.memory}%</div>
       </div>
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Network In</div>
         <div id="network-in-value" class="text-3xl font-bold text-navy dark:text-slate-100">{instance.network_in} Mbps</div>
       </div>
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Network Out</div>
         <div id="network-out-value" class="text-3xl font-bold text-navy dark:text-slate-100">{instance.network_out} Mbps</div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div class="card overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
           <h2 class="text-lg font-semibold text-navy dark:text-slate-100">CPU & Memory History</h2>
         </div>
@@ -83,7 +84,7 @@ const serializedMetrics = JSON.stringify(instanceData?.metrics || []);
         </div>
       </div>
 
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+      <div class="card overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
           <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Instance Details</h2>
         </div>
@@ -124,7 +125,7 @@ const serializedMetrics = JSON.stringify(instanceData?.metrics || []);
       </div>
     </div>
 
-    <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden mb-8">
+    <div class="card overflow-hidden mb-6">
       <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
         <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Actions</h2>
       </div>
@@ -167,7 +168,6 @@ const serializedMetrics = JSON.stringify(instanceData?.metrics || []);
         </table>
       </div>
     </div>
-  </div>
 
   <script>
     const metrics = {serializedMetrics};

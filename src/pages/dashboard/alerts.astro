@@ -6,13 +6,14 @@ const alertsData = await alertsRes.json();
 const alerts = alertsData.alerts || [];
 const alertsSummary = alertsData.summary || {};
 const pagination = alertsData.pagination || {};
+const loading = false;
 ---
 
 <DashboardLayout title="Alerts - CloudDroid">
-  <div class="p-8">
-    <div class="mb-8 flex items-center justify-between">
+    <!-- Header -->
+    <div class="mb-6 flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-navy dark:text-slate-100 mb-2">Alerts</h1>
+        <h1 class="text-2xl font-bold text-navy dark:text-slate-100 mb-1">Alerts</h1>
         <p class="text-slate dark:text-slate-400">Live compliance and security monitoring</p>
       </div>
       <div class="flex items-center gap-2">
@@ -21,38 +22,49 @@ const pagination = alertsData.pagination || {};
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+    {loading ? (
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        {Array.from({ length: 4 }).map(() => (
+          <div class="card p-5"><Skeleton variant="text" count={2} /></div>
+        ))}
+      </div>
+    ) : (
+      <>
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Total Alerts</div>
         <div class="text-3xl font-bold text-navy dark:text-slate-100">{alertsSummary.total || 0}</div>
       </div>
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Unacknowledged</div>
         <div class="text-3xl font-bold text-red-600">{alertsSummary.unacknowledged || 0}</div>
       </div>
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Critical</div>
         <div class="text-3xl font-bold text-red-600">{alertsSummary.critical || 0}</div>
       </div>
-      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+      <div class="card p-5">
         <div class="text-sm text-slate dark:text-slate-400 mb-1">Warnings</div>
         <div class="text-3xl font-bold text-yellow-600">{alertsSummary.warning || 0}</div>
       </div>
     </div>
+    </>
+    )}
 
-    <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+    <div class="card overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
         <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Active Alerts</h2>
       </div>
       <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
         <div class="flex flex-wrap items-center gap-3">
-          <select id="filter-severity" class="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-white dark:bg-navy-light">
+          <select id="filter-severity" class="select">
             <option value="">All Severities</option>
             <option value="critical">Critical</option>
             <option value="warning">Warning</option>
             <option value="info">Info</option>
           </select>
-          <select id="filter-type" class="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-white dark:bg-navy-light">
+          <select id="filter-type" class="select">
             <option value="">All Types</option>
             <option value="cpu">CPU</option>
             <option value="network">Network</option>
@@ -60,13 +72,13 @@ const pagination = alertsData.pagination || {};
             <option value="security">Security</option>
             <option value="billing">Billing</option>
           </select>
-          <select id="filter-acknowledged" class="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-white dark:bg-navy-light">
+          <select id="filter-acknowledged" class="select">
             <option value="">All Status</option>
             <option value="false">Unacknowledged</option>
             <option value="true">Acknowledged</option>
           </select>
-          <button id="apply-filters" class="text-sm bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">Apply</button>
-          <button id="clear-filters" class="text-sm text-slate dark:text-slate-400 hover:text-navy dark:text-slate-100 font-medium">Clear</button>
+          <button id="apply-filters" class="btn btn-primary">Apply</button>
+          <button id="clear-filters" class="btn btn-ghost">Clear</button>
         </div>
       </div>
       <div id="alerts-list" class="divide-y divide-slate-200 dark:divide-slate-700">
@@ -95,7 +107,7 @@ const pagination = alertsData.pagination || {};
                 </div>
               </div>
               {!alert.acknowledged && (
-                <button class="text-sm bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors" data-alert-id={alert.id}>
+                <button class="btn btn-danger btn-sm" data-alert-id={alert.id}>
                   Acknowledge
                 </button>
               )}
@@ -115,13 +127,12 @@ const pagination = alertsData.pagination || {};
         </div>
       )}
       <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
-        <button id="prev-page" {pagination.offset === 0 ? 'disabled' : ''} class="text-sm text-navy dark:text-slate-100 hover:text-navy-light dark:hover:text-slate-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
+        <button id="prev-page" {pagination.offset === 0 ? 'disabled' : ''} class="btn btn-ghost btn-sm disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
         <span id="page-info" class="text-sm text-slate dark:text-slate-400">Showing {pagination.offset + 1}-{Math.min(pagination.offset + pagination.limit, pagination.total)} of {pagination.total}</span>
-        <button id="next-page" {!pagination.hasMore ? 'disabled' : ''} class="text-sm text-navy dark:text-slate-100 hover:text-navy-light dark:hover:text-slate-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
+        <button id="next-page" {!pagination.hasMore ? 'disabled' : ''} class="btn btn-ghost btn-sm disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
       </div>
       <div id="pagination-data" data-offset="{pagination.offset || 0}" data-limit="{pagination.limit || 10}" data-total="{pagination.total || 0}" data-has-more="{pagination.hasMore ? 'true' : 'false'}" class="hidden"></div>
     </div>
-  </div>
 
   <script>
     document.querySelectorAll('[data-alert-id]').forEach((btn) => {
@@ -133,6 +144,7 @@ const pagination = alertsData.pagination || {};
           body: JSON.stringify({ alertId }),
         });
         if (res.ok) {
+          window.showToast('Alert acknowledged', 'success');
           window.location.reload();
         }
       });
@@ -177,7 +189,7 @@ const pagination = alertsData.pagination || {};
                   </div>
                 </div>
               </div>
-              ${!alert.acknowledged ? `<button class="text-sm bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors" data-alert-id="${alert.id}">Acknowledge</button>` : ''}
+              ${!alert.acknowledged ? `<button class="btn btn-danger btn-sm" data-alert-id="${alert.id}">Acknowledge</button>` : ''}
             </div>
           </div>
         `).join('');
@@ -207,15 +219,13 @@ const pagination = alertsData.pagination || {};
 
     prevBtn?.addEventListener('click', () => {
       if (currentOffset > 0) {
-        const newOffset = currentOffset - limit;
-        loadAlerts(newOffset);
+        loadAlerts(currentOffset - limit);
       }
     });
 
     nextBtn?.addEventListener('click', () => {
       if (hasMore) {
-        const newOffset = currentOffset + limit;
-        loadAlerts(newOffset);
+        loadAlerts(currentOffset + limit);
       }
     });
 
