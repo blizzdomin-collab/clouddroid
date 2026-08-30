@@ -11,6 +11,7 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const dodoWebhookSecret = import.meta.env.DODO_PAYMENTS_WEBHOOK_KEY;
     if (!dodoWebhookSecret) {
+      console.error('Dodo webhook secret not configured');
       return new Response(JSON.stringify({ error: 'Webhook secret not configured' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
@@ -21,18 +22,29 @@ export const POST: APIRoute = async ({ request }) => {
     const signature = request.headers.get('x-dodo-signature') || '';
 
     if (!verifyDodoSignature(payload, signature, dodoWebhookSecret)) {
+      console.error('Dodo webhook signature verification failed');
       return new Response(JSON.stringify({ error: 'Invalid signature' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
-    const event = JSON.parse(payload);
+    let event: any;
+    try {
+      event = JSON.parse(payload);
+    } catch (parseError) {
+      console.error('Dodo webhook JSON parse error:', parseError);
+      return new Response(JSON.stringify({ error: 'Invalid payload' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('Dodo webhook received:', event.type, event.data?.id);
 
     if (event.type === 'checkout.session.completed') {
       const sessionId = event.data?.id;
       const customerId = event.data?.customer?.id;
-      const planName = event.data?.items?.[0]?.price_data?.product_data?.name || 'Unknown';
 
       if (!sessionId) {
         return new Response(JSON.stringify({ error: 'Missing session data' }), {
@@ -165,11 +177,20 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
+    if (event.type === 'payment.failed') {
+      console.log('Payment failed event:', event.data?.id, event.data?.customer?.email);
+      return new Response(JSON.stringify({ received: true }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     return new Response(JSON.stringify({ received: true }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
+    console.error('Dodo webhook error:', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
