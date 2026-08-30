@@ -13,12 +13,12 @@ const loading = false;
     <!-- Header -->
     <div class="mb-6 flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-slate-100  mb-1">Alerts</h1>
-        <p class="text-slate dark:text-slate-400">Live compliance and security monitoring</p>
+        <h1 class="text-2xl font-bold text-slate-100 mb-1">Alerts</h1>
+        <p class="text-slate text-slate-400">Live compliance and security monitoring</p>
       </div>
       <div class="flex items-center gap-2">
-        <span class="w-2 h-2 bg-green-900/300 rounded-full animate-pulse"></span>
-        <span class="text-sm text-slate dark:text-slate-400">Live</span>
+        <span class="w-2 h-2 bg-green-900/30 rounded-full animate-pulse"></span>
+        <span class="text-sm text-slate text-slate-400">Live</span>
       </div>
     </div>
 
@@ -33,19 +33,19 @@ const loading = false;
     <!-- Stats -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
       <div class="card p-5">
-        <div class="text-sm text-slate dark:text-slate-400 mb-1">Total Alerts</div>
-        <div class="text-3xl font-bold text-slate-100 ">{alertsSummary.total || 0}</div>
+        <div class="text-sm text-slate text-slate-400 mb-1">Total Alerts</div>
+        <div class="text-3xl font-bold text-slate-100">{alertsSummary.total || 0}</div>
       </div>
       <div class="card p-5">
-        <div class="text-sm text-slate dark:text-slate-400 mb-1">Unacknowledged</div>
+        <div class="text-sm text-slate text-slate-400 mb-1">Unacknowledged</div>
         <div class="text-3xl font-bold text-red-400">{alertsSummary.unacknowledged || 0}</div>
       </div>
       <div class="card p-5">
-        <div class="text-sm text-slate dark:text-slate-400 mb-1">Critical</div>
+        <div class="text-sm text-slate text-slate-400 mb-1">Critical</div>
         <div class="text-3xl font-bold text-red-400">{alertsSummary.critical || 0}</div>
       </div>
       <div class="card p-5">
-        <div class="text-sm text-slate dark:text-slate-400 mb-1">Warnings</div>
+        <div class="text-sm text-slate text-slate-400 mb-1">Warnings</div>
         <div class="text-3xl font-bold text-yellow-400">{alertsSummary.warning || 0}</div>
       </div>
     </div>
@@ -53,10 +53,10 @@ const loading = false;
     )}
 
     <div class="card overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
-        <h2 class="text-lg font-semibold text-slate-100 ">Active Alerts</h2>
+      <div class="px-6 py-4 border-b border-slate-700">
+        <h2 class="text-lg font-semibold text-slate-100">Active Alerts</h2>
       </div>
-      <div class="p-4 border-b border-slate-700 dark:border-slate-700 bg-slate-800 dark:bg-slate-800">
+      <div class="p-4 border-b border-slate-700 bg-slate-800">
         <div class="flex flex-wrap items-center gap-3">
           <select id="filter-severity" class="select">
             <option value="">All Severities</option>
@@ -81,12 +81,12 @@ const loading = false;
           <button id="clear-filters" class="btn btn-ghost">Clear</button>
         </div>
       </div>
-      <div id="alerts-list" class="divide-y divide-slate-200 dark:divide-slate-700">
+      <div id="alerts-list" class="divide-y divide-slate-200 divide-slate-700">
         {alerts.map((alert) => (
-          <div class={`p-6 ${alert.acknowledged ? 'bg-slate-800 dark:bg-slate-800' : 'bg-red-900/30 border-l-4 border-red-400'}`}>
+          <div class={`p-6 ${alert.acknowledged ? 'bg-slate-800 bg-slate-800' : 'bg-red-900/30 border-l-4 border-red-400'}`}>
             <div class="flex items-start justify-between gap-4">
               <div class="flex items-start gap-3 flex-1">
-                <svg class={`w-5 h-5 ${alert.acknowledged ? 'text-slate dark:text-slate-400' : 'text-red-400'} mt-0.5`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class={`w-5 h-5 ${alert.acknowledged ? 'text-slate text-slate-400' : 'text-red-400'} mt-0.5`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {alert.acknowledged ? (
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   ) : (
@@ -95,11 +95,11 @@ const loading = false;
                 </svg>
                 <div class="flex-1">
                   <div class="flex items-center gap-2 mb-1">
-                    <h4 class="font-semibold text-slate-100 ">{alert.title}</h4>
-                    <span class="text-xs text-slate dark:text-slate-400 bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded-full">{alert.acknowledged ? 'Acknowledged' : alert.severity}</span>
+                    <h4 class="font-semibold text-slate-100">{alert.title}</h4>
+                    <span class="text-xs text-slate text-slate-400 bg-slate-200 bg-slate-700 px-2 py-0.5 rounded-full">{alert.acknowledged ? 'Acknowledged' : alert.severity}</span>
                   </div>
-                  <p class="text-sm text-slate dark:text-slate-400 mb-2">{alert.message}</p>
-                  <div class="flex items-center gap-4 text-xs text-slate dark:text-slate-400">
+                  <p class="text-sm text-slate text-slate-400 mb-2">{alert.message}</p>
+                  <div class="flex items-center gap-4 text-xs text-slate text-slate-400">
                     <span>{new Date(alert.timestamp).toLocaleString()}</span>
                     {alert.instance_id && <span>Instance: {alert.instance_id}</span>}
                     <span class="capitalize">{alert.type}</span>
@@ -117,18 +117,18 @@ const loading = false;
       </div>
       {alerts.length === 0 && (
         <div class="p-8 text-center">
-          <div class="w-16 h-16 bg-green-900/30 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-green-400 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-16 h-16 bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
           </div>
-          <h3 class="text-lg font-semibold text-slate-100  mb-2">All Clear!</h3>
-          <p class="text-sm text-slate dark:text-slate-400">No active alerts. Your instances are running smoothly.</p>
+          <h3 class="text-lg font-semibold text-slate-100 mb-2">All Clear!</h3>
+          <p class="text-sm text-slate text-slate-400">No active alerts. Your instances are running smoothly.</p>
         </div>
       )}
-      <div class="px-6 py-4 border-t border-slate-700 dark:border-slate-700 flex items-center justify-between">
+      <div class="px-6 py-4 border-t border-slate-700 flex items-center justify-between">
         <button id="prev-page" {pagination.offset === 0 ? 'disabled' : ''} class="btn btn-ghost btn-sm disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
-        <span id="page-info" class="text-sm text-slate dark:text-slate-400">Showing {pagination.offset + 1}-{Math.min(pagination.offset + pagination.limit, pagination.total)} of {pagination.total}</span>
+        <span id="page-info" class="text-sm text-slate text-slate-400">Showing {pagination.offset + 1}-{Math.min(pagination.offset + pagination.limit, pagination.total)} of {pagination.total}</span>
         <button id="next-page" {!pagination.hasMore ? 'disabled' : ''} class="btn btn-ghost btn-sm disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
       </div>
       <div id="pagination-data" data-offset="{pagination.offset || 0}" data-limit="{pagination.limit || 10}" data-total="{pagination.total || 0}" data-has-more="{pagination.hasMore ? 'true' : 'false'}" class="hidden"></div>
@@ -170,19 +170,19 @@ const loading = false;
 
       if (alertsList) {
         alertsList.innerHTML = alerts.map((alert) => `
-          <div class="p-6 ${alert.acknowledged ? 'bg-slate-800 dark:bg-slate-800' : 'bg-red-900/30 border-l-4 border-red-400'}">
+          <div class="p-6 ${alert.acknowledged ? 'bg-slate-800 bg-slate-800' : 'bg-red-900/30 border-l-4 border-red-400'}">
             <div class="flex items-start justify-between gap-4">
               <div class="flex items-start gap-3 flex-1">
-                <svg class="w-5 h-5 ${alert.acknowledged ? 'text-slate dark:text-slate-400' : 'text-red-400'} mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 ${alert.acknowledged ? 'text-slate text-slate-400' : 'text-red-400'} mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   ${alert.acknowledged ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />' : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />'}
                 </svg>
                 <div class="flex-1">
                   <div class="flex items-center gap-2 mb-1">
-                    <h4 class="font-semibold text-slate-100 ">${alert.title}</h4>
-                    <span class="text-xs text-slate dark:text-slate-400 bg-slate-200 px-2 py-0.5 rounded-full">${alert.acknowledged ? 'Acknowledged' : alert.severity}</span>
+                    <h4 class="font-semibold text-slate-100">${alert.title}</h4>
+                    <span class="text-xs text-slate text-slate-400 bg-slate-200 px-2 py-0.5 rounded-full">${alert.acknowledged ? 'Acknowledged' : alert.severity}</span>
                   </div>
-                  <p class="text-sm text-slate dark:text-slate-400 mb-2">${alert.message}</p>
-                  <div class="flex items-center gap-4 text-xs text-slate dark:text-slate-400">
+                  <p class="text-sm text-slate text-slate-400 mb-2">${alert.message}</p>
+                  <div class="flex items-center gap-4 text-xs text-slate text-slate-400">
                     <span>${new Date(alert.timestamp).toLocaleString()}</span>
                     ${alert.instance_id ? `<span>Instance: ${alert.instance_id}</span>` : ''}
                     <span class="capitalize">${alert.type}</span>
@@ -263,18 +263,18 @@ const loading = false;
           newAlerts.forEach((alert: { id: string; severity: string; title: string; message: string; timestamp: string; acknowledged: number }) => {
             insertedAlertIds.add(alert.id);
             const alertEl = document.createElement('div');
-            alertEl.className = 'p-6 border-b border-slate-700 dark:border-slate-700 last:border-b-0';
+            alertEl.className = 'p-6 border-b border-slate-700 last:border-b-0';
             alertEl.innerHTML = `
               <div class="flex items-start justify-between">
                 <div class="flex-1">
                   <div class="flex items-center gap-2 mb-1">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${alert.severity === 'critical' ? 'bg-red-100 text-red-800' : alert.severity === 'warning' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'}">${alert.severity}</span>
-                    <span class="text-sm font-medium text-slate-100 ">${alert.title}</span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${alert.severity === 'critical' ? 'bg-red-900/30 text-red-400' : alert.severity === 'warning' ? 'bg-yellow-900/30 text-yellow-400' : 'bg-blue-900/30 text-blue-400'}">${alert.severity}</span>
+                    <span class="text-sm font-medium text-slate-100">${alert.title}</span>
                   </div>
-                  <p class="text-sm text-slate dark:text-slate-400">${alert.message}</p>
-                  <p class="text-xs text-slate dark:text-slate-400 mt-1">${new Date(alert.timestamp).toLocaleString()}</p>
+                  <p class="text-sm text-slate text-slate-400">${alert.message}</p>
+                  <p class="text-xs text-slate text-slate-400 mt-1">${new Date(alert.timestamp).toLocaleString()}</p>
                 </div>
-                ${alert.acknowledged === 0 ? `<button data-alert-id="${alert.id}" class="acknowledge-btn text-xs bg-navy text-white px-3 py-1.5 rounded-lg hover:bg-navy-light transition-colors">Acknowledge</button>` : '<span class="text-xs text-slate dark:text-slate-400">Acknowledged</span>'}
+                ${alert.acknowledged === 0 ? `<button data-alert-id="${alert.id}" class="acknowledge-btn text-xs bg-navy text-white px-3 py-1.5 rounded-lg hover:bg-navy-light transition-colors">Acknowledge</button>` : '<span class="text-xs text-slate text-slate-400">Acknowledged</span>'}
               </div>
             `;
             alertsList.insertBefore(alertEl, alertsList.firstChild);
@@ -302,18 +302,18 @@ const loading = false;
             if (insertedAlertIds.has(alert.id)) return;
             insertedAlertIds.add(alert.id);
             const alertEl = document.createElement('div');
-            alertEl.className = 'p-6 border-b border-slate-700 dark:border-slate-700 last:border-b-0';
+            alertEl.className = 'p-6 border-b border-slate-700 last:border-b-0';
             alertEl.innerHTML = `
               <div class="flex items-start justify-between">
                 <div class="flex-1">
                   <div class="flex items-center gap-2 mb-1">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${alert.severity === 'critical' ? 'bg-red-100 text-red-800' : alert.severity === 'warning' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'}">${alert.severity}</span>
-                    <span class="text-sm font-medium text-slate-100 ">${alert.title}</span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${alert.severity === 'critical' ? 'bg-red-900/30 text-red-400' : alert.severity === 'warning' ? 'bg-yellow-900/30 text-yellow-400' : 'bg-blue-900/30 text-blue-400'}">${alert.severity}</span>
+                    <span class="text-sm font-medium text-slate-100">${alert.title}</span>
                   </div>
-                  <p class="text-sm text-slate dark:text-slate-400">${alert.message}</p>
-                  <p class="text-xs text-slate dark:text-slate-400 mt-1">${new Date(alert.timestamp).toLocaleString()}</p>
+                  <p class="text-sm text-slate text-slate-400">${alert.message}</p>
+                  <p class="text-xs text-slate text-slate-400 mt-1">${new Date(alert.timestamp).toLocaleString()}</p>
                 </div>
-                ${alert.acknowledged === 0 ? `<button data-alert-id="${alert.id}" class="acknowledge-btn text-xs bg-navy text-white px-3 py-1.5 rounded-lg hover:bg-navy-light transition-colors">Acknowledge</button>` : '<span class="text-xs text-slate dark:text-slate-400">Acknowledged</span>'}
+                ${alert.acknowledged === 0 ? `<button data-alert-id="${alert.id}" class="acknowledge-btn text-xs bg-navy text-white px-3 py-1.5 rounded-lg hover:bg-navy-light transition-colors">Acknowledge</button>` : '<span class="text-xs text-slate text-slate-400">Acknowledged</span>'}
               </div>
             `;
             alertsList.insertBefore(alertEl, alertsList.firstChild);

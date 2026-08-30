@@ -181,7 +181,8 @@ export const GET: APIRoute = async ({ cookies }) => {
       }
     );
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });

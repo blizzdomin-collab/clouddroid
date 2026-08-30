@@ -5,6 +5,7 @@ import { getUserByEmail } from '../../lib/database';
 const sessionCookie = Astro.cookies.get('session');
 let isAdmin = false;
 let stats: any = null;
+let health: any = null;
 let error: string | null = null;
 
 if (sessionCookie) {
@@ -14,11 +15,26 @@ if (sessionCookie) {
       const user = getUserByEmail(session.email);
       if (user && user.role === 'admin') {
         isAdmin = true;
-        const res = await fetch(`${Astro.url.origin}/api/admin/stats`);
-        if (res.ok) {
-          stats = await res.json();
+        const [statsRes, healthRes] = await Promise.all([
+          fetch(`${Astro.url.origin}/api/admin/stats`),
+          fetch(`${Astro.url.origin}/api/admin/health`),
+        ]);
+        if (statsRes.ok) {
+          stats = await statsRes.json();
         } else {
-          error = 'Failed to load admin stats';
+          const body = await statsRes.text();
+          console.error('Admin stats API error:', statsRes.status, body);
+          let detail = `HTTP ${statsRes.status}`;
+          try {
+            const parsed = JSON.parse(body);
+            if (parsed.error) detail += `: ${parsed.error}`;
+          } catch {
+            if (body.length > 0) detail += `: ${body.slice(0, 200)}`;
+          }
+          error = `Failed to load admin stats (${detail})`;
+        }
+        if (healthRes.ok) {
+          health = await healthRes.json();
         }
       }
     }
@@ -31,118 +47,118 @@ if (sessionCookie) {
 <DashboardLayout title="Admin Dashboard - CloudDroid">
   {isAdmin ? (
     error ? (
-      <div class="bg-red-900/30 border border-red-800 rounded-xl p-6 text-red-800">{error}</div>
+      <div class="bg-red-900/30 border border-red-800 rounded-xl p-6 text-red-400">{error}</div>
     ) : stats ? (
       <div class="space-y-6">
         <div>
-          <h1 class="text-2xl font-bold text-slate-100  mb-1">Admin Dashboard</h1>
-            <p class="text-slate dark:text-slate-400">Platform overview and key metrics</p>
+          <h1 class="text-2xl font-bold text-slate-100 mb-1">Admin Dashboard</h1>
+            <p class="text-slate text-slate-400">Platform overview and key metrics</p>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="card p-5">
-              <div class="text-sm text-slate dark:text-slate-400 mb-1">Total Users</div>
-              <div class="text-3xl font-bold text-slate-100 ">{stats.overview.totalUsers}</div>
+              <div class="text-sm text-slate text-slate-400 mb-1">Total Users</div>
+              <div class="text-3xl font-bold text-slate-100">{stats.overview.totalUsers}</div>
             </div>
             <div class="card p-5">
-              <div class="text-sm text-slate dark:text-slate-400 mb-1">Total Instances</div>
-              <div class="text-3xl font-bold text-slate-100 ">{stats.overview.totalInstances}</div>
+              <div class="text-sm text-slate text-slate-400 mb-1">Total Instances</div>
+              <div class="text-3xl font-bold text-slate-100">{stats.overview.totalInstances}</div>
             </div>
             <div class="card p-5">
-              <div class="text-sm text-slate dark:text-slate-400 mb-1">Active Subscriptions</div>
+              <div class="text-sm text-slate text-slate-400 mb-1">Active Subscriptions</div>
               <div class="text-3xl font-bold text-green-400">{stats.overview.activeSubscriptions}</div>
             </div>
             <div class="card p-5">
-              <div class="text-sm text-slate dark:text-slate-400 mb-1">Total Revenue</div>
-              <div class="text-3xl font-bold text-slate-100 ">${stats.overview.totalRevenue.toFixed(2)}</div>
+              <div class="text-sm text-slate text-slate-400 mb-1">Total Revenue</div>
+              <div class="text-3xl font-bold text-slate-100">${stats.overview.totalRevenue.toFixed(2)}</div>
             </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="card p-5">
-              <div class="text-sm text-slate dark:text-slate-400 mb-1">Active Access</div>
+              <div class="text-sm text-slate text-slate-400 mb-1">Active Access</div>
               <div class="text-3xl font-bold text-green-400">{stats.overview.activeSubscriptions}</div>
             </div>
             <div class="card p-5">
-              <div class="text-sm text-slate dark:text-slate-400 mb-1">Expiring in 7 days</div>
+              <div class="text-sm text-slate text-slate-400 mb-1">Expiring in 7 days</div>
               <div class="text-3xl font-bold text-yellow-400">{stats.overview.expiringSoon}</div>
             </div>
             <div class="card p-5">
-              <div class="text-sm text-slate dark:text-slate-400 mb-1">Expired</div>
+              <div class="text-sm text-slate text-slate-400 mb-1">Expired</div>
               <div class="text-3xl font-bold text-red-400">{stats.overview.expiredSubscriptions}</div>
             </div>
           </div>
 
           <div class="card overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
-              <h2 class="text-lg font-semibold text-slate-100 ">Expiring Soon (next 7 days)</h2>
+            <div class="px-6 py-4 border-b border-slate-700">
+              <h2 class="text-lg font-semibold text-slate-100">Expiring Soon (next 7 days)</h2>
             </div>
             <div class="p-6">
               {stats.expiringSoonList?.length > 0 ? (
                 <div class="overflow-x-auto">
                   <table class="w-full">
-                    <thead class="bg-slate-800 dark:bg-slate-800">
+                    <thead class="bg-slate-800">
                       <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Email</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Plan</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Days Left</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Expires</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Plan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Days Left</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Expires</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                    <tbody class="divide-y divide-slate-700">
                       {stats.expiringSoonList.map((u: any) => (
                         <tr>
-                          <td class="px-6 py-4 text-slate-100  font-medium">{u.email}</td>
-                          <td class="px-6 py-4 text-slate dark:text-slate-400">{u.plan}</td>
+                          <td class="px-6 py-4 text-slate-100 font-medium">{u.email}</td>
+                          <td class="px-6 py-4 text-slate text-slate-400">{u.plan}</td>
                           <td class="px-6 py-4 text-yellow-400 font-medium">{u.daysLeft}</td>
-                          <td class="px-6 py-4 text-slate dark:text-slate-400">{new Date(u.current_period_end).toLocaleDateString()}</td>
+                          <td class="px-6 py-4 text-slate text-slate-400">{new Date(u.current_period_end).toLocaleDateString()}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               ) : (
-                <p class="text-sm text-slate dark:text-slate-400">No subscriptions expiring in the next 7 days.</p>
+                <p class="text-sm text-slate text-slate-400">No subscriptions expiring in the next 7 days.</p>
               )}
             </div>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 bg-navy-light dark:bg-navy-light rounded-xl border border-slate-700 dark:border-slate-700 overflow-hidden">
-              <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
-                <h2 class="text-lg font-semibold text-slate-100 ">Plan Distribution</h2>
+            <div class="lg:col-span-2 bg-navy-light rounded-xl border border-slate-700 overflow-hidden">
+              <div class="px-6 py-4 border-b border-slate-700">
+                <h2 class="text-lg font-semibold text-slate-100">Plan Distribution</h2>
               </div>
               <div class="p-6">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {Object.entries(stats.planDistribution || {}).map(([plan, count]) => (
-                    <div class="bg-slate-800 dark:bg-slate-800 rounded-lg p-4">
-                      <div class="text-sm text-slate dark:text-slate-400 mb-1">{plan}</div>
-                      <div class="text-2xl font-bold text-slate-100 ">{count}</div>
+                    <div class="bg-slate-800 rounded-lg p-4">
+                      <div class="text-sm text-slate text-slate-400 mb-1">{plan}</div>
+                      <div class="text-2xl font-bold text-slate-100">{count}</div>
                     </div>
                   ))}
                   {Object.keys(stats.planDistribution || {}).length === 0 && (
-                    <p class="text-sm text-slate dark:text-slate-400">No subscriptions yet.</p>
+                    <p class="text-sm text-slate text-slate-400">No subscriptions yet.</p>
                   )}
                 </div>
               </div>
             </div>
 
             <div class="card overflow-hidden">
-              <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
-                <h2 class="text-lg font-semibold text-slate-100 ">Quick Actions</h2>
+              <div class="px-6 py-4 border-b border-slate-700">
+                <h2 class="text-lg font-semibold text-slate-100">Quick Actions</h2>
               </div>
               <div class="p-6 space-y-3">
-                <a href="/dashboard/users" class="flex items-center justify-between bg-slate-800 dark:bg-slate-800 rounded-lg p-4 hover:bg-slate-700 dark:hover:bg-slate-700 transition-colors">
-                  <span class="text-sm font-medium text-slate-100 ">Manage Users</span>
-                  <svg class="w-4 h-4 text-slate dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                <a href="/dashboard/users" class="flex items-center justify-between bg-slate-800 rounded-lg p-4 hover:bg-slate-700 transition-colors">
+                  <span class="text-sm font-medium text-slate-100">Manage Users</span>
+                  <svg class="w-4 h-4 text-slate text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                 </a>
-                <a href="/dashboard/announcements" class="flex items-center justify-between bg-slate-800 dark:bg-slate-800 rounded-lg p-4 hover:bg-slate-700 dark:hover:bg-slate-700 transition-colors">
-                  <span class="text-sm font-medium text-slate-100 ">Announcements</span>
-                  <svg class="w-4 h-4 text-slate dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                <a href="/dashboard/announcements" class="flex items-center justify-between bg-slate-800 rounded-lg p-4 hover:bg-slate-700 transition-colors">
+                  <span class="text-sm font-medium text-slate-100">Announcements</span>
+                  <svg class="w-4 h-4 text-slate text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                 </a>
-                <a href="/dashboard/activity" class="flex items-center justify-between bg-slate-800 dark:bg-slate-800 rounded-lg p-4 hover:bg-slate-700 dark:hover:bg-slate-700 transition-colors">
-                  <span class="text-sm font-medium text-slate-100 ">Audit Activity</span>
-                  <svg class="w-4 h-4 text-slate dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                <a href="/dashboard/activity" class="flex items-center justify-between bg-slate-800 rounded-lg p-4 hover:bg-slate-700 transition-colors">
+                  <span class="text-sm font-medium text-slate-100">Audit Activity</span>
+                  <svg class="w-4 h-4 text-slate text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                 </a>
               </div>
             </div>
@@ -150,31 +166,31 @@ if (sessionCookie) {
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="card p-5">
-              <div class="text-sm text-slate dark:text-slate-400 mb-1">Dodo Payments Users</div>
-              <div class="text-3xl font-bold text-slate-100 ">{stats.paymentGateways?.dodo?.users || 0}</div>
-              <div class="text-xs text-slate dark:text-slate-400 mt-1">Revenue: ${(stats.paymentGateways?.dodo?.revenue || 0).toFixed(2)}</div>
+              <div class="text-sm text-slate text-slate-400 mb-1">Dodo Payments Users</div>
+              <div class="text-3xl font-bold text-slate-100">{stats.paymentGateways?.dodo?.users || 0}</div>
+              <div class="text-xs text-slate text-slate-400 mt-1">Revenue: ${(stats.paymentGateways?.dodo?.revenue || 0).toFixed(2)}</div>
             </div>
             <div class="card p-5">
-              <div class="text-sm text-slate dark:text-slate-400 mb-1">Mollie Users</div>
-              <div class="text-3xl font-bold text-slate-100 ">{stats.paymentGateways?.mollie?.users || 0}</div>
-              <div class="text-xs text-slate dark:text-slate-400 mt-1">Revenue: €{(stats.paymentGateways?.mollie?.revenue || 0).toFixed(2)}</div>
+              <div class="text-sm text-slate text-slate-400 mb-1">Mollie Users</div>
+              <div class="text-3xl font-bold text-slate-100">{stats.paymentGateways?.mollie?.users || 0}</div>
+              <div class="text-xs text-slate text-slate-400 mt-1">Revenue: €{(stats.paymentGateways?.mollie?.revenue || 0).toFixed(2)}</div>
             </div>
             <div class="card p-5">
-              <div class="text-sm text-slate dark:text-slate-400 mb-1">PayNow Users</div>
-              <div class="text-3xl font-bold text-slate-100 ">{stats.paymentGateways?.paynow?.users || 0}</div>
-              <div class="text-xs text-slate dark:text-slate-400 mt-1">Revenue: ${(stats.paymentGateways?.paynow?.revenue || 0).toFixed(2)}</div>
+              <div class="text-sm text-slate text-slate-400 mb-1">PayNow Users</div>
+              <div class="text-3xl font-bold text-slate-100">{stats.paymentGateways?.paynow?.users || 0}</div>
+              <div class="text-xs text-slate text-slate-400 mt-1">Revenue: ${(stats.paymentGateways?.paynow?.revenue || 0).toFixed(2)}</div>
             </div>
             <div class="card p-5">
-              <div class="text-sm text-slate dark:text-slate-400 mb-1">EasyTransac Users</div>
-              <div class="text-3xl font-bold text-slate-100 ">{stats.paymentGateways?.easytransac?.users || 0}</div>
-              <div class="text-xs text-slate dark:text-slate-400 mt-1">Revenue: €{(stats.paymentGateways?.easytransac?.revenue || 0).toFixed(2)}</div>
+              <div class="text-sm text-slate text-slate-400 mb-1">EasyTransac Users</div>
+              <div class="text-3xl font-bold text-slate-100">{stats.paymentGateways?.easytransac?.users || 0}</div>
+              <div class="text-xs text-slate text-slate-400 mt-1">Revenue: €{(stats.paymentGateways?.easytransac?.revenue || 0).toFixed(2)}</div>
             </div>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div class="card overflow-hidden">
-              <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
-                <h2 class="text-lg font-semibold text-slate-100 ">User Growth (Last 30 Days)</h2>
+              <div class="px-6 py-4 border-b border-slate-700">
+                <h2 class="text-lg font-semibold text-slate-100">User Growth (Last 30 Days)</h2>
               </div>
               <div class="p-6">
                 <div class="relative h-64">
@@ -184,8 +200,8 @@ if (sessionCookie) {
             </div>
 
             <div class="card overflow-hidden">
-              <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
-                <h2 class="text-lg font-semibold text-slate-100 ">Revenue (Last 30 Days)</h2>
+              <div class="px-6 py-4 border-b border-slate-700">
+                <h2 class="text-lg font-semibold text-slate-100">Revenue (Last 30 Days)</h2>
               </div>
               <div class="p-6">
                 <div class="relative h-64">
@@ -196,30 +212,65 @@ if (sessionCookie) {
           </div>
 
           <div class="card overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
-              <h2 class="text-lg font-semibold text-slate-100 ">Instance Status</h2>
+            <div class="px-6 py-4 border-b border-slate-700">
+              <h2 class="text-lg font-semibold text-slate-100">Instance Status</h2>
             </div>
             <div class="p-6">
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-green-900/30 rounded-lg p-4">
-                  <div class="text-sm text-slate dark:text-slate-400 mb-1">Running</div>
-                  <div class="text-2xl font-bold text-green-700">{stats.instanceStatusCounts.running}</div>
+                  <div class="text-sm text-slate text-slate-400 mb-1">Running</div>
+                  <div class="text-2xl font-bold text-green-400">{stats.instanceStatusCounts.running}</div>
                 </div>
                 <div class="bg-yellow-900/30 rounded-lg p-4">
-                  <div class="text-sm text-slate dark:text-slate-400 mb-1">Stopped</div>
-                  <div class="text-2xl font-bold text-yellow-700">{stats.instanceStatusCounts.stopped}</div>
+                  <div class="text-sm text-slate text-slate-400 mb-1">Stopped</div>
+                  <div class="text-2xl font-bold text-yellow-400">{stats.instanceStatusCounts.stopped}</div>
                 </div>
                 <div class="bg-red-900/30 rounded-lg p-4">
-                  <div class="text-sm text-slate dark:text-slate-400 mb-1">Warnings</div>
-                  <div class="text-2xl font-bold text-red-700">{stats.instanceStatusCounts.warning}</div>
+                  <div class="text-sm text-slate text-slate-400 mb-1">Warnings</div>
+                  <div class="text-2xl font-bold text-red-400">{stats.instanceStatusCounts.warning}</div>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="card overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
-              <h2 class="text-lg font-semibold text-slate-100 ">Revenue by Month</h2>
+            <div class="px-6 py-4 border-b border-slate-700">
+              <h2 class="text-lg font-semibold text-slate-100">System Health</h2>
+            </div>
+            <div class="p-6">
+              {health ? (
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div class="flex items-center gap-3 bg-slate-800 rounded-lg p-4">
+                    <div class="w-2.5 h-2.5 rounded-full {health.checks?.database?.status === 'healthy' ? 'bg-green-400' : 'bg-red-400'}"></div>
+                    <div>
+                      <div class="text-sm font-medium text-slate-100">Database</div>
+                      <div class="text-xs text-slate text-slate-400 capitalize">{health.checks?.database?.status || 'unknown'}</div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 bg-slate-800 rounded-lg p-4">
+                    <div class="w-2.5 h-2.5 rounded-full {health.checks?.redis?.status === 'healthy' ? 'bg-green-400' : 'bg-red-400'}"></div>
+                    <div>
+                      <div class="text-sm font-medium text-slate-100">Redis</div>
+                      <div class="text-xs text-slate text-slate-400 capitalize">{health.checks?.redis?.status || 'unknown'}</div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 bg-slate-800 rounded-lg p-4">
+                    <div class="w-2.5 h-2.5 rounded-full {health.overall === 'healthy' ? 'bg-green-400' : 'bg-yellow-400'}"></div>
+                    <div>
+                      <div class="text-sm font-medium text-slate-100">Overall</div>
+                      <div class="text-xs text-slate text-slate-400 capitalize">{health.overall || 'unknown'}</div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p class="text-sm text-slate text-slate-400">System health data unavailable.</p>
+              )}
+            </div>
+          </div>
+
+          <div class="card overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700">
+              <h2 class="text-lg font-semibold text-slate-100">Revenue by Month</h2>
             </div>
             <div class="p-6">
               {stats.revenueByMonth?.length > 0 ? (
@@ -229,86 +280,86 @@ if (sessionCookie) {
                     const pct = Math.max(4, (m.total / max) * 100);
                     return (
                       <div class="flex-1 flex flex-col items-center justify-end gap-2">
-                        <span class="text-xs text-slate dark:text-slate-400">${m.total.toFixed(0)}</span>
+                        <span class="text-xs text-slate text-slate-400">${m.total.toFixed(0)}</span>
                         <div class="w-full bg-navy rounded-t" style={`height: ${pct}%`}></div>
-                        <span class="text-xs text-slate dark:text-slate-400">{m.month.slice(2)}</span>
+                        <span class="text-xs text-slate text-slate-400">{m.month.slice(2)}</span>
                       </div>
                     );
                   })}
                 </div>
               ) : (
-                <p class="text-sm text-slate dark:text-slate-400">No revenue data yet.</p>
+                <p class="text-sm text-slate text-slate-400">No revenue data yet.</p>
               )}
             </div>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div class="card overflow-hidden">
-              <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
-                <h2 class="text-lg font-semibold text-slate-100 ">Recent Users</h2>
+              <div class="px-6 py-4 border-b border-slate-700">
+                <h2 class="text-lg font-semibold text-slate-100">Recent Users</h2>
               </div>
               <div class="p-6">
                 {stats.recentUsers.length > 0 ? (
                   <div class="overflow-x-auto">
                     <table class="w-full">
-                      <thead class="bg-slate-800 dark:bg-slate-800">
+                      <thead class="bg-slate-800">
                         <tr>
-                          <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Name</th>
-                          <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Email</th>
-                          <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Created</th>
+                          <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Name</th>
+                          <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Email</th>
+                          <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Created</th>
                         </tr>
                       </thead>
-                      <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                      <tbody class="divide-y divide-slate-700">
                         {stats.recentUsers.map((user: any) => (
                           <tr>
-                            <td class="px-6 py-4 text-slate-100  font-medium">{user.name}</td>
-                            <td class="px-6 py-4 text-slate dark:text-slate-400">{user.email}</td>
-                            <td class="px-6 py-4 text-slate dark:text-slate-400">{new Date(user.created_at).toLocaleDateString()}</td>
+                            <td class="px-6 py-4 text-slate-100 font-medium">{user.name}</td>
+                            <td class="px-6 py-4 text-slate text-slate-400">{user.email}</td>
+                            <td class="px-6 py-4 text-slate text-slate-400">{new Date(user.created_at).toLocaleDateString()}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
                 ) : (
-                  <p class="text-sm text-slate dark:text-slate-400">No users yet.</p>
+                  <p class="text-sm text-slate text-slate-400">No users yet.</p>
                 )}
               </div>
             </div>
 
             <div class="card overflow-hidden">
-              <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
-                <h2 class="text-lg font-semibold text-slate-100 ">Recent Invoices</h2>
+              <div class="px-6 py-4 border-b border-slate-700">
+                <h2 class="text-lg font-semibold text-slate-100">Recent Invoices</h2>
               </div>
               <div class="p-6">
                 {stats.recentInvoices.length > 0 ? (
                   <div class="overflow-x-auto">
                     <table class="w-full">
-                      <thead class="bg-slate-800 dark:bg-slate-800">
+                      <thead class="bg-slate-800">
                         <tr>
-                          <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Invoice ID</th>
-                          <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Amount</th>
-                          <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Status</th>
-                          <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Date</th>
+                          <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Invoice ID</th>
+                          <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Amount</th>
+                          <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Status</th>
+                          <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Date</th>
                         </tr>
                       </thead>
-                      <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                      <tbody class="divide-y divide-slate-700">
                         {stats.recentInvoices.map((inv: any) => (
                           <tr>
-                            <td class="px-6 py-4 text-slate-100  font-medium">{inv.id}</td>
-                            <td class="px-6 py-4 text-slate dark:text-slate-400">${inv.amount} {inv.currency}</td>
+                            <td class="px-6 py-4 text-slate-100 font-medium">{inv.id}</td>
+                            <td class="px-6 py-4 text-slate text-slate-400">${inv.amount} {inv.currency}</td>
                             <td class="px-6 py-4">
-                              <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${inv.status === 'paid' ? 'text-green-700 bg-green-100' : inv.status === 'pending' ? 'text-yellow-700 bg-yellow-100' : 'text-red-700 bg-red-100'}`}>
+                              <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${inv.status === 'paid' ? 'text-green-400 bg-green-900/30' : inv.status === 'pending' ? 'text-yellow-400 bg-yellow-900/30' : 'text-red-400 bg-red-900/30'}`}>
                                 {inv.status}
                               </span>
                             </td>
-                            <td class="px-6 py-4 text-slate dark:text-slate-400">{new Date(inv.created_at).toLocaleDateString()}</td>
+                            <td class="px-6 py-4 text-slate text-slate-400">{new Date(inv.created_at).toLocaleDateString()}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
                 ) : (
-                  <p class="text-sm text-slate dark:text-slate-400">No invoices yet.</p>
+                  <p class="text-sm text-slate text-slate-400">No invoices yet.</p>
                  )}
                </div>
              </div>
@@ -316,14 +367,14 @@ if (sessionCookie) {
          </div>
      ) : null
      ) : (
-      <div class="bg-navy-light dark:bg-navy-light rounded-xl border border-slate-700 dark:border-slate-700 p-8 text-center">
+      <div class="bg-navy-light rounded-xl border border-slate-700 p-8 text-center">
         <div class="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
           <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-slate-100  mb-2">Access Denied</h3>
-        <p class="text-sm text-slate dark:text-slate-400">You need admin privileges to view this page.</p>
+        <h3 class="text-lg font-semibold text-slate-100 mb-2">Access Denied</h3>
+        <p class="text-sm text-slate text-slate-400">You need admin privileges to view this page.</p>
       </div>
     )}
 
@@ -346,8 +397,8 @@ if (sessionCookie) {
               {
                 label: 'Users',
                 data: userGrowthData.map((d: any) => d.count),
-                borderColor: '#0f172a',
-                backgroundColor: 'rgba(15, 23, 42, 0.1)',
+                borderColor: '#38bdf8',
+                backgroundColor: 'rgba(56, 189, 248, 0.1)',
                 tension: 0.4,
                 fill: true,
               },
@@ -375,7 +426,7 @@ if (sessionCookie) {
               {
                 label: 'Revenue ($)',
                 data: revenueData.map((d: any) => d.amount),
-                backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                backgroundColor: 'rgba(56, 189, 248, 0.8)',
               },
             ],
           },

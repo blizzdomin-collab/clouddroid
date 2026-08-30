@@ -30,134 +30,140 @@ if (sessionCookie) {
   <div class="p-8">
     {isAdmin ? (
       error ? (
-        <div class="bg-red-900/30 border border-red-800 rounded-xl p-6 text-red-800">{error}</div>
+        <div class="bg-red-900/30 border border-red-800 rounded-xl p-6 text-red-400">{error}</div>
       ) : userData ? (
         <div class="space-y-6">
-          <div class="flex items-center gap-4">
-            <a href="/dashboard/users" class="text-sm text-slate dark:text-slate-400 hover:text-slate-100  transition-colors">← Back to Users</a>
+          <div class="flex items-center gap-3">
+            <a href="/dashboard/users" class="text-sm text-slate text-slate-400 hover:text-slate-100 transition-colors">← Back to Users</a>
           </div>
 
-          <div class="bg-navy-light dark:bg-navy-light rounded-xl border border-slate-700 dark:border-slate-700 p-6">
+          <div class="bg-navy-light rounded-xl border border-slate-700 p-6">
             <div class="flex items-start justify-between">
               <div>
-                <h1 class="text-2xl font-bold text-slate-100  mb-1">{userData.user.name}</h1>
-                <p class="text-slate dark:text-slate-400">{userData.user.email}</p>
+                <h1 class="text-2xl font-bold text-slate-100 mb-1">{userData.user.name}</h1>
+                <p class="text-slate text-slate-400">{userData.user.email}</p>
               </div>
-              <span class={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${userData.user.suspended ? 'text-red-700 bg-red-100' : 'text-green-700 bg-green-100'}`}>
-                {userData.user.suspended ? 'Suspended' : 'Active'}
-              </span>
+              <div class="flex items-center gap-2">
+                <span class={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${userData.user.suspended ? 'text-red-400 bg-red-900/30' : 'text-green-400 bg-green-900/30'}`}>
+                  {userData.user.suspended ? 'Suspended' : 'Active'}
+                </span>
+                <button data-action="toggle-suspend" data-id={userData.user.id} data-suspended={userData.user.suspended ? 'true' : 'false'} class="btn btn-sm {userData.user.suspended ? 'btn-accent' : 'btn-danger'}">
+                  {userData.user.suspended ? 'Unsuspend' : 'Suspend'}
+                </button>
+                <button data-action="delete" data-id={userData.user.id} class="btn btn-danger btn-sm">Delete</button>
+              </div>
             </div>
             <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <div class="text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider mb-1">Role</div>
-                <div class="text-sm text-slate-100  capitalize">{userData.user.role}</div>
+                <div class="text-xs font-medium text-slate text-slate-400 uppercase tracking-wider mb-1">Role</div>
+                <div class="text-sm text-slate-100 capitalize">{userData.user.role}</div>
               </div>
               <div>
-                <div class="text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider mb-1">Created</div>
-                <div class="text-sm text-slate-100 ">{new Date(userData.user.created_at).toLocaleDateString()}</div>
+                <div class="text-xs font-medium text-slate text-slate-400 uppercase tracking-wider mb-1">Created</div>
+                <div class="text-sm text-slate-100">{new Date(userData.user.created_at).toLocaleDateString()}</div>
               </div>
               <div>
-                <div class="text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider mb-1">2FA</div>
-                <div class="text-sm text-slate-100 ">{userData.user.two_factor_enabled ? 'Enabled' : 'Disabled'}</div>
+                <div class="text-xs font-medium text-slate text-slate-400 uppercase tracking-wider mb-1">2FA</div>
+                <div class="text-sm text-slate-100">{userData.user.two_factor_enabled ? 'Enabled' : 'Disabled'}</div>
               </div>
               <div>
-                <div class="text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider mb-1">Registration IP</div>
-                <div class="text-sm text-slate-100 ">{userData.user.registration_ip || 'N/A'}</div>
+                <div class="text-xs font-medium text-slate text-slate-400 uppercase tracking-wider mb-1">Registration IP</div>
+                <div class="text-sm text-slate-100">{userData.user.registration_ip || 'N/A'}</div>
               </div>
             </div>
             <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <div class="text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider mb-1">Dodo Customer ID</div>
-                <div class="text-sm text-slate-100 ">{userData.user.dodo_customer_id || 'N/A'}</div>
+                <div class="text-xs font-medium text-slate text-slate-400 uppercase tracking-wider mb-1">Dodo Customer ID</div>
+                <div class="text-sm text-slate-100">{userData.user.dodo_customer_id || 'N/A'}</div>
               </div>
               <div>
-                <div class="text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider mb-1">Mollie Customer ID</div>
-                <div class="text-sm text-slate-100 ">{userData.user.mollie_customer_id || 'N/A'}</div>
+                <div class="text-xs font-medium text-slate text-slate-400 uppercase tracking-wider mb-1">Mollie Customer ID</div>
+                <div class="text-sm text-slate-100">{userData.user.mollie_customer_id || 'N/A'}</div>
               </div>
               <div>
-                <div class="text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider mb-1">PayNow Customer ID</div>
-                <div class="text-sm text-slate-100 ">{userData.user.paynow_customer_id || 'N/A'}</div>
+                <div class="text-xs font-medium text-slate text-slate-400 uppercase tracking-wider mb-1">PayNow Customer ID</div>
+                <div class="text-sm text-slate-100">{userData.user.paynow_customer_id || 'N/A'}</div>
               </div>
               <div>
-                <div class="text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider mb-1">EasyTransac Client ID</div>
-                <div class="text-sm text-slate-100 ">{userData.user.easytransac_client_id || 'N/A'}</div>
+                <div class="text-xs font-medium text-slate text-slate-400 uppercase tracking-wider mb-1">EasyTransac Client ID</div>
+                <div class="text-sm text-slate-100">{userData.user.easytransac_client_id || 'N/A'}</div>
               </div>
             </div>
             {userData.user.suspension_reason && (
               <div class="mt-4">
-                <div class="text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider mb-1">Suspension Reason</div>
-                <div class="text-sm text-red-700">{userData.user.suspension_reason}</div>
+                <div class="text-xs font-medium text-slate text-slate-400 uppercase tracking-wider mb-1">Suspension Reason</div>
+                <div class="text-sm text-red-400">{userData.user.suspension_reason}</div>
               </div>
             )}
           </div>
 
-          <div class="bg-navy-light dark:bg-navy-light rounded-xl border border-slate-700 dark:border-slate-700 overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
-              <h2 class="text-lg font-semibold text-slate-100 ">Instances ({userData.instances.length})</h2>
+          <div class="bg-navy-light rounded-xl border border-slate-700 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700">
+              <h2 class="text-lg font-semibold text-slate-100">Instances ({userData.instances.length})</h2>
             </div>
             <div class="p-6">
               {userData.instances.length > 0 ? (
                 <div class="overflow-x-auto">
                   <table class="w-full">
-                    <thead class="bg-slate-800 dark:bg-slate-800">
+                    <thead class="bg-slate-800">
                       <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Name</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Platform</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Resources</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Created</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Platform</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Resources</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Created</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                    <tbody class="divide-y divide-slate-700">
                       {userData.instances.map((instance: any) => (
                         <tr>
-                          <td class="px-6 py-4 text-slate-100  font-medium">{instance.name}</td>
-                          <td class="px-6 py-4 text-slate dark:text-slate-400">{instance.platform}</td>
-                          <td class="px-6 py-4 text-slate dark:text-slate-400">{instance.ram}GB RAM / {instance.storage}GB</td>
+                          <td class="px-6 py-4 text-slate-100 font-medium">{instance.name}</td>
+                          <td class="px-6 py-4 text-slate text-slate-400">{instance.platform}</td>
+                          <td class="px-6 py-4 text-slate text-slate-400">{instance.ram}GB RAM / {instance.storage}GB</td>
                           <td class="px-6 py-4">
-                            <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${instance.status === 'running' ? 'text-green-700 bg-green-100' : instance.status === 'stopped' ? 'text-yellow-700 bg-yellow-100' : 'text-red-700 bg-red-100'}`}>
+                            <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${instance.status === 'running' ? 'text-green-400 bg-green-900/30' : instance.status === 'stopped' ? 'text-yellow-400 bg-yellow-900/30' : 'text-red-400 bg-red-900/30'}`}>
                               {instance.status}
                             </span>
                           </td>
-                          <td class="px-6 py-4 text-slate dark:text-slate-400">{new Date(instance.created_at).toLocaleDateString()}</td>
+                          <td class="px-6 py-4 text-slate text-slate-400">{new Date(instance.created_at).toLocaleDateString()}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               ) : (
-                <p class="text-sm text-slate dark:text-slate-400">No instances yet.</p>
+                <p class="text-sm text-slate text-slate-400">No instances yet.</p>
               )}
             </div>
           </div>
 
-          <div class="bg-navy-light dark:bg-navy-light rounded-xl border border-slate-700 dark:border-slate-700 overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
-              <h2 class="text-lg font-semibold text-slate-100 ">Subscriptions ({userData.subscriptions.length})</h2>
+          <div class="bg-navy-light rounded-xl border border-slate-700 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700">
+              <h2 class="text-lg font-semibold text-slate-100">Subscriptions ({userData.subscriptions.length})</h2>
             </div>
             <div class="p-6">
               {userData.subscriptions.length > 0 ? (
                 <div class="overflow-x-auto">
                   <table class="w-full">
-                    <thead class="bg-slate-800 dark:bg-slate-800">
+                    <thead class="bg-slate-800">
                       <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Plan</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Amount</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Period</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Plan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Period</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                    <tbody class="divide-y divide-slate-700">
                       {userData.subscriptions.map((sub: any) => (
                         <tr>
-                          <td class="px-6 py-4 text-slate-100  font-medium capitalize">{sub.plan}</td>
+                          <td class="px-6 py-4 text-slate-100 font-medium capitalize">{sub.plan}</td>
                           <td class="px-6 py-4">
-                            <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${sub.status === 'active' ? 'text-green-700 bg-green-100' : sub.status === 'cancelled' ? 'text-red-700 bg-red-100' : 'text-yellow-700 bg-yellow-100'}`}>
+                            <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${sub.status === 'active' ? 'text-green-400 bg-green-900/30' : sub.status === 'cancelled' ? 'text-red-400 bg-red-900/30' : 'text-yellow-400 bg-yellow-900/30'}`}>
                               {sub.status}
                             </span>
                           </td>
-                          <td class="px-6 py-4 text-slate dark:text-slate-400">{sub.currency} {sub.amount.toFixed(2)}</td>
-                          <td class="px-6 py-4 text-slate dark:text-slate-400">
+                          <td class="px-6 py-4 text-slate text-slate-400">{sub.currency} {sub.amount.toFixed(2)}</td>
+                          <td class="px-6 py-4 text-slate text-slate-400">
                             {new Date(sub.current_period_start).toLocaleDateString()} - {new Date(sub.current_period_end).toLocaleDateString()}
                           </td>
                         </tr>
@@ -166,60 +172,100 @@ if (sessionCookie) {
                   </table>
                 </div>
               ) : (
-                <p class="text-sm text-slate dark:text-slate-400">No subscriptions yet.</p>
+                <p class="text-sm text-slate text-slate-400">No subscriptions yet.</p>
               )}
             </div>
           </div>
 
-          <div class="bg-navy-light dark:bg-navy-light rounded-xl border border-slate-700 dark:border-slate-700 overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700">
-              <h2 class="text-lg font-semibold text-slate-100 ">Invoices ({userData.invoices.length})</h2>
+          <div class="bg-navy-light rounded-xl border border-slate-700 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700">
+              <h2 class="text-lg font-semibold text-slate-100">Invoices ({userData.invoices.length})</h2>
             </div>
             <div class="p-6">
               {userData.invoices.length > 0 ? (
                 <div class="overflow-x-auto">
                   <table class="w-full">
-                    <thead class="bg-slate-800 dark:bg-slate-800">
+                    <thead class="bg-slate-800">
                       <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Invoice ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Amount</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Invoice ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Date</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                    <tbody class="divide-y divide-slate-700">
                       {userData.invoices.map((invoice: any) => (
                         <tr>
-                          <td class="px-6 py-4 text-slate-100  font-medium">{invoice.id}</td>
-                          <td class="px-6 py-4 text-slate dark:text-slate-400">{invoice.currency} {invoice.amount.toFixed(2)}</td>
+                          <td class="px-6 py-4 text-slate-100 font-medium">{invoice.id}</td>
+                          <td class="px-6 py-4 text-slate text-slate-400">{invoice.currency} {invoice.amount.toFixed(2)}</td>
                           <td class="px-6 py-4">
-                            <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${invoice.status === 'paid' ? 'text-green-700 bg-green-100' : invoice.status === 'pending' ? 'text-yellow-700 bg-yellow-100' : 'text-red-700 bg-red-100'}`}>
+                            <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${invoice.status === 'paid' ? 'text-green-400 bg-green-900/30' : invoice.status === 'pending' ? 'text-yellow-400 bg-yellow-900/30' : 'text-red-400 bg-red-900/30'}`}>
                               {invoice.status}
                             </span>
                           </td>
-                          <td class="px-6 py-4 text-slate dark:text-slate-400">{new Date(invoice.created_at).toLocaleDateString()}</td>
+                          <td class="px-6 py-4 text-slate text-slate-400">{new Date(invoice.created_at).toLocaleDateString()}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               ) : (
-                <p class="text-sm text-slate dark:text-slate-400">No invoices yet.</p>
+                <p class="text-sm text-slate text-slate-400">No invoices yet.</p>
               )}
             </div>
           </div>
         </div>
       ) : null
     ) : (
-      <div class="bg-navy-light dark:bg-navy-light rounded-xl border border-slate-700 dark:border-slate-700 p-8 text-center">
+      <div class="bg-navy-light rounded-xl border border-slate-700 p-8 text-center">
         <div class="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
           <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 002 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-slate-100  mb-2">Access Denied</h3>
-        <p class="text-sm text-slate dark:text-slate-400">You need admin privileges to view this page.</p>
+        <h3 class="text-lg font-semibold text-slate-100 mb-2">Access Denied</h3>
+        <p class="text-sm text-slate text-slate-400">You need admin privileges to view this page.</p>
       </div>
     )}
   </div>
+
+  {isAdmin && userData && (
+    <script>
+      document.querySelectorAll('[data-action="toggle-suspend"]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-id');
+          const suspended = btn.getAttribute('data-suspended') === 'true';
+          if (!id) return;
+          const action = suspended ? 'unsuspend' : 'suspend';
+          if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+          const res = await fetch(`/api/admin/users/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ suspended: !suspended }),
+          });
+          if (res.ok) {
+            window.showToast(`User ${action}ed successfully`, 'success');
+            window.location.reload();
+          } else {
+            window.showToast(`Failed to ${action} user`, 'error');
+          }
+        });
+      });
+
+      document.querySelectorAll('[data-action="delete"]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-id');
+          if (!id) return;
+          if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+          const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            window.showToast('User deleted successfully', 'success');
+            window.location.href = '/dashboard/users';
+          } else {
+            window.showToast('Failed to delete user', 'error');
+          }
+        });
+      });
+    </script>
+  )}
 </DashboardLayout>

@@ -29,8 +29,8 @@ if (sessionCookie) {
   <!-- Header -->
   <div class="mb-6 flex items-center justify-between">
     <div>
-      <h1 class="text-2xl font-bold text-slate-100  mb-1">Announcements</h1>
-      <p class="text-slate dark:text-slate-400">Manage changelog, maintenance windows, and new features</p>
+      <h1 class="text-2xl font-bold text-slate-100 mb-1">Announcements</h1>
+      <p class="text-slate text-slate-400">Manage changelog, maintenance windows, and new features</p>
     </div>
     <button id="open-modal" class="text-sm bg-accent text-white px-4 py-2 rounded-lg font-medium hover:bg-accent-hover transition-colors">
       New Announcement
@@ -39,55 +39,55 @@ if (sessionCookie) {
 
   {isAdmin ? (
     error ? (
-      <div class="bg-red-900/30 border border-red-800 rounded-xl p-6 text-red-800">{error}</div>
+      <div class="bg-red-900/30 border border-red-800 rounded-xl p-6 text-red-400">{error}</div>
     ) : (
       <div class="space-y-4">
         <div class="card overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full">
-              <thead class="bg-slate-800 dark:bg-slate-800">
+              <thead class="bg-slate-800">
                 <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Title</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Type</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Status</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Created</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Actions</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Title</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Type</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Status</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Created</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+              <tbody class="divide-y divide-slate-200 divide-slate-700">
                 {announcements.length === 0 ? (
                   <tr>
                     <td colspan="5" class="px-6 py-8 text-center">
-                      <div class="w-16 h-16 bg-navy/5 dark:bg-navy/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-slate-100 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div class="w-16 h-16 bg-navy/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
                         </svg>
                       </div>
-                      <h3 class="text-lg font-semibold text-slate-100  mb-2">No Announcements Yet</h3>
-                      <p class="text-sm text-slate dark:text-slate-400">Create your first announcement to get started!</p>
+                      <h3 class="text-lg font-semibold text-slate-100 mb-2">No Announcements Yet</h3>
+                      <p class="text-sm text-slate text-slate-400">Create your first announcement to get started!</p>
                     </td>
                   </tr>
                 ) : (
                   announcements.map((announcement) => (
                     <tr>
-                      <td class="px-6 py-4 text-sm font-medium text-slate-100 ">{announcement.title}</td>
+                      <td class="px-6 py-4 text-sm font-medium text-slate-100">{announcement.title}</td>
                       <td class="px-6 py-4">
-                        <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${announcement.type === 'maintenance' ? 'text-yellow-700 bg-yellow-100' : announcement.type === 'changelog' ? 'text-blue-700 bg-blue-100' : announcement.type === 'feature' ? 'text-green-700 bg-green-100' : 'text-slate-700 bg-slate-700'}`}>
+                        <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${announcement.type === 'maintenance' ? 'text-yellow-400 bg-yellow-900/30' : announcement.type === 'changelog' ? 'text-blue-400 bg-blue-900/30' : announcement.type === 'feature' ? 'text-green-400 bg-green-900/30' : 'text-slate-400 bg-slate-700'}`}>
                           {announcement.type}
                         </span>
                       </td>
                       <td class="px-6 py-4">
-                        <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${announcement.status === 'active' ? 'text-green-700 bg-green-100' : 'text-slate-700 bg-slate-700'}`}>
+                        <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${announcement.status === 'active' ? 'text-green-400 bg-green-900/30' : 'text-slate-400 bg-slate-700'}`}>
                           {announcement.status}
                         </span>
                       </td>
-                      <td class="px-6 py-4 text-sm text-slate dark:text-slate-400">{new Date(announcement.created_at).toLocaleDateString()}</td>
+                      <td class="px-6 py-4 text-sm text-slate text-slate-400">{new Date(announcement.created_at).toLocaleDateString()}</td>
                       <td class="px-6 py-4">
                         <div class="flex items-center gap-2">
-                          <button data-action="edit" data-id={announcement.id} data-title={announcement.title} data-message={announcement.message} data-type={announcement.type} data-status={announcement.status} class="text-xs bg-slate-800 dark:bg-slate-800 text-slate-700 dark:text-slate-400 px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors">
+                          <button data-action="edit" data-id={announcement.id} data-title={announcement.title} data-message={announcement.message} data-type={announcement.type} data-status={announcement.status} class="text-xs bg-slate-800 text-slate-400 text-slate-400 px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors">
                             Edit
                           </button>
-                          <button data-action="delete" data-id={announcement.id} class="text-xs bg-red-900/30 text-red-700 px-4 py-2 rounded-lg hover:bg-red-100 transition-colors">
+                          <button data-action="delete" data-id={announcement.id} class="text-xs bg-red-900/30 text-red-400 px-4 py-2 rounded-lg hover:bg-red-900/30 transition-colors">
                             Delete
                           </button>
                         </div>
@@ -108,30 +108,30 @@ if (sessionCookie) {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 002 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
         </svg>
       </div>
-      <h3 class="text-lg font-semibold text-slate-100  mb-2">Access Denied</h3>
-      <p class="text-sm text-slate dark:text-slate-400">You need admin privileges to view this page.</p>
+      <h3 class="text-lg font-semibold text-slate-100 mb-2">Access Denied</h3>
+      <p class="text-sm text-slate text-slate-400">You need admin privileges to view this page.</p>
     </div>
   )}
 
   {isAdmin && (
     <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
       <div class="card shadow-xl w-full max-w-md mx-4">
-        <div class="px-6 py-4 border-b border-slate-700 dark:border-slate-700 flex items-center justify-between">
-          <h3 id="modal-title" class="text-lg font-semibold text-slate-100 ">New Announcement</h3>
-          <button id="close-modal" class="text-slate dark:text-slate-400 hover:text-slate-100 ">✕</button>
+        <div class="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+          <h3 id="modal-title" class="text-lg font-semibold text-slate-100">New Announcement</h3>
+          <button id="close-modal" class="text-slate text-slate-400 hover:text-slate-100">✕</button>
         </div>
         <form id="announcement-form" class="p-6 space-y-4">
           <div>
-            <label for="title" class="block text-sm font-medium text-slate-100  mb-1">Title</label>
-            <input type="text" id="title" name="title" required class="w-full px-3 py-2 border border-slate-700 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" />
+            <label for="title" class="block text-sm font-medium text-slate-100 mb-1">Title</label>
+            <input type="text" id="title" name="title" required class="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none" />
           </div>
           <div>
-            <label for="message" class="block text-sm font-medium text-slate-100  mb-1">Message</label>
-            <textarea id="message" name="message" rows="4" required class="w-full px-3 py-2 border border-slate-700 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none"></textarea>
+            <label for="message" class="block text-sm font-medium text-slate-100 mb-1">Message</label>
+            <textarea id="message" name="message" rows="4" required class="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none"></textarea>
           </div>
           <div>
-            <label for="type" class="block text-sm font-medium text-slate-100  mb-1">Type</label>
-            <select id="type" name="type" class="w-full px-3 py-2 border border-slate-700 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none">
+            <label for="type" class="block text-sm font-medium text-slate-100 mb-1">Type</label>
+            <select id="type" name="type" class="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none">
               <option value="info">Info</option>
               <option value="changelog">Changelog</option>
               <option value="maintenance">Maintenance</option>
@@ -139,15 +139,15 @@ if (sessionCookie) {
             </select>
           </div>
           <div>
-            <label for="status" class="block text-sm font-medium text-slate-100  mb-1">Status</label>
-            <select id="status" name="status" class="w-full px-3 py-2 border border-slate-700 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none">
+            <label for="status" class="block text-sm font-medium text-slate-100 mb-1">Status</label>
+            <select id="status" name="status" class="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none">
               <option value="active">Active</option>
               <option value="archived">Archived</option>
             </select>
           </div>
           <input type="hidden" id="announcement-id" name="id" value="" />
           <div class="flex items-center justify-end gap-3 pt-2">
-            <button type="button" id="cancel-modal" class="px-4 py-2 text-sm text-slate dark:text-slate-400 hover:text-slate-100 ">Cancel</button>
+            <button type="button" id="cancel-modal" class="px-4 py-2 text-sm text-slate text-slate-400 hover:text-slate-100">Cancel</button>
             <button type="submit" class="bg-accent text-white px-4 py-2 rounded-lg font-medium hover:bg-accent-hover transition-colors">Save</button>
           </div>
         </form>
@@ -216,7 +216,7 @@ if (sessionCookie) {
         if (res.ok) {
           window.location.reload();
         } else {
-          alert('Failed to delete announcement');
+          window.showToast('Failed to delete announcement', 'error');
         }
       });
     });
@@ -244,7 +244,7 @@ if (sessionCookie) {
       if (res.ok) {
         window.location.reload();
       } else {
-        alert('Failed to save announcement');
+        window.showToast('Failed to save announcement', 'error');
       }
     });
   </script>

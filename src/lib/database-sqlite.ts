@@ -13,6 +13,7 @@ if (!fs.existsSync(dbDir)) {
 }
 
 const db = new Database(dbPath);
+export { db };
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 

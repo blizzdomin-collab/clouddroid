@@ -112,7 +112,7 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
           </a>
         </div>
         <div class="mt-4 w-full bg-slate-700 rounded-full h-2 overflow-hidden">
-          <div class={`h-2 rounded-full ${renewSoon ? 'bg-yellow-900/300' : 'bg-accent'}`} style={`width: ${Math.min(100, Math.max(5, (daysLeft / 30) * 100))}%`}></div>
+          <div class={`h-2 rounded-full ${renewSoon ? 'bg-yellow-900/30' : 'bg-accent'}`} style={`width: ${Math.min(100, Math.max(5, (daysLeft / 30) * 100))}%`}></div>
         </div>
       </div>
     )}
@@ -328,7 +328,7 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
                   </div>
                 </div>
                 <span class="inline-flex items-center gap-1.5 text-xs text-green-400 bg-green-900/30 px-3 py-1 rounded-full">
-                  <span class="w-1.5 h-1.5 bg-green-900/300 rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-green-900/30 rounded-full"></span>
                   {inst.status}
                 </span>
               </div>
@@ -427,7 +427,7 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
                 </div>
               </div>
               <span class="inline-flex items-center gap-1.5 text-xs text-green-400 bg-green-900/30 px-3 py-1 rounded-full">
-                <span class="w-1.5 h-1.5 bg-green-900/300 rounded-full"></span>
+                <span class="w-1.5 h-1.5 bg-green-900/30 rounded-full"></span>
                 ${inst.status}
               </span>
             </div>

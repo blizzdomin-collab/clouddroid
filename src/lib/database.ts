@@ -1,4 +1,5 @@
 export {
+  db,
   hashPassword,
   verifyPassword,
   needsRehash,
