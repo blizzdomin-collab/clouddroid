@@ -36,15 +36,15 @@ const serializedMetrics = JSON.stringify(instanceData?.metrics || []);
     <div class="mb-8 flex items-center justify-between">
       <div>
         <div class="flex items-center gap-3 mb-2">
-          <a href="/dashboard/instances" class="text-sm text-slate hover:text-navy flex items-center gap-1">
+          <a href="/dashboard/instances" class="text-sm text-slate dark:text-slate-400 hover:text-navy dark:hover:text-slate-100 flex items-center gap-1">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Back to Instances
           </a>
         </div>
-        <h1 class="text-3xl font-bold text-navy">{instance.name}</h1>
-        <p class="text-slate">{instance.id} • {instance.platform}</p>
+    <h1 class="text-3xl font-bold text-navy dark:text-slate-100">{instance.name}</h1>
+    <p class="text-slate dark:text-slate-400">{instance.id} • {instance.platform}</p>
       </div>
       <span id="instance-status" class="inline-flex items-center gap-1.5 text-xs text-green-600 bg-green-50 px-3 py-1 rounded-full">
         <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
@@ -53,28 +53,28 @@ const serializedMetrics = JSON.stringify(instanceData?.metrics || []);
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white rounded-xl border border-slate-200 p-6">
-        <div class="text-sm text-slate mb-1">CPU</div>
-        <div id="cpu-value" class="text-3xl font-bold text-navy">{instance.cpu}%</div>
+      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <div class="text-sm text-slate dark:text-slate-400 mb-1">CPU</div>
+        <div id="cpu-value" class="text-3xl font-bold text-navy dark:text-slate-100">{instance.cpu}%</div>
       </div>
-      <div class="bg-white rounded-xl border border-slate-200 p-6">
-        <div class="text-sm text-slate mb-1">Memory</div>
-        <div id="memory-value" class="text-3xl font-bold text-navy">{instance.memory}%</div>
+      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <div class="text-sm text-slate dark:text-slate-400 mb-1">Memory</div>
+        <div id="memory-value" class="text-3xl font-bold text-navy dark:text-slate-100">{instance.memory}%</div>
       </div>
-      <div class="bg-white rounded-xl border border-slate-200 p-6">
-        <div class="text-sm text-slate mb-1">Network In</div>
-        <div id="network-in-value" class="text-3xl font-bold text-navy">{instance.network_in} Mbps</div>
+      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <div class="text-sm text-slate dark:text-slate-400 mb-1">Network In</div>
+        <div id="network-in-value" class="text-3xl font-bold text-navy dark:text-slate-100">{instance.network_in} Mbps</div>
       </div>
-      <div class="bg-white rounded-xl border border-slate-200 p-6">
-        <div class="text-sm text-slate mb-1">Network Out</div>
-        <div id="network-out-value" class="text-3xl font-bold text-navy">{instance.network_out} Mbps</div>
+      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <div class="text-sm text-slate dark:text-slate-400 mb-1">Network Out</div>
+        <div id="network-out-value" class="text-3xl font-bold text-navy dark:text-slate-100">{instance.network_out} Mbps</div>
       </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200">
-          <h2 class="text-lg font-semibold text-navy">CPU & Memory History</h2>
+      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+          <h2 class="text-lg font-semibold text-navy dark:text-slate-100">CPU & Memory History</h2>
         </div>
         <div class="p-6">
           <div class="relative h-64">
@@ -83,50 +83,50 @@ const serializedMetrics = JSON.stringify(instanceData?.metrics || []);
         </div>
       </div>
 
-      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200">
-          <h2 class="text-lg font-semibold text-navy">Instance Details</h2>
+      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+          <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Instance Details</h2>
         </div>
         <div class="p-6 space-y-4">
           <div class="flex items-center justify-between">
-            <span class="text-sm text-slate">RAM</span>
-            <span class="text-sm font-medium text-navy">{instance.ram} GB</span>
+            <span class="text-sm text-slate dark:text-slate-400">RAM</span>
+            <span class="text-sm font-medium text-navy dark:text-slate-100">{instance.ram} GB</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-sm text-slate">Storage</span>
-            <span class="text-sm font-medium text-navy">{instance.storage} GB</span>
+            <span class="text-sm text-slate dark:text-slate-400">Storage</span>
+            <span class="text-sm font-medium text-navy dark:text-slate-100">{instance.storage} GB</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-sm text-slate">Platform</span>
-            <span class="text-sm font-medium text-navy">{instance.platform}</span>
+            <span class="text-sm text-slate dark:text-slate-400">Platform</span>
+            <span class="text-sm font-medium text-navy dark:text-slate-100">{instance.platform}</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-sm text-slate">Created</span>
-            <span class="text-sm font-medium text-navy">{new Date(instance.created_at).toLocaleString()}</span>
+            <span class="text-sm text-slate dark:text-slate-400">Created</span>
+            <span class="text-sm font-medium text-navy dark:text-slate-100">{new Date(instance.created_at).toLocaleString()}</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-sm text-slate">Updated</span>
-            <span class="text-sm font-medium text-navy">{new Date(instance.updated_at).toLocaleString()}</span>
+            <span class="text-sm text-slate dark:text-slate-400">Updated</span>
+            <span class="text-sm font-medium text-navy dark:text-slate-100">{new Date(instance.updated_at).toLocaleString()}</span>
           </div>
           <div>
-            <span class="text-sm text-slate block mb-2">Tags</span>
+            <span class="text-sm text-slate dark:text-slate-400 block mb-2">Tags</span>
             <div class="flex flex-wrap gap-1">
               {(instance.tags || []).map((tag: string) => (
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">{tag}</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400">{tag}</span>
               ))}
             </div>
           </div>
           <div>
-            <span class="text-sm text-slate block mb-2">Notes</span>
-            <p class="text-sm text-navy">{instance.notes || 'No notes'}</p>
+            <span class="text-sm text-slate dark:text-slate-400 block mb-2">Notes</span>
+            <p class="text-sm text-navy dark:text-slate-100">{instance.notes || 'No notes'}</p>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden mb-8">
-      <div class="px-6 py-4 border-b border-slate-200">
-        <h2 class="text-lg font-semibold text-navy">Actions</h2>
+    <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden mb-8">
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+        <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Actions</h2>
       </div>
       <div class="p-6 flex flex-wrap gap-3">
         <button data-action="start" data-id={instance.id} class="text-sm bg-green-50 text-green-700 px-4 py-2 rounded-lg hover:bg-green-100 transition-colors">Start</button>
@@ -136,31 +136,31 @@ const serializedMetrics = JSON.stringify(instanceData?.metrics || []);
       </div>
     </div>
 
-    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-200">
-        <h2 class="text-lg font-semibold text-navy">Recent Audit Logs</h2>
+    <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+        <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Recent Audit Logs</h2>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-slate-50">
+          <thead class="bg-slate-50 dark:bg-slate-800">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Timestamp</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Event</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Severity</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Action</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Details</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Timestamp</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Event</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Severity</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Action</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Details</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-200">
+          <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
             {(instanceData?.logs || []).map((log: any) => (
               <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate">{new Date(log.timestamp).toLocaleString()}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy">{log.event}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate dark:text-slate-400">{new Date(log.timestamp).toLocaleString()}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy dark:text-slate-100">{log.event}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-blue-800 bg-blue-100">{log.severity}</span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate">{log.action}</td>
-                <td class="px-6 py-4 text-sm text-slate">{log.details}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate dark:text-slate-400">{log.action}</td>
+                <td class="px-6 py-4 text-sm text-slate dark:text-slate-400">{log.details}</td>
               </tr>
             ))}
           </tbody>

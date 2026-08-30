@@ -81,7 +81,7 @@ if (mustChangePassword && !Astro.url.pathname.startsWith('/change-password')) {
   </head>
   <body class="antialiased bg-slate-light dark:bg-navy">
     <div class="flex h-screen">
-      <aside class="w-64 bg-navy text-white flex flex-col dark:bg-navy-light">
+      <aside class="w-64 bg-navy text-white flex flex-col">
         <div class="p-6">
           <a href="/" class="flex items-center gap-2">
             <div class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
@@ -196,7 +196,7 @@ if (mustChangePassword && !Astro.url.pathname.startsWith('/change-password')) {
           </a>
         </div>
       </aside>
-      <main class="flex-1 overflow-y-auto bg-slate-light dark:bg-navy">
+      <main class="flex-1 overflow-y-auto bg-slate-light dark:bg-navy min-h-screen">
         <Announcements announcements={announcements} />
         <slot />
       </main>

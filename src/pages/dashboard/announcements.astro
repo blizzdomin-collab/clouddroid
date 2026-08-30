@@ -84,7 +84,7 @@ if (sessionCookie) {
                         <td class="px-6 py-4 text-sm text-slate dark:text-slate-400">{new Date(announcement.created_at).toLocaleDateString()}</td>
                         <td class="px-6 py-4">
                           <div class="flex items-center gap-2">
-                            <button data-action="edit" data-id={announcement.id} data-title={announcement.title} data-message={announcement.message} data-type={announcement.type} data-status={announcement.status} class="text-xs bg-slate-50 dark:bg-slate-800 text-slate dark:text-slate-400-700 px-4 py-2 rounded-lg hover:bg-slate-100 transition-colors">
+                            <button data-action="edit" data-id={announcement.id} data-title={announcement.title} data-message={announcement.message} data-type={announcement.type} data-status={announcement.status} class="text-xs bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-400 px-4 py-2 rounded-lg hover:bg-slate-100 transition-colors">
                               Edit
                             </button>
                             <button data-action="delete" data-id={announcement.id} class="text-xs bg-red-50 text-red-700 px-4 py-2 rounded-lg hover:bg-red-100 transition-colors">

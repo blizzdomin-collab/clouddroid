@@ -28,7 +28,7 @@ const instances = instancesData.instances || [];
           <option value="warning">Warning</option>
         </select>
         <button id="apply-filters" class="bg-navy text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-navy-light transition-colors">Apply</button>
-        <button id="clear-filters" class="text-slate dark:text-slate-400-700 bg-slate-100 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors">Clear</button>
+        <button id="clear-filters" class="text-slate dark:text-slate-400 bg-slate-100 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors">Clear</button>
       </div>
     </div>
 
@@ -66,7 +66,7 @@ const instances = instancesData.instances || [];
                 <td class="px-6 py-4">
                   <div class="flex flex-wrap gap-1">
                     {(inst.tags || []).map((tag: string) => (
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate dark:text-slate-400-700">{tag}</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700 dark:text-slate-400">{tag}</span>
                     ))}
                   </div>
                 </td>
@@ -75,7 +75,7 @@ const instances = instancesData.instances || [];
                     const status = inst.status;
                     const colorMap: Record<string, { text: string; bg: string; dot: string }> = {
                       running: { text: 'text-green-700', bg: 'bg-green-50', dot: 'bg-green-500' },
-                      stopped: { text: 'text-slate dark:text-slate-400-700', bg: 'bg-slate-100', dot: 'bg-slate-400' },
+                      stopped: { text: 'text-slate-700 dark:text-slate-400', bg: 'bg-slate-100', dot: 'bg-slate-400' },
                       warning: { text: 'text-yellow-700', bg: 'bg-yellow-50', dot: 'bg-yellow-500' },
                     };
                     const colors = colorMap[status] || colorMap.running;
@@ -89,7 +89,7 @@ const instances = instancesData.instances || [];
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-2">
-                    <button data-action="edit" data-id={inst.id} class="text-xs bg-slate-50 dark:bg-slate-800 text-slate dark:text-slate-400-700 px-2 py-1 rounded hover:bg-slate-100">Edit</button>
+                    <button data-action="edit" data-id={inst.id} class="text-xs bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-400 px-2 py-1 rounded hover:bg-slate-100">Edit</button>
                     <button data-action="start" data-id={inst.id} class="text-xs bg-green-50 text-green-700 px-2 py-1 rounded hover:bg-green-100">Start</button>
                     <button data-action="stop" data-id={inst.id} class="text-xs bg-yellow-50 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-100">Stop</button>
                     <button data-action="restart" data-id={inst.id} class="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded hover:bg-blue-100">Restart</button>

@@ -80,7 +80,7 @@ if (sessionCookie) {
               <p class="text-sm font-medium text-navy dark:text-slate-100">2FA Status</p>
               <p class="text-sm text-slate dark:text-slate-400 mt-1">Add an extra layer of security to your account.</p>
             </div>
-            <span id="two-factor-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate dark:text-slate-400-800">
+            <span id="two-factor-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate dark:text-slate-800">
               Disabled
             </span>
           </div>
@@ -99,7 +99,7 @@ if (sessionCookie) {
             <div id="two-factor-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"></div>
             <div class="flex gap-3">
               <button type="button" id="enable-2fa-btn" class="bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">Enable 2FA</button>
-              <button type="button" id="cancel-2fa-btn" class="text-slate dark:text-slate-400-700 bg-slate-100 px-4 py-2 rounded-lg font-medium hover:bg-slate-200 transition-colors">Cancel</button>
+              <button type="button" id="cancel-2fa-btn" class="text-slate-700 dark:text-slate-400 bg-slate-100 px-4 py-2 rounded-lg font-medium hover:bg-slate-200 transition-colors">Cancel</button>
             </div>
           </div>
 
@@ -120,7 +120,7 @@ if (sessionCookie) {
                 <div id="disable-2fa-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"></div>
                 <div class="flex gap-3">
                   <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors">Disable 2FA</button>
-                  <button type="button" id="cancel-disable-2fa" class="text-slate dark:text-slate-400-700 bg-slate-100 px-4 py-2 rounded-lg font-medium hover:bg-slate-200 transition-colors">Cancel</button>
+                  <button type="button" id="cancel-disable-2fa" class="text-slate-700 dark:text-slate-400 bg-slate-100 px-4 py-2 rounded-lg font-medium hover:bg-slate-200 transition-colors">Cancel</button>
                 </div>
               </form>
             </div>
@@ -161,7 +161,7 @@ if (sessionCookie) {
                 <div id="add-channel-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"></div>
                 <div class="flex gap-3">
                   <button type="submit" class="bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">Add Channel</button>
-                  <button type="button" id="cancel-add-channel" class="text-slate dark:text-slate-400-700 bg-slate-100 px-4 py-2 rounded-lg font-medium hover:bg-slate-200 transition-colors">Cancel</button>
+                  <button type="button" id="cancel-add-channel" class="text-slate-700 dark:text-slate-400 bg-slate-100 px-4 py-2 rounded-lg font-medium hover:bg-slate-200 transition-colors">Cancel</button>
                 </div>
               </form>
             </div>
@@ -361,7 +361,7 @@ if (sessionCookie) {
           if (twoFactorStatus) twoFactorStatus.classList.remove('hidden');
           if (twoFactorBadge) {
             twoFactorBadge.textContent = 'Disabled';
-            twoFactorBadge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate dark:text-slate-400-800';
+            twoFactorBadge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate dark:text-slate-800';
           }
           if (passwordInput) passwordInput.value = '';
         } else {
@@ -393,7 +393,7 @@ if (sessionCookie) {
               <p class="text-xs text-slate dark:text-slate-400 capitalize">${ch.type}</p>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-xs ${ch.enabled ? 'text-green-700' : 'text-slate dark:text-slate-400-500'}">${ch.enabled ? 'Enabled' : 'Disabled'}</span>
+              <span class="text-xs ${ch.enabled ? 'text-green-700' : 'text-slate dark:text-slate-500'}">${ch.enabled ? 'Enabled' : 'Disabled'}</span>
               <button type="button" data-id="${ch.id}" class="delete-channel text-xs text-red-700 hover:text-red-800">Delete</button>
             </div>
           </div>

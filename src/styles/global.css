@@ -12,6 +12,7 @@
 :root {
   --bg-primary: #ffffff;
   --bg-secondary: #f1f5f9;
+  --bg-card: #ffffff;
   --text-primary: #0f172a;
   --text-secondary: #64748b;
   --border-color: #e2e8f0;
@@ -20,6 +21,7 @@
 .dark {
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --border-color: #334155;
