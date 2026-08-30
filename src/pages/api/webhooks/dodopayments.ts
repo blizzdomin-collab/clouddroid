@@ -4,7 +4,7 @@ import crypto from 'crypto';
 
 function verifyDodoSignature(payload: string, signatureHeader: string, timestamp: string, secret: string): boolean {
   const signedPayload = `${timestamp}.${payload}`;
-  const expected = crypto.createHmac('sha256', secret).update(signedPayload).digest('hex');
+  const expected = crypto.createHmac('sha256', secret).update(signedPayload).digest('base64');
   const signature = signatureHeader.replace(/^v1,/, '');
   if (signature.length !== expected.length) {
     console.error('Dodo signature length mismatch:', signature.length, 'vs', expected.length);
