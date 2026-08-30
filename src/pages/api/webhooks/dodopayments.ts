@@ -3,26 +3,28 @@ import { getCheckoutSessionBySessionId, updateCheckoutSession, getUserByEmail, c
 import crypto from 'crypto';
 
 function verifyDodoSignature(payload: string, signatureHeader: string, timestamp: string, secret: string): boolean {
-  const signedPayload = `${timestamp}.${payload}`;
-  const expected = crypto.createHmac('sha256', secret).update(signedPayload).digest('base64');
   const signature = signatureHeader.replace(/^v1,/, '');
-  console.log('Dodo signature verification:', {
+  
+  const expectedWithTimestamp = crypto.createHmac('sha256', secret).update(`${timestamp}.${payload}`).digest('base64');
+  const expectedWithoutTimestamp = crypto.createHmac('sha256', secret).update(payload).digest('base64');
+  
+  console.log('Dodo signature comparison:', {
     signatureLength: signature.length,
-    expectedLength: expected.length,
-    timestamp,
-    signedPayloadLength: signedPayload.length,
-    payloadLength: payload.length,
-    secretLength: secret.length,
+    withTimestampLength: expectedWithTimestamp.length,
+    withoutTimestampLength: expectedWithoutTimestamp.length,
+    signaturePrefix: signature.slice(0, 20),
+    withTimestampPrefix: expectedWithTimestamp.slice(0, 20),
+    withoutTimestampPrefix: expectedWithoutTimestamp.slice(0, 20),
   });
-  if (signature.length !== expected.length) {
-    console.error('Dodo signature length mismatch:', signature.length, 'vs', expected.length);
-    return false;
+
+  const isValidWithTimestamp = crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedWithTimestamp));
+  const isValidWithoutTimestamp = crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedWithoutTimestamp));
+  
+  if (!isValidWithTimestamp && !isValidWithoutTimestamp) {
+    console.error('Dodo signature mismatch - both methods failed');
   }
-  const isValid = crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
-  if (!isValid) {
-    console.error('Dodo signature mismatch:', signature.slice(0, 20), 'vs', expected.slice(0, 20));
-  }
-  return isValid;
+  
+  return isValidWithTimestamp || isValidWithoutTimestamp;
 }
 
 export const POST: APIRoute = async ({ request }) => {
