@@ -2,14 +2,15 @@ import type { APIRoute } from 'astro';
 import { getCheckoutSessionBySessionId, updateCheckoutSession, getUserByEmail, createUser, createSubscription, updateSubscription, createInvoice, createAuditLog, provisionInstancesForUser, getSubscriptionByUserId } from '../../../lib/database';
 import crypto from 'crypto';
 
-function verifyDodoSignature(payload: string, signature: string, secret: string): boolean {
-  const expected = crypto.createHmac('sha256', secret).update(payload).digest('hex');
-  const normalizedSignature = signature.replace(/^sha256=/, '');
-  if (normalizedSignature.length !== expected.length) {
-    console.error('Dodo signature length mismatch:', normalizedSignature.length, 'vs', expected.length);
+function verifyDodoSignature(payload: string, signatureHeader: string, timestamp: string, secret: string): boolean {
+  const signedPayload = `${timestamp}.${payload}`;
+  const expected = crypto.createHmac('sha256', secret).update(signedPayload).digest('hex');
+  const signature = signatureHeader.replace(/^v1,/, '');
+  if (signature.length !== expected.length) {
+    console.error('Dodo signature length mismatch:', signature.length, 'vs', expected.length);
     return false;
   }
-  return crypto.timingSafeEqual(Buffer.from(normalizedSignature), Buffer.from(expected));
+  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
 }
 
 export const POST: APIRoute = async ({ request }) => {
@@ -24,15 +25,24 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const payload = await request.text();
-    const signature = request.headers.get('x-dodo-signature') || '';
+    const signatureHeader = request.headers.get('webhook-signature') || '';
+    const timestamp = request.headers.get('webhook-timestamp') || '';
     const allHeaders: Record<string, string> = {};
     request.headers.forEach((value, key) => {
       allHeaders[key] = value;
     });
     console.log('Dodo webhook headers:', JSON.stringify(allHeaders));
-    console.log('Dodo webhook signature length:', signature.length);
+    console.log('Dodo webhook signature length:', signatureHeader.length);
 
-    if (!verifyDodoSignature(payload, signature, dodoWebhookSecret)) {
+    if (!signatureHeader || !timestamp) {
+      console.error('Dodo webhook missing signature or timestamp');
+      return new Response(JSON.stringify({ error: 'Missing signature or timestamp' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!verifyDodoSignature(payload, signatureHeader, timestamp, dodoWebhookSecret)) {
       console.error('Dodo webhook signature verification failed');
       return new Response(JSON.stringify({ error: 'Invalid signature' }), {
         status: 401,
