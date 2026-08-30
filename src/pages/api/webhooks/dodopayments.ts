@@ -62,6 +62,8 @@ export const POST: APIRoute = async ({ request }) => {
 
     const payloadBuffer = await request.arrayBuffer();
     const payload = Buffer.from(payloadBuffer).toString('utf8');
+    const signatureHeader = request.headers.get('webhook-signature') || '';
+    const timestamp = request.headers.get('webhook-timestamp') || '';
     console.log('Dodo webhook payload length:', payload.length);
     console.log('Dodo webhook payload first 200 chars:', payload.slice(0, 200));
     console.log('Dodo webhook payload last 50 chars:', JSON.stringify(payload.slice(-50)));
@@ -69,8 +71,6 @@ export const POST: APIRoute = async ({ request }) => {
     fs.writeFileSync('/tmp/dodo_last_payload.json', payload);
     fs.writeFileSync('/tmp/dodo_last_sig.txt', signatureHeader);
     fs.writeFileSync('/tmp/dodo_last_ts.txt', timestamp);
-    const signatureHeader = request.headers.get('webhook-signature') || '';
-    const timestamp = request.headers.get('webhook-timestamp') || '';
     const allHeaders: Record<string, string> = {};
     request.headers.forEach((value, key) => {
       allHeaders[key] = value;
