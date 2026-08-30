@@ -11,86 +11,86 @@ const pagination = logsData.pagination || {};
 <DashboardLayout title="Compliance - CloudDroid">
   <div class="p-8">
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-navy mb-2">Compliance</h1>
-      <p class="text-slate">Audit logs, policy violations, and compliance reporting</p>
+      <h1 class="text-3xl font-bold text-navy dark:text-slate-100 mb-2">Compliance</h1>
+      <p class="text-slate dark:text-slate-400">Audit logs, policy violations, and compliance reporting</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white rounded-xl border border-slate-200 p-6">
-        <div class="text-sm text-slate mb-1">Total Events</div>
-        <div class="text-3xl font-bold text-navy">{summary.total || 0}</div>
+      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <div class="text-sm text-slate dark:text-slate-400 mb-1">Total Events</div>
+        <div class="text-3xl font-bold text-navy dark:text-slate-100">{summary.total || 0}</div>
       </div>
-      <div class="bg-white rounded-xl border border-slate-200 p-6">
-        <div class="text-sm text-slate mb-1">Critical</div>
+      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <div class="text-sm text-slate dark:text-slate-400 mb-1">Critical</div>
         <div class="text-3xl font-bold text-red-600">{summary.critical || 0}</div>
       </div>
-      <div class="bg-white rounded-xl border border-slate-200 p-6">
-        <div class="text-sm text-slate mb-1">Warnings</div>
+      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <div class="text-sm text-slate dark:text-slate-400 mb-1">Warnings</div>
         <div class="text-3xl font-bold text-yellow-600">{summary.warnings || 0}</div>
       </div>
-      <div class="bg-white rounded-xl border border-slate-200 p-6">
-        <div class="text-sm text-slate mb-1">Info</div>
+      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <div class="text-sm text-slate dark:text-slate-400 mb-1">Info</div>
         <div class="text-3xl font-bold text-blue-600">{summary.info || 0}</div>
       </div>
     </div>
 
-    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden mb-8">
-      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-        <h2 class="text-lg font-semibold text-navy">Audit Log</h2>
-        <button id="export-csv" class="text-sm text-navy hover:text-navy-light font-medium">Export CSV</button>
+    <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden mb-8">
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Audit Log</h2>
+        <button id="export-csv" class="text-sm text-navy dark:text-slate-100 hover:text-navy dark:text-slate-100 font-medium">Export CSV</button>
       </div>
-      <div class="p-4 border-b border-slate-200 bg-slate-50">
+      <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
         <div class="flex flex-wrap items-center gap-3">
-          <select id="filter-severity" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white">
+          <select id="filter-severity" class="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-white dark:bg-navy-light">
             <option value="">All Severities</option>
             <option value="critical">Critical</option>
             <option value="warning">Warning</option>
             <option value="info">Info</option>
           </select>
-          <input type="date" id="filter-start-date" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white" />
-          <input type="date" id="filter-end-date" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white" />
-          <input type="text" id="filter-search" placeholder="Search logs..." class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white" />
+          <input type="date" id="filter-start-date" class="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-white dark:bg-navy-light" />
+          <input type="date" id="filter-end-date" class="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-white dark:bg-navy-light" />
+          <input type="text" id="filter-search" placeholder="Search logs..." class="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-white dark:bg-navy-light" />
           <button id="apply-filters" class="text-sm bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">Apply</button>
-          <button id="clear-filters" class="text-sm text-slate hover:text-navy font-medium">Clear</button>
+          <button id="clear-filters" class="text-sm text-slate dark:text-slate-400 hover:text-navy dark:text-slate-100 font-medium">Clear</button>
         </div>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-slate-50">
+          <thead class="bg-slate-50 dark:bg-slate-800">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Timestamp</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Event</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Severity</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Action</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Details</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Timestamp</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Event</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Severity</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Action</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-slate dark:text-slate-400 uppercase tracking-wider">Details</th>
             </tr>
           </thead>
-          <tbody id="logs-table" class="divide-y divide-slate-200">
+          <tbody id="logs-table" class="divide-y divide-slate-200 dark:divide-slate-700">
             {logs.map((log) => (
               <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate">{new Date(log.timestamp).toLocaleString()}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy">{log.event}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate dark:text-slate-400">{new Date(log.timestamp).toLocaleString()}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy dark:text-slate-100">{log.event}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-blue-800 bg-blue-100">{log.severity}</span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate">{log.action}</td>
-                <td class="px-6 py-4 text-sm text-slate">{log.details}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate dark:text-slate-400">{log.action}</td>
+                <td class="px-6 py-4 text-sm text-slate dark:text-slate-400">{log.details}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
-        <button id="prev-page" {pagination.offset === 0 ? 'disabled' : ''} class="text-sm text-navy hover:text-navy-light font-medium disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
-        <span id="page-info" class="text-sm text-slate">Showing {pagination.offset + 1}-{Math.min(pagination.offset + pagination.limit, pagination.total)} of {pagination.total}</span>
-        <button id="next-page" {!pagination.hasMore ? 'disabled' : ''} class="text-sm text-navy hover:text-navy-light font-medium disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
+      <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+        <button id="prev-page" {pagination.offset === 0 ? 'disabled' : ''} class="text-sm text-navy dark:text-slate-100 hover:text-navy dark:text-slate-100 font-medium disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
+        <span id="page-info" class="text-sm text-slate dark:text-slate-400">Showing {pagination.offset + 1}-{Math.min(pagination.offset + pagination.limit, pagination.total)} of {pagination.total}</span>
+        <button id="next-page" {!pagination.hasMore ? 'disabled' : ''} class="text-sm text-navy dark:text-slate-100 hover:text-navy dark:text-slate-100 font-medium disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
       </div>
       <div id="pagination-data" data-offset="{pagination.offset || 0}" data-limit="{pagination.limit || 10}" data-total="{pagination.total || 0}" data-has-more="{pagination.hasMore ? 'true' : 'false'}" class="hidden"></div>
     </div>
 
-    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-200">
-        <h2 class="text-lg font-semibold text-navy">Compliance Status</h2>
+    <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+        <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Compliance Status</h2>
       </div>
       <div class="p-6">
         <div class="space-y-4">
@@ -230,13 +230,13 @@ const pagination = logsData.pagination || {};
       if (logsTable) {
         logsTable.innerHTML = logs.map((log) => `
           <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate">${new Date(log.timestamp).toLocaleString()}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy">${log.event}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate dark:text-slate-400">${new Date(log.timestamp).toLocaleString()}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-navy dark:text-slate-100">${log.event}</td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-blue-800 bg-blue-100">${log.severity}</span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate">${log.action}</td>
-            <td class="px-6 py-4 text-sm text-slate">${log.details}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate dark:text-slate-400">${log.action}</td>
+            <td class="px-6 py-4 text-sm text-slate dark:text-slate-400">${log.details}</td>
           </tr>
         `).join('');
       }

@@ -16,26 +16,26 @@ const { announcements }: { announcements: Announcement[] } = Astro.props;
   <div class="mb-6 space-y-3">
     {announcements.map((announcement) => (
       <div class={`rounded-xl border p-5 ${
-        announcement.type === 'maintenance' ? 'bg-yellow-50 border-yellow-200' :
-        announcement.type === 'changelog' ? 'bg-blue-50 border-blue-200' :
-        announcement.type === 'feature' ? 'bg-green-50 border-green-200' :
-        'bg-slate-50 border-slate-200'
+        announcement.type === 'maintenance' ? 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800' :
+        announcement.type === 'changelog' ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800' :
+        announcement.type === 'feature' ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' :
+        'bg-slate-50 border-slate-200 dark:bg-slate-800 dark:border-slate-700'
       }`}>
         <div class="flex items-start justify-between">
           <div class="flex-1">
             <div class="flex items-center gap-2 mb-1">
-              <h3 class="text-sm font-semibold text-navy">{announcement.title}</h3>
+              <h3 class="text-sm font-semibold text-navy dark:text-slate-100">{announcement.title}</h3>
               <span class={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                announcement.type === 'maintenance' ? 'text-yellow-700 bg-yellow-100' :
-                announcement.type === 'changelog' ? 'text-blue-700 bg-blue-100' :
-                announcement.type === 'feature' ? 'text-green-700 bg-green-100' :
-                'text-slate-700 bg-slate-100'
+                announcement.type === 'maintenance' ? 'text-yellow-700 bg-yellow-100 dark:text-yellow-300 dark:bg-yellow-900/30' :
+                announcement.type === 'changelog' ? 'text-blue-700 bg-blue-100 dark:text-blue-300 dark:bg-blue-900/30' :
+                announcement.type === 'feature' ? 'text-green-700 bg-green-100 dark:text-green-300 dark:bg-green-900/30' :
+                'text-slate-700 bg-slate-100 dark:text-slate-300 dark:bg-slate-800'
               }`}>
                 {announcement.type}
               </span>
             </div>
-            <p class="text-sm text-slate whitespace-pre-wrap">{announcement.message}</p>
-            <p class="text-xs text-slate mt-2">{new Date(announcement.created_at).toLocaleDateString()}</p>
+              <p class="text-sm text-slate dark:text-slate-400 whitespace-pre-wrap">{announcement.message}</p>
+              <p class="text-xs text-slate dark:text-slate-500 mt-2">{new Date(announcement.created_at).toLocaleDateString()}</p>
           </div>
         </div>
       </div>

@@ -61,11 +61,11 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
 <DashboardLayout title="Dashboard Overview - CloudDroid">
   <div class="p-8">
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-navy mb-2">Dashboard Overview</h1>
-      <p class="text-slate">Welcome back! Here's what's happening with your CloudDroid instances.</p>
+      <h1 class="text-3xl font-bold text-navy dark:text-slate-100 mb-2 dark:text-slate-100">Dashboard Overview</h1>
+      <p class="text-slate dark:text-slate-400">Welcome back! Here's what's happening with your CloudDroid instances.</p>
     </div>
 
-    <div class="mb-8 bg-white rounded-xl border border-slate-200 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="mb-8 bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 dark:bg-navy-light dark:border-slate-700">
       <div class="flex items-center gap-4">
         <div class={`w-12 h-12 rounded-lg flex items-center justify-center ${isActive ? 'bg-green-50' : isExpired ? 'bg-red-50' : 'bg-slate-100'}`}>
           <svg class={`w-6 h-6 ${isActive ? 'text-green-600' : isExpired ? 'text-red-600' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,7 +74,7 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
         </div>
         <div>
           <div class="text-sm text-slate mb-1">Current Plan</div>
-          <div class="text-xl font-bold text-navy">{planName}</div>
+          <div class="text-xl font-bold text-navy dark:text-slate-100">{planName}</div>
           {isActive && periodEnd && (
             <div class="text-xs text-slate mt-1">Access active until {periodEnd}</div>
           )}
@@ -98,11 +98,11 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
     </div>
 
     {isActive && daysLeft !== null && (
-      <div class={`mb-8 rounded-xl border p-6 ${renewSoon ? 'bg-yellow-50 border-yellow-200' : 'bg-white border-slate-200'}`}>
+      <div class={`mb-8 rounded-xl border p-6 ${renewSoon ? 'bg-yellow-50 border-yellow-200' : 'bg-white dark:bg-navy-light border-slate-200 dark:border-slate-700'}`}>
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div class="text-sm text-slate mb-1">Access {renewSoon ? 'expires soon' : 'renews in'}</div>
-            <div class={`text-2xl font-bold ${renewSoon ? 'text-yellow-700' : 'text-navy'}`}>
+            <div class={`text-2xl font-bold ${renewSoon ? 'text-yellow-700' : 'text-navy dark:text-slate-100'}`}>
               {daysLeft} {daysLeft === 1 ? 'day' : 'days'} remaining
             </div>
           </div>
@@ -124,57 +124,57 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
           </svg>
         </div>
         <div>
-          <h2 class="text-lg font-semibold text-navy mb-1">Welcome to CloudDroid!</h2>
+          <h2 class="text-lg font-semibold text-navy dark:text-slate-100 mb-1">Welcome to CloudDroid!</h2>
           <p class="text-sm text-slate">Your account is set up and your cloud Android workspaces are ready. Here's how to get the most out of your dashboard.</p>
         </div>
       </div>
     )}
 
     <div class="mb-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-      <a href="/dashboard/instances" class="bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-3 hover:border-navy transition-colors">
+      <a href="/dashboard/instances" class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-4 flex items-center gap-3 hover:border-navy transition-colors dark:bg-navy-light dark:border-slate-700">
         <div class="w-10 h-10 bg-navy/5 rounded-lg flex items-center justify-center">
-          <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+          <svg class="w-5 h-5 text-navy dark:text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
         </div>
-        <span class="text-sm font-medium text-navy">Instances</span>
+        <span class="text-sm font-medium text-navy dark:text-slate-100">Instances</span>
       </a>
-      <a href="/dashboard/monitoring" class="bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-3 hover:border-navy transition-colors">
+      <a href="/dashboard/monitoring" class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-4 flex items-center gap-3 hover:border-navy transition-colors">
         <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
           <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
         </div>
-        <span class="text-sm font-medium text-navy">Monitoring</span>
+        <span class="text-sm font-medium text-navy dark:text-slate-100">Monitoring</span>
       </a>
-      <a href="/dashboard/alerts" class="bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-3 hover:border-navy transition-colors">
+      <a href="/dashboard/alerts" class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-4 flex items-center gap-3 hover:border-navy transition-colors">
         <div class="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center">
           <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
         </div>
-        <span class="text-sm font-medium text-navy">Alerts</span>
+        <span class="text-sm font-medium text-navy dark:text-slate-100">Alerts</span>
       </a>
-      <a href="/dashboard/billing" class="bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-3 hover:border-navy transition-colors">
+      <a href="/dashboard/billing" class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-4 flex items-center gap-3 hover:border-navy transition-colors">
         <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
           <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
         </div>
-        <span class="text-sm font-medium text-navy">Billing</span>
+        <span class="text-sm font-medium text-navy dark:text-slate-100">Billing</span>
       </a>
     </div>
 
     <div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white rounded-xl border border-slate-200 p-6">
+      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6 dark:bg-navy-light dark:border-slate-700">
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-semibold text-navy">Your Instances</h3>
-          <a href="/dashboard/instances" class="text-xs text-navy hover:underline">View all</a>
+          <h3 class="text-sm font-semibold text-navy dark:text-slate-100">Your Instances</h3>
+          <a href="/dashboard/instances" class="text-xs text-navy dark:text-slate-100 hover:underline">View all</a>
         </div>
-        <div class="text-3xl font-bold text-navy">{userInstances.length}</div>
+        <div class="text-3xl font-bold text-navy dark:text-slate-100">{userInstances.length}</div>
         <div class="text-xs text-slate mt-2">{userInstancesRunning} running • {userInstancesStopped} stopped</div>
       </div>
 
-      <div class="bg-white rounded-xl border border-slate-200 p-6">
+      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6 dark:bg-navy-light dark:border-slate-700">
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-semibold text-navy">Billing</h3>
-          <a href="/dashboard/billing" class="text-xs text-navy hover:underline">Details</a>
+          <h3 class="text-sm font-semibold text-navy dark:text-slate-100">Billing</h3>
+          <a href="/dashboard/billing" class="text-xs text-navy dark:text-slate-100 hover:underline">Details</a>
         </div>
         {lastInvoice ? (
           <>
-            <div class="text-3xl font-bold text-navy">${lastInvoice.amount} {lastInvoice.currency}</div>
+            <div class="text-3xl font-bold text-navy dark:text-slate-100">${lastInvoice.amount} {lastInvoice.currency}</div>
             <div class="text-xs text-slate mt-2">Last payment {new Date(lastInvoice.created_at).toLocaleDateString()}</div>
           </>
         ) : (
@@ -182,10 +182,10 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
         )}
       </div>
 
-      <div class="bg-white rounded-xl border border-slate-200 p-6">
+      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6 dark:bg-navy-light dark:border-slate-700">
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-semibold text-navy">Recent Activity</h3>
-          <a href="/dashboard/activity" class="text-xs text-navy hover:underline">All</a>
+          <h3 class="text-sm font-semibold text-navy dark:text-slate-100">Recent Activity</h3>
+          <a href="/dashboard/activity" class="text-xs text-navy dark:text-slate-100 hover:underline">All</a>
         </div>
         {recentActivity.length > 0 ? (
           <ul class="space-y-2">
@@ -203,27 +203,27 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
     </div>
 
     {isNewUser && (
-      <div class="mb-8 bg-white rounded-xl border border-slate-200 p-6">
-        <h2 class="text-lg font-semibold text-navy mb-4">Getting Started</h2>
+      <div class="mb-8 bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <h2 class="text-lg font-semibold text-navy dark:text-slate-100 mb-4">Getting Started</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
+          <div class="flex items-start gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
             <span class="w-7 h-7 bg-navy text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
             <div>
-              <div class="text-sm font-medium text-navy">Create a workspace</div>
+              <div class="text-sm font-medium text-navy dark:text-slate-100">Create a workspace</div>
               <p class="text-xs text-slate mt-1">Spin up your first cloud Android instance.</p>
             </div>
           </div>
-          <div class="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
+          <div class="flex items-start gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
             <span class="w-7 h-7 bg-navy text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>
             <div>
-              <div class="text-sm font-medium text-navy">Set up monitoring</div>
+              <div class="text-sm font-medium text-navy dark:text-slate-100">Set up monitoring</div>
               <p class="text-xs text-slate mt-1">Track CPU, memory and uptime in real time.</p>
             </div>
           </div>
-          <div class="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
+          <div class="flex items-start gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
             <span class="w-7 h-7 bg-navy text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">3</span>
             <div>
-              <div class="text-sm font-medium text-navy">Configure alerts</div>
+              <div class="text-sm font-medium text-navy dark:text-slate-100">Configure alerts</div>
               <p class="text-xs text-slate mt-1">Get notified when something needs attention.</p>
             </div>
           </div>
@@ -247,8 +247,8 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
     </div>
 
     <div id="dashboard-content">
-      <div id="loading-overlay" class="hidden fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div class="flex items-center gap-3 text-navy">
+      <div id="loading-overlay" class="hidden fixed inset-0 bg-white dark:bg-navy-light/80 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div class="flex items-center gap-3 text-navy dark:text-slate-100">
           <svg class="animate-spin h-8 w-8" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -257,19 +257,19 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
         </div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6 dark:bg-navy-light dark:border-slate-700">
           <div class="flex items-center justify-between mb-4">
             <div class="w-12 h-12 bg-navy/5 rounded-lg flex items-center justify-center">
-              <svg class="w-6 h-6 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-6 h-6 text-navy dark:text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
             </div>
           </div>
           <div class="text-sm text-slate mb-1">Active Instances</div>
-          <div id="total-instances" class="text-3xl font-bold text-navy">{summary.total || 0}</div>
+          <div id="total-instances" class="text-3xl font-bold text-navy dark:text-slate-100">{summary.total || 0}</div>
           <div class="text-xs text-green-600 mt-2">↑ {summary.running || 0} running</div>
         </div>
-        <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6 dark:bg-navy-light dark:border-slate-700">
           <div class="flex items-center justify-between mb-4">
             <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
               <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -278,10 +278,10 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
             </div>
           </div>
           <div class="text-sm text-slate mb-1">Avg CPU Usage</div>
-          <div id="avg-cpu" class="text-3xl font-bold text-navy">{instances.length > 0 ? Math.round(instances.reduce((a, b) => a + b.cpu, 0) / instances.length) : 0}%</div>
+          <div id="avg-cpu" class="text-3xl font-bold text-navy dark:text-slate-100">{instances.length > 0 ? Math.round(instances.reduce((a, b) => a + b.cpu, 0) / instances.length) : 0}%</div>
           <div class="text-xs text-slate mt-2">Across all instances</div>
         </div>
-        <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6 dark:bg-navy-light dark:border-slate-700">
           <div class="flex items-center justify-between mb-4">
             <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
               <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -290,10 +290,10 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
             </div>
           </div>
           <div class="text-sm text-slate mb-1">Allocated RAM</div>
-          <div class="text-3xl font-bold text-navy">{totalRam} GB</div>
+          <div class="text-3xl font-bold text-navy dark:text-slate-100">{totalRam} GB</div>
           <div class="text-xs text-slate mt-2">Across all instances</div>
         </div>
-        <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-6 dark:bg-navy-light dark:border-slate-700">
           <div class="flex items-center justify-between mb-4">
             <div class="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
               <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,27 +302,27 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
             </div>
           </div>
           <div class="text-sm text-slate mb-1">Active Alerts</div>
-          <div id="active-alerts" class="text-3xl font-bold text-navy">{alertsSummary.unacknowledged || 0}</div>
+          <div id="active-alerts" class="text-3xl font-bold text-navy dark:text-slate-100">{alertsSummary.unacknowledged || 0}</div>
           <div class="text-xs text-yellow-600 mt-2">{alertsSummary.critical || 0} requires attention</div>
         </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-          <div class="px-6 py-4 border-b border-slate-200">
-            <h2 class="text-lg font-semibold text-navy">Recent Instances</h2>
+        <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden dark:bg-navy-light dark:border-slate-700">
+          <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+            <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Recent Instances</h2>
           </div>
-          <div id="instances-list" class="divide-y divide-slate-200">
+          <div id="instances-list" class="divide-y divide-slate-200 dark:divide-slate-700">
             {instances.slice(0, 3).map((inst) => (
               <div class="p-6 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                   <div class="w-10 h-10 bg-navy/5 rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 text-navy dark:text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
                   </div>
                   <div>
-                    <div class="font-medium text-navy">{inst.name}</div>
+                    <div class="font-medium text-navy dark:text-slate-100">{inst.name}</div>
                     <div class="text-sm text-slate">{inst.platform} • {inst.ram} GB RAM</div>
                   </div>
                 </div>
@@ -335,11 +335,11 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
           </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-          <div class="px-6 py-4 border-b border-slate-200">
-            <h2 class="text-lg font-semibold text-navy">Recent Alerts</h2>
+        <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden dark:bg-navy-light dark:border-slate-700">
+          <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+            <h2 class="text-lg font-semibold text-navy dark:text-slate-100">Recent Alerts</h2>
           </div>
-          <div id="alerts-list" class="divide-y divide-slate-200">
+          <div id="alerts-list" class="divide-y divide-slate-200 dark:divide-slate-700">
             {alerts.slice(0, 3).map((alert) => (
               <div class="p-6">
                 <div class="flex items-start gap-3">
@@ -349,7 +349,7 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
                     </svg>
                   </div>
                   <div>
-                    <div class="font-medium text-navy text-sm">{alert.title}</div>
+                    <div class="font-medium text-navy dark:text-slate-100 text-sm">{alert.title}</div>
                     <div class="text-xs text-slate mt-1">{alert.message}</div>
                     <div class="text-xs text-slate mt-1">{new Date(alert.timestamp).toLocaleString()}</div>
                   </div>
@@ -417,12 +417,12 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
             <div class="p-6 flex items-center justify-between">
               <div class="flex items-center gap-4">
                 <div class="w-10 h-10 bg-navy/5 rounded-lg flex items-center justify-center">
-                  <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5 text-navy dark:text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 </div>
                 <div>
-                  <div class="font-medium text-navy">${inst.name}</div>
+                  <div class="font-medium text-navy dark:text-slate-100">${inst.name}</div>
                   <div class="text-sm text-slate">${inst.platform} • ${inst.ram} GB RAM</div>
                 </div>
               </div>
@@ -444,7 +444,7 @@ const totalRam = instances.reduce((a: any, b: any) => a + (b.ram || 0), 0);
                   </svg>
                 </div>
                 <div>
-                  <div class="font-medium text-navy text-sm">${alert.title}</div>
+                  <div class="font-medium text-navy dark:text-slate-100 text-sm">${alert.title}</div>
                   <div class="text-xs text-slate mt-1">${alert.message}</div>
                   <div class="text-xs text-slate mt-1">${new Date(alert.timestamp).toLocaleString()}</div>
                 </div>

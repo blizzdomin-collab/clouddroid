@@ -4,14 +4,14 @@
   --color-navy: #0f172a;
   --color-navy-light: #1e293b;
   --color-slate: #64748b;
-  --color-slate-light: #f8fafc;
+  --color-slate-light: #f1f5f9;
   --color-accent: #3b82f6;
   --color-accent-hover: #2563eb;
 }
 
 :root {
   --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
+  --bg-secondary: #f1f5f9;
   --text-primary: #0f172a;
   --text-secondary: #64748b;
   --border-color: #e2e8f0;
@@ -32,11 +32,11 @@ html {
 body {
   font-family: 'Inter', sans-serif;
   color: var(--text-primary);
-  background-color: var(--bg-primary);
+  background-color: var(--bg-secondary);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .dark body {
   color: var(--text-primary);
-  background-color: var(--bg-primary);
+  background-color: var(--bg-secondary);
 }
