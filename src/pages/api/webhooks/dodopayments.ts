@@ -37,6 +37,7 @@ export const POST: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       });
     }
+    console.log('Dodo webhook secret length:', dodoWebhookSecret.length);
 
     const payload = await request.text();
     const signatureHeader = request.headers.get('webhook-signature') || '';
@@ -57,7 +58,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     if (!verifyDodoSignature(payload, signatureHeader, timestamp, dodoWebhookSecret)) {
-      console.error('Dodo webhook signature verification failed');
+      console.error('Dodo webhook signature verification failed. Check that DODO_PAYMENTS_WEBHOOK_KEY matches the webhook secret in Dodo Payments dashboard.');
       return new Response(JSON.stringify({ error: 'Invalid signature' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
