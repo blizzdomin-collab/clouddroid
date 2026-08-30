@@ -22,8 +22,8 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 │   ├── pages/
 │   │   ├── index.astro           # Marketing homepage
 │   │   ├── about.astro           # About page
-│   │   ├── pricing.astro         # Pricing page with annual toggle
-│   │   ├── faq.astro             # Frequently asked questions
+│   │   ├── pricing.astro         # Pricing page with annual toggle + comparison table
+│   │   ├── faq.astro             # Frequently asked questions (FAQPage JSON-LD)
 │   │   ├── contact.astro         # Contact form + info
 │   │   ├── status.astro          # System status / uptime
 │   │   ├── business.astro        # KYB/business verification info
@@ -31,6 +31,8 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 │   │   ├── security-disclosure.astro # Vulnerability disclosure
 │   │   ├── sla.astro             # Service Level Agreement
 │   │   ├── dpa.astro             # Data Processing Agreement
+│   │   ├── changelog.astro       # Public changelog (announcements)
+│   │   ├── how-it-works.astro    # Onboarding / how-it-works guide
 │   │   ├── api-docs.astro        # API documentation
 │   │   ├── login.astro           # Login page
 │   │   ├── register.astro        # Registration page
@@ -65,6 +67,7 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 │   │       ├── auth/             # Login, logout, register, password reset, 2FA, activity, sessions
 │   │       ├── checkout.ts       # Dodo Payments + Mollie + PayNow checkout session
 │   │       ├── contact.ts        # Contact form submission
+│   │       ├── announcements.ts  # Public announcements feed
 │   │       ├── webhooks/         # Dodo Payments + Mollie + PayNow webhooks
 │   │       ├── instances/        # Instance CRUD + actions + detail
 │   │       ├── monitoring/       # Metrics, collect, charts
@@ -82,7 +85,9 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 │   │   ├── Features.astro
 │   │   ├── UseCases.astro
 │   │   ├── ProductShowcase.astro
-│   │   └── Pricing.astro
+│   │   ├── Pricing.astro
+│   │   ├── Announcements.astro   # User-facing announcement banner
+│   │   └── Breadcrumbs.astro     # SEO breadcrumb navigation
 │   ├── lib/
 │   │   ├── database.ts           # SQLite DB with CRUD
 │   │   ├── database-sqlite.ts    # SQLite implementation
@@ -181,6 +186,7 @@ Static B2B consulting site hosted on `consulting.clouddroid.eu`:
 - Customer portal endpoint: `POST /customers/{customer_id}/customer-portal/session`
 - Subscribed events: checkout.session.completed, subscription.active, subscription.cancelled, subscription.renewed, payment.succeeded, payment.failed, refund.succeeded
 - Account status: Fully approved, live mode activated
+- **Webhook signature algorithm (IMPORTANT):** Dodo does NOT use the standard Svix format. The signed content is `webhook-id + "." + webhook-timestamp + "." + raw-payload-body`, HMAC-SHA256 with the base64-decoded secret (strip the `whsec_` prefix first). Signature header is `webhook-signature` with format `v1,<base64>`. Verify with `crypto.timingSafeEqual`.
 
 ### Mollie
 - Webhook endpoint: `/api/webhooks/mollie`
@@ -193,7 +199,7 @@ Static B2B consulting site hosted on `consulting.clouddroid.eu`:
 - Webhook endpoint: `/api/webhooks/paynow`
 - Environment variables: `PAYNOW_API_KEY`, `PAYNOW_WEBHOOK_KEY`, `PAYNOW_ENVIRONMENT=live`, `PAYNOW_RETURN_URL=https://clouddroid.eu/checkout/success`
 - Management API endpoint: `/v1/stores/{storeId}/checkouts`
-- Store ID: `596938077507686400`
+- Store ID: `596937251510820864`
 - Product ID: `596937594697154560`
 - Auth format: `Authorization: apikey <token>`
 - Webhook signature: HMAC SHA256 with timestamp tolerance 5 minutes

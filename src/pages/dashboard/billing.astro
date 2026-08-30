@@ -1,5 +1,6 @@
 ---
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import { isSubscriptionActive } from '../../lib/database';
 
 const sessionCookie = Astro.cookies.get('session');
 let currentUser: { email: string; name: string; role: string; mollie_customer_id?: string | null; dodo_customer_id?: string | null } | null = null;
@@ -38,6 +39,7 @@ if (sessionCookie) {
         const data = await instRes.json();
         instances = data.instances || [];
       }
+      var isExpired = subscription ? !isSubscriptionActive(subscription) : false;
     }
   } catch {
     currentUser = null;
@@ -64,8 +66,8 @@ if (sessionCookie) {
                 <div class="text-2xl font-bold text-navy">{subscription.plan}</div>
                 <div class="text-sm text-slate">${subscription.amount} one-time payment</div>
               </div>
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-green-700 bg-green-100">
-                {subscription.status}
+              <span class={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${isExpired ? 'text-red-700 bg-red-100' : 'text-green-700 bg-green-100'}`}>
+                {isExpired ? 'Expired' : 'Active'}
               </span>
             </div>
             <div class="space-y-2 text-sm text-slate">
@@ -78,10 +80,13 @@ if (sessionCookie) {
                 <span class="text-navy font-medium">{paymentGateway === 'mollie' ? 'Mollie (iDEAL, Bancontact, Card)' : paymentGateway === 'paynow' ? 'PayNow (Card)' : 'Dodo Payments (Card, Apple Pay, Google Pay)'}</span>
               </div>
               <div class="pt-4 flex items-center gap-3">
-                <a href="/#pricing" class="inline-flex items-center gap-2 bg-navy text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-navy-light transition-colors">
-                  Renew Access
+                <a href="/#pricing" class={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isExpired ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-navy text-white hover:bg-navy-light'}`}>
+                  {isExpired ? 'Renew Access Now' : 'Renew Access'}
                 </a>
               </div>
+              {isExpired && (
+                <p class="text-xs text-red-600 mt-2">Your access has expired. Purchase again with the same email to extend it by 30 days.</p>
+              )}
               {renewSuccess && <p class="text-sm text-green-600 mt-2">Access extended successfully.</p>}
               {renewError && <p class="text-sm text-red-600 mt-2">{renewError}</p>}
             </div>
@@ -170,24 +175,24 @@ if (sessionCookie) {
           <div class="p-6">
             {invoices.length > 0 ? (
               <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                  <thead>
-                    <tr class="border-b border-slate-200">
-                      <th class="text-left py-3 px-4 font-medium text-slate">Invoice</th>
-                      <th class="text-left py-3 px-4 font-medium text-slate">Date</th>
-                      <th class="text-left py-3 px-4 font-medium text-slate">Amount</th>
-                      <th class="text-left py-3 px-4 font-medium text-slate">Status</th>
+                <table class="w-full">
+                  <thead class="bg-slate-50">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Invoice</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Date</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Amount</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Status</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {invoices.map((invoice) => (
-                      <tr class="border-b border-slate-100 last:border-0">
-                        <td class="py-3 px-4 text-navy font-medium">{invoice.id}</td>
-                        <td class="py-3 px-4 text-slate">{new Date(invoice.created_at).toLocaleDateString()}</td>
-                        <td class="py-3 px-4 text-navy">${invoice.amount} {invoice.currency}</td>
-                        <td class="py-3 px-4">
-                          <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${invoice.status === 'paid' ? 'text-green-700 bg-green-100' : invoice.status === 'pending' ? 'text-yellow-700 bg-yellow-100' : 'text-red-700 bg-red-100'}`}>
-                            {invoice.status}
+                  <tbody class="divide-y divide-slate-200">
+                    {invoices.map((inv) => (
+                      <tr>
+                        <td class="px-6 py-4 text-navy font-medium">{inv.id}</td>
+                        <td class="px-6 py-4 text-slate">{new Date(inv.created_at).toLocaleDateString()}</td>
+                        <td class="px-6 py-4 text-slate">${inv.amount} {inv.currency}</td>
+                        <td class="px-6 py-4">
+                          <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${inv.status === 'paid' ? 'text-green-700 bg-green-100' : inv.status === 'pending' ? 'text-yellow-700 bg-yellow-100' : 'text-red-700 bg-red-100'}`}>
+                            {inv.status}
                           </span>
                         </td>
                       </tr>

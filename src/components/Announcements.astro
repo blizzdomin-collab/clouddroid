@@ -15,7 +15,7 @@ const { announcements }: { announcements: Announcement[] } = Astro.props;
 {announcements.length > 0 && (
   <div class="mb-6 space-y-3">
     {announcements.map((announcement) => (
-      <div class={`rounded-lg border p-4 ${
+      <div class={`rounded-xl border p-5 ${
         announcement.type === 'maintenance' ? 'bg-yellow-50 border-yellow-200' :
         announcement.type === 'changelog' ? 'bg-blue-50 border-blue-200' :
         announcement.type === 'feature' ? 'bg-green-50 border-green-200' :

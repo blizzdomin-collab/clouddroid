@@ -232,6 +232,17 @@ function seedData() {
 
 seedData();
 
+function promoteAdminFromEnv() {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) return;
+  const user = getUserByEmail(adminEmail);
+  if (user && user.role !== 'admin') {
+    updateUser(user.id, { role: 'admin' });
+  }
+}
+
+promoteAdminFromEnv();
+
 function migrateSchema() {
   const userColumns = db.prepare("PRAGMA table_info(users)").all() as any[];
   const hasSuspended = userColumns.some((col) => col.name === 'suspended');
@@ -427,6 +438,11 @@ export function getSubscriptions() {
 
 export function getSubscriptionByUserId(userId: string) {
   return db.prepare('SELECT * FROM subscriptions WHERE user_id = ?').get(userId) as any || null;
+}
+
+export function isSubscriptionActive(subscription: any): boolean {
+  if (!subscription || subscription.status !== 'active') return false;
+  return new Date(subscription.current_period_end).getTime() > Date.now();
 }
 
 export function createSubscription(data: Omit<any, 'id' | 'created_at'>) {
@@ -708,6 +724,10 @@ export function completeCheckout({
   const now = new Date().toISOString();
   const periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
+  if (checkoutSessionId) {
+    updateCheckoutSession(checkoutSessionId, { status: 'completed' });
+  }
+
   let user = getUserByEmail(email);
   if (!user) {
     const finalPassword = tempPassword || crypto.randomBytes(12).toString('hex');
@@ -759,16 +779,31 @@ export function completeCheckout({
     return { user, subscription, created: true };
   }
 
-  const subscription = createSubscription({
-    user_id: user.id,
-    plan,
-    status: 'active',
-    amount,
-    currency,
-    current_period_start: now,
-    current_period_end: periodEnd,
-    cancel_at_period_end: false,
-  });
+  const existingSubscription = getSubscriptionByUserId(user.id);
+  const extendFrom = existingSubscription && new Date(existingSubscription.current_period_end) > new Date()
+    ? new Date(new Date(existingSubscription.current_period_end).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+  let subscription;
+  if (existingSubscription) {
+    updateSubscription(existingSubscription.id, {
+      status: 'active',
+      current_period_start: now,
+      current_period_end: extendFrom,
+    });
+    subscription = getSubscriptionByUserId(user.id);
+  } else {
+    subscription = createSubscription({
+      user_id: user.id,
+      plan,
+      status: 'active',
+      amount,
+      currency,
+      current_period_start: now,
+      current_period_end: extendFrom,
+      cancel_at_period_end: false,
+    });
+  }
 
   createInvoice({
     user_id: user.id,

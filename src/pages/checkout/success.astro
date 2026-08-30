@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getCheckoutSessionBySessionId, completeCheckout, getUserByEmail } from '../../lib/database';
+import { getCheckoutSessionBySessionId, completeCheckout, getUserByEmail, createSession } from '../../lib/database';
 import crypto from 'crypto';
 
 function generateEasyTransacSignature(params: Record<string, string | number>, apiKey: string): string {
@@ -15,6 +15,16 @@ function generateEasyTransacSignature(params: Record<string, string | number>, a
 export const prerender = false;
 
 const sessionId = Astro.url.searchParams.get('session_id');
+const existingSessionCookie = Astro.cookies.get('session');
+let alreadyAuthenticated = false;
+if (existingSessionCookie) {
+  try {
+    const s = JSON.parse(existingSessionCookie.value);
+    alreadyAuthenticated = s.authenticated === true && !!s.email;
+  } catch {
+    alreadyAuthenticated = false;
+  }
+}
 let userCreated = false;
 let userEmail = '';
 let tempPassword = '';
@@ -155,6 +165,30 @@ if (sessionId) {
         userCreated = result.created;
         userEmail = customerEmail;
         planName = plan;
+
+        if (!alreadyAuthenticated) {
+          const sessionToken = crypto.randomBytes(32).toString('hex');
+          const sessionRecord = createSession({
+            user_id: result.user.id,
+            token: sessionToken,
+            ip_address: Astro.clientAddress || null,
+            user_agent: Astro.request.headers.get('user-agent') || null,
+          });
+          Astro.cookies.set('session', JSON.stringify({
+            email: result.user.email,
+            authenticated: true,
+            name: result.user.name,
+            role: result.user.role,
+            must_change_password: result.user.must_change_password,
+            sessionId: sessionRecord.id,
+          }), {
+            path: '/',
+            httpOnly: true,
+            secure: import.meta.env.PROD,
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 24 * 7,
+          });
+        }
       }
     } catch (e) {
       errorMessage = 'Unable to verify payment status. Please contact support.';
@@ -168,6 +202,30 @@ if (sessionId) {
       paymentSuccess = true;
       isRenewal = !user.must_change_password;
       userCreated = user.must_change_password;
+
+      if (!alreadyAuthenticated) {
+        const sessionToken = crypto.randomBytes(32).toString('hex');
+        const sessionRecord = createSession({
+          user_id: user.id,
+          token: sessionToken,
+          ip_address: Astro.clientAddress || null,
+          user_agent: Astro.request.headers.get('user-agent') || null,
+        });
+        Astro.cookies.set('session', JSON.stringify({
+          email: user.email,
+          authenticated: true,
+          name: user.name,
+          role: user.role,
+          must_change_password: user.must_change_password,
+          sessionId: sessionRecord.id,
+        }), {
+          path: '/',
+          httpOnly: true,
+          secure: import.meta.env.PROD,
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 24 * 7,
+        });
+      }
     }
   }
 }
@@ -193,16 +251,17 @@ if (sessionId) {
               <p class="text-sm text-slate mb-1"><span class="font-medium">Amount:</span> {paidCurrency === 'EUR' ? '€' : '$'}{paidAmount.toFixed(2)}</p>
                <p class="text-sm text-slate mb-1"><span class="font-medium">Method:</span> {gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : 'Dodo Payments'}</p>
               <p class="text-sm text-slate mb-1"><span class="font-medium">Email:</span> {userEmail}</p>
-              {tempPassword && (
-                <p class="text-sm text-slate mb-1">
-                  <span class="font-medium">Temporary password:</span>{' '}
-                  <code class="bg-white px-2 py-1 rounded border border-slate-200">{tempPassword}</code>
-                </p>
-              )}
-              <p class="text-xs text-slate mt-2">Please save this password and change it after logging in.</p>
+            </div>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
+              <p class="text-sm font-medium text-navy mb-2">What's next</p>
+              <ul class="text-sm text-slate space-y-1 list-disc list-inside">
+                <li>You're signed in automatically — no need to log in.</li>
+                <li>Set a permanent password on the next screen to secure your account.</li>
+                <li>Your cloud Android workspaces are ready in the dashboard.</li>
+              </ul>
             </div>
             <a
-              href="/login"
+              href="/dashboard"
               class="inline-flex items-center justify-center bg-navy text-white px-6 py-3 rounded-lg font-semibold hover:bg-navy-light transition-colors"
             >
               Go to Dashboard
@@ -226,7 +285,7 @@ if (sessionId) {
               <p class="text-sm text-slate mb-1"><span class="font-medium">Email:</span> {userEmail}</p>
             </div>
             <a
-              href="/login"
+              href="/dashboard"
               class="inline-flex items-center justify-center bg-navy text-white px-6 py-3 rounded-lg font-semibold hover:bg-navy-light transition-colors"
             >
               Go to Dashboard

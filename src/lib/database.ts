@@ -13,6 +13,7 @@ export {
   clearResetToken,
   getSubscriptions,
   getSubscriptionByUserId,
+  isSubscriptionActive,
   createSubscription,
   updateSubscription,
   getInvoices,

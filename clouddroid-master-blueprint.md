@@ -186,7 +186,7 @@ Showcasing a robust backend builds trust.
 ## Business Details (Merchant Account)
 
 - **Business Name:** CloudDroid
-- **Legal Name:** RUNESTONE HANDLUNG s.r.o.
+- **Legal Name:** RUNESTONE HANDLUNG s.r.o. (operating company; not Prime Consulting Group Ltd.)
 - **Address:** Soukenická 877/9, Ostrava, 702 00, Czech Republic
 - **Support Email:** support@clouddroid.eu
 - **Security Email:** security@clouddroid.eu
@@ -202,6 +202,7 @@ Showcasing a robust backend builds trust.
 - Customer portal endpoint: `POST /customers/{customer_id}/customer-portal/session`
 - Subscribed events: checkout.session.completed, subscription.active, subscription.cancelled, subscription.renewed, payment.succeeded, payment.failed, refund.succeeded
 - Account status: Fully approved, live mode activated
+- **Webhook signature algorithm (CRITICAL):** Dodo does NOT use the standard Svix `timestamp.payload` format. The signed content is `webhook-id + "." + webhook-timestamp + "." + raw-payload-body`. Compute `HMAC-SHA256` with the **base64-decoded** secret (strip the `whsec_` prefix first), then base64-encode the result. The signature header is `webhook-signature` with format `v1,<base64-signature>`. Verify with `crypto.timingSafeEqual`. This was the root cause of earlier 401/500 webhook failures.
 
 ## Mollie Setup
 
@@ -216,7 +217,7 @@ Showcasing a robust backend builds trust.
 - Webhook endpoint: `/api/webhooks/paynow`
 - Environment variables: `PAYNOW_API_KEY`, `PAYNOW_WEBHOOK_KEY`, `PAYNOW_ENVIRONMENT=live`, `PAYNOW_RETURN_URL=https://clouddroid.eu/checkout/success`
 - Management API endpoint: `/v1/stores/{storeId}/checkouts`
-- Store ID: `596938077507686400`
+- Store ID: `596937251510820864`
 - Product ID: `596937594697154560`
 - Auth format: `Authorization: apikey <token>`
 - Webhook signature: HMAC SHA256 with timestamp tolerance 5 minutes
@@ -228,7 +229,7 @@ Showcasing a robust backend builds trust.
 ## 8. Implementation Progress
 
 **Framework:** Astro 7.2 with Tailwind CSS v4  
-**Status:** Core marketing site scaffolded, build verified, APIs functional, Dodo Payments + Mollie + PayNow checkout working in production
+**Status:** Core marketing site scaffolded, build verified, APIs functional, Dodo Payments + Mollie + PayNow checkout + webhooks working in production, SEO structured data and announcements system live
 
 ### Completed Components
 
@@ -322,6 +323,17 @@ Showcasing a robust backend builds trust.
 | Robust Deploy Script | `deploy/scripts/deploy.sh` | ✅ Done |
 | GitHub Actions Workflow | `.github/workflows/deploy.yml` | ✅ Done |
 | Nginx Config | `deploy/nginx.conf` | ✅ Done |
+| Changelog Page | `src/pages/changelog.astro` | ✅ Done |
+| How It Works Page | `src/pages/how-it-works.astro` | ✅ Done |
+| Breadcrumbs Component | `src/components/Breadcrumbs.astro` | ✅ Done |
+| Announcements Component | `src/components/Announcements.astro` | ✅ Done |
+| Announcements API | `src/pages/api/announcements.ts` | ✅ Done |
+| Admin Announcements API | `src/pages/api/admin/announcements.ts` | ✅ Done |
+| Admin Announcements Page | `src/pages/dashboard/announcements.astro` | ✅ Done |
+| Product JSON-LD | `src/pages/pricing.astro` + `Layout.astro` | ✅ Done |
+| FAQPage JSON-LD | `src/pages/faq.astro` | ✅ Done |
+| Robots Meta Tags | `src/layouts/Layout.astro` | ✅ Done |
+| Dodo Webhook Signature Fix | `src/pages/api/webhooks/dodopayments.ts` | ✅ Done (id.timestamp.payload HMAC) |
 
 ### Compliance Checklist
 
@@ -437,6 +449,14 @@ Showcasing a robust backend builds trust.
 - [x] Stable asset filenames to prevent cache invalidation issues
 - [x] Robust deploy script with build verification
 - [x] Nginx config with proper WebSocket handling
+- [x] Public changelog page (`/changelog`) with announcement feed
+- [x] How-it-works / onboarding page (`/how-it-works`)
+- [x] Breadcrumbs component on legal pages for SEO
+- [x] Announcements system (DB table, public + admin API, admin UI, user banner)
+- [x] Product JSON-LD structured data on pricing page
+- [x] FAQPage JSON-LD structured data on FAQ page
+- [x] Robots meta tags on all pages via Layout
+- [x] Dodo Payments webhook signature verification fixed (id.timestamp.payload HMAC-SHA256)
 
 ### Next Steps
 

@@ -102,6 +102,21 @@ const instances = instancesData.instances || [];
         </table>
       </div>
     </div>
+
+    {instances.length === 0 && (
+      <div class="bg-white rounded-xl border border-slate-200 p-8 text-center">
+        <div class="w-16 h-16 bg-navy/5 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-navy mb-2">No instances yet</h3>
+        <p class="text-sm text-slate mb-6 max-w-sm mx-auto">You don't have any cloud Android workspaces. Create your first instance to get started.</p>
+        <button id="open-modal-empty" class="bg-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-navy-light transition-colors">
+          New Instance
+        </button>
+      </div>
+    )}
   </div>
 
   <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
@@ -169,14 +184,18 @@ const instances = instancesData.instances || [];
   <script>
     const modal = document.getElementById('modal');
     const openBtn = document.getElementById('open-modal');
+    const openEmptyBtn = document.getElementById('open-modal-empty');
     const closeBtn = document.getElementById('close-modal');
     const cancelBtn = document.getElementById('cancel-modal');
     const form = document.getElementById('create-form');
 
-    openBtn?.addEventListener('click', () => {
+    const showModal = () => {
       modal?.classList.remove('hidden');
       modal?.classList.add('flex');
-    });
+    };
+
+    openBtn?.addEventListener('click', showModal);
+    openEmptyBtn?.addEventListener('click', showModal);
 
     const hideModal = () => {
       modal?.classList.add('hidden');

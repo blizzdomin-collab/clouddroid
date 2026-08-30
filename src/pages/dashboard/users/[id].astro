@@ -98,28 +98,28 @@ if (sessionCookie) {
             <div class="p-6">
               {userData.instances.length > 0 ? (
                 <div class="overflow-x-auto">
-                  <table class="w-full text-sm">
-                    <thead>
-                      <tr class="border-b border-slate-200">
-                        <th class="text-left py-3 px-4 font-medium text-slate">Name</th>
-                        <th class="text-left py-3 px-4 font-medium text-slate">Platform</th>
-                        <th class="text-left py-3 px-4 font-medium text-slate">Resources</th>
-                        <th class="text-left py-3 px-4 font-medium text-slate">Status</th>
-                        <th class="text-left py-3 px-4 font-medium text-slate">Created</th>
+                  <table class="w-full">
+                    <thead class="bg-slate-50">
+                      <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Platform</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Resources</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Created</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-200">
                       {userData.instances.map((instance: any) => (
                         <tr>
-                          <td class="py-3 px-4 text-navy font-medium">{instance.name}</td>
-                          <td class="py-3 px-4 text-slate">{instance.platform}</td>
-                          <td class="py-3 px-4 text-slate">{instance.ram}GB RAM / {instance.storage}GB</td>
-                          <td class="py-3 px-4">
+                          <td class="px-6 py-4 text-navy font-medium">{instance.name}</td>
+                          <td class="px-6 py-4 text-slate">{instance.platform}</td>
+                          <td class="px-6 py-4 text-slate">{instance.ram}GB RAM / {instance.storage}GB</td>
+                          <td class="px-6 py-4">
                             <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${instance.status === 'running' ? 'text-green-700 bg-green-100' : instance.status === 'stopped' ? 'text-yellow-700 bg-yellow-100' : 'text-red-700 bg-red-100'}`}>
                               {instance.status}
                             </span>
                           </td>
-                          <td class="py-3 px-4 text-slate">{new Date(instance.created_at).toLocaleDateString()}</td>
+                          <td class="px-6 py-4 text-slate">{new Date(instance.created_at).toLocaleDateString()}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -138,26 +138,26 @@ if (sessionCookie) {
             <div class="p-6">
               {userData.subscriptions.length > 0 ? (
                 <div class="overflow-x-auto">
-                  <table class="w-full text-sm">
-                    <thead>
-                      <tr class="border-b border-slate-200">
-                        <th class="text-left py-3 px-4 font-medium text-slate">Plan</th>
-                        <th class="text-left py-3 px-4 font-medium text-slate">Status</th>
-                        <th class="text-left py-3 px-4 font-medium text-slate">Amount</th>
-                        <th class="text-left py-3 px-4 font-medium text-slate">Period</th>
+                  <table class="w-full">
+                    <thead class="bg-slate-50">
+                      <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Plan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Period</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-200">
                       {userData.subscriptions.map((sub: any) => (
                         <tr>
-                          <td class="py-3 px-4 text-navy font-medium capitalize">{sub.plan}</td>
-                          <td class="py-3 px-4">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${sub.status === 'active' ? 'text-green-700 bg-green-100' : sub.status === 'cancelled' ? 'text-red-700 bg-red-100' : 'text-yellow-700 bg-yellow-100'}`}>
+                          <td class="px-6 py-4 text-navy font-medium capitalize">{sub.plan}</td>
+                          <td class="px-6 py-4">
+                            <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${sub.status === 'active' ? 'text-green-700 bg-green-100' : sub.status === 'cancelled' ? 'text-red-700 bg-red-100' : 'text-yellow-700 bg-yellow-100'}`}>
                               {sub.status}
                             </span>
                           </td>
-                          <td class="py-3 px-4 text-slate">{sub.currency} {sub.amount.toFixed(2)}</td>
-                          <td class="py-3 px-4 text-slate">
+                          <td class="px-6 py-4 text-slate">{sub.currency} {sub.amount.toFixed(2)}</td>
+                          <td class="px-6 py-4 text-slate">
                             {new Date(sub.current_period_start).toLocaleDateString()} - {new Date(sub.current_period_end).toLocaleDateString()}
                           </td>
                         </tr>
@@ -178,26 +178,26 @@ if (sessionCookie) {
             <div class="p-6">
               {userData.invoices.length > 0 ? (
                 <div class="overflow-x-auto">
-                  <table class="w-full text-sm">
-                    <thead>
-                      <tr class="border-b border-slate-200">
-                        <th class="text-left py-3 px-4 font-medium text-slate">Invoice ID</th>
-                        <th class="text-left py-3 px-4 font-medium text-slate">Amount</th>
-                        <th class="text-left py-3 px-4 font-medium text-slate">Status</th>
-                        <th class="text-left py-3 px-4 font-medium text-slate">Date</th>
+                  <table class="w-full">
+                    <thead class="bg-slate-50">
+                      <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Invoice ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate uppercase tracking-wider">Date</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-200">
                       {userData.invoices.map((invoice: any) => (
                         <tr>
-                          <td class="py-3 px-4 text-navy font-medium">{invoice.id}</td>
-                          <td class="py-3 px-4 text-slate">{invoice.currency} {invoice.amount.toFixed(2)}</td>
-                          <td class="py-3 px-4">
+                          <td class="px-6 py-4 text-navy font-medium">{invoice.id}</td>
+                          <td class="px-6 py-4 text-slate">{invoice.currency} {invoice.amount.toFixed(2)}</td>
+                          <td class="px-6 py-4">
                             <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${invoice.status === 'paid' ? 'text-green-700 bg-green-100' : invoice.status === 'pending' ? 'text-yellow-700 bg-yellow-100' : 'text-red-700 bg-red-100'}`}>
                               {invoice.status}
                             </span>
                           </td>
-                          <td class="py-3 px-4 text-slate">{new Date(invoice.created_at).toLocaleDateString()}</td>
+                          <td class="px-6 py-4 text-slate">{new Date(invoice.created_at).toLocaleDateString()}</td>
                         </tr>
                       ))}
                     </tbody>

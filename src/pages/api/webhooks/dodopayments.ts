@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getCheckoutSessionBySessionId, updateCheckoutSession, getUserByEmail, createUser, createSubscription, updateSubscription, createInvoice, createAuditLog, provisionInstancesForUser, getSubscriptionByUserId } from '../../../lib/database';
+import { getCheckoutSessionBySessionId, updateCheckoutSession, getUserByEmail, createUser, createSubscription, updateSubscription, createInvoice, createAuditLog, provisionInstancesForUser, getSubscriptionByUserId, hashPassword } from '../../../lib/database';
 import crypto from 'crypto';
 
 function verifyDodoSignature(payload: string, signatureHeader: string, timestamp: string, webhookId: string, secret: string): boolean {
@@ -97,7 +97,7 @@ export const POST: APIRoute = async ({ request }) => {
       if (!user) {
         user = createUser({
           email: customerEmail,
-          password_hash: crypto.createHash('sha256').update(tempPassword).digest('hex'),
+          password_hash: hashPassword(tempPassword),
           name: customerEmail.split('@')[0],
           role: 'user',
           reset_token: null,

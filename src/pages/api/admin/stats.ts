@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getUsers, getInstances, getSubscriptions, getInvoices } from '../../../lib/database';
+import { getUsers, getInstances, getSubscriptions, getInvoices, getUserByEmail, isSubscriptionActive } from '../../../lib/database';
 
 export const GET: APIRoute = async ({ cookies }) => {
   try {
@@ -12,7 +12,15 @@ export const GET: APIRoute = async ({ cookies }) => {
     }
 
     const session = JSON.parse(sessionCookie.value);
-    if (!session.authenticated || !session.email || session.role !== 'admin') {
+    if (!session.authenticated || !session.email) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const adminUser = getUserByEmail(session.email);
+    if (!adminUser || adminUser.role !== 'admin') {
       return new Response(JSON.stringify({ error: 'Forbidden' }), {
         status: 403,
         headers: { 'Content-Type': 'application/json' },
@@ -28,7 +36,35 @@ export const GET: APIRoute = async ({ cookies }) => {
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    const activeSubscriptions = subscriptions.filter((s) => s.status === 'active');
+    const activeSubscriptions = subscriptions.filter((s) => isSubscriptionActive(s));
+    const expiringSoon = subscriptions.filter(
+      (s) => s.status === 'active' && new Date(s.current_period_end).getTime() > Date.now() && new Date(s.current_period_end).getTime() <= Date.now() + 7 * 24 * 60 * 60 * 1000
+    );
+    const expiredSubscriptions = subscriptions.filter((s) => !isSubscriptionActive(s));
+
+    const expiringSoonList = expiringSoon.map((s) => {
+      const u = users.find((x) => x.id === s.user_id);
+      const days = Math.ceil((new Date(s.current_period_end).getTime() - Date.now()) / (1000 * 60 * 60 * 1000));
+      return {
+        email: u?.email || 'unknown',
+        plan: s.plan || 'Unknown',
+        daysLeft: Math.max(0, days),
+        current_period_end: s.current_period_end,
+      };
+    });
+
+    const monthRevenueMap = new Map<string, number>();
+    invoices
+      .filter((inv) => inv.status === 'paid')
+      .forEach((inv) => {
+        const month = new Date(inv.created_at).toISOString().slice(0, 7);
+        monthRevenueMap.set(month, (monthRevenueMap.get(month) || 0) + inv.amount);
+      });
+    const revenueByMonth = Array.from(monthRevenueMap.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .slice(-6)
+      .map(([month, total]) => ({ month, total }));
+
     const totalRevenue = invoices
       .filter((inv) => inv.status === 'paid')
       .reduce((sum, inv) => sum + inv.amount, 0);
@@ -57,6 +93,12 @@ export const GET: APIRoute = async ({ cookies }) => {
     const recentUsers = users
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 5);
+
+    const planDistribution = subscriptions.reduce((acc: Record<string, number>, s) => {
+      const plan = s.plan || 'Unknown';
+      acc[plan] = (acc[plan] || 0) + 1;
+      return acc;
+    }, {});
 
     const recentInvoices = invoices
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -113,9 +155,12 @@ export const GET: APIRoute = async ({ cookies }) => {
           totalUsers: users.length,
           totalInstances: instances.length,
           activeSubscriptions: activeSubscriptions.length,
+          expiringSoon: expiringSoon.length,
+          expiredSubscriptions: expiredSubscriptions.length,
           totalRevenue,
           pendingInvoices: invoices.filter((inv) => inv.status === 'pending').length,
         },
+        planDistribution,
         paymentGateways: {
           dodo: { users: dodoUsers, revenue: dodoRevenue, currency: 'USD' },
           mollie: { users: mollieUsers, revenue: mollieRevenue, currency: 'EUR' },
@@ -127,6 +172,8 @@ export const GET: APIRoute = async ({ cookies }) => {
         instanceStatusCounts,
         recentUsers,
         recentInvoices,
+        expiringSoonList,
+        revenueByMonth,
       }),
       {
         status: 200,
