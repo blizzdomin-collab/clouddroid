@@ -25,6 +25,12 @@ export const POST: APIRoute = async ({ request }) => {
 
     const payload = await request.text();
     const signature = request.headers.get('x-dodo-signature') || '';
+    const allHeaders: Record<string, string> = {};
+    request.headers.forEach((value, key) => {
+      allHeaders[key] = value;
+    });
+    console.log('Dodo webhook headers:', JSON.stringify(allHeaders));
+    console.log('Dodo webhook signature length:', signature.length);
 
     if (!verifyDodoSignature(payload, signature, dodoWebhookSecret)) {
       console.error('Dodo webhook signature verification failed');
