@@ -171,7 +171,7 @@ Auto-deploy via GitHub Actions on push to `main`.
 ## 🌐 Consulting Subdomain
 
 Static B2B consulting site hosted on `consulting.clouddroid.eu`:
-- Company: PRIME CONSULTING GROUP LTD (No. 16993940)
+- Company: RUNESTONE HANDLUNG s.r.o.
 - Services: FinOps audits, IT budget strategy, cloud financial management
 - Legal pages: Terms & Conditions, Privacy Policy, Refund Policy
 - Nginx serves static files from `/var/www/clouddroid/consulting`
@@ -198,10 +198,11 @@ Static B2B consulting site hosted on `consulting.clouddroid.eu`:
 ### PayNow
 - Webhook endpoint: `/api/webhooks/paynow`
 - Environment variables: `PAYNOW_API_KEY`, `PAYNOW_WEBHOOK_KEY`, `PAYNOW_ENVIRONMENT=live`, `PAYNOW_RETURN_URL=https://clouddroid.eu/checkout/success`
-- Management API endpoint: `/v1/stores/{storeId}/checkouts`
+- **Storefront API checkout endpoint: `POST /v1/checkouts`** (not Management API)
 - Store ID: `596937251510820864`
 - Product ID: `596937594697154560`
-- Auth format: `Authorization: apikey <token>`
+- **Auth format: `Authorization: Customer <token>`** (Storefront API uses customer tokens)
+- Customer auth endpoint: `POST /v1/store/customer/auth` (creates customer with platform 'paynow' and id = customerEmail)
 - Webhook signature: HMAC SHA256 with timestamp tolerance 5 minutes
 - Test customer ID: `596957825259806720`
 - Webhook events verified: `ON_ORDER_COMPLETED`, `ONDELIVERYITEMADDED`, `ONDELIVERYITEMACTIVATED`
@@ -209,3 +210,13 @@ Static B2B consulting site hosted on `consulting.clouddroid.eu`:
 ## 📄 License
 
 Proprietary - All rights reserved
+
+## 🔄 Recent Updates (2026-08-30)
+
+- **Dark mode** — Full dark mode support across all dashboard pages with `dark:` Tailwind variants
+- **Empty states** — Consistent empty state designs for alerts, monitoring, compliance, users, announcements
+- **Design unification** — All tables, cards, badges, and buttons use consistent styling
+- **Bug fixes** — Fixed string interpolation bugs in `class` attributes (alerts, billing)
+- **PayNow Storefront API** — Migrated from Management API to Storefront API for unique customer binding
+- **Admin dashboard** — Added plan distribution, expiring soon list, revenue by month chart
+- **Dashboard overview** — Added renewal countdown, instances preview, billing snapshot, activity feed

@@ -216,10 +216,11 @@ Showcasing a robust backend builds trust.
 
 - Webhook endpoint: `/api/webhooks/paynow`
 - Environment variables: `PAYNOW_API_KEY`, `PAYNOW_WEBHOOK_KEY`, `PAYNOW_ENVIRONMENT=live`, `PAYNOW_RETURN_URL=https://clouddroid.eu/checkout/success`
-- Management API endpoint: `/v1/stores/{storeId}/checkouts`
+- **Storefront API checkout endpoint: `POST /v1/checkouts`** (not Management API `/v1/stores/{storeId}/checkouts`)
 - Store ID: `596937251510820864`
 - Product ID: `596937594697154560`
-- Auth format: `Authorization: apikey <token>`
+- **Auth format: `Authorization: Customer <token>`** (Storefront API uses customer tokens, not apikey)
+- Customer auth endpoint: `POST /v1/store/customer/auth` (creates customer with platform 'paynow' and id = customerEmail, returns customer_token)
 - Webhook signature: HMAC SHA256 with timestamp tolerance 5 minutes
 - Test customer ID: `596957825259806720`
 - Webhook events verified: `ON_ORDER_COMPLETED`, `ONDELIVERYITEMADDED`, `ONDELIVERYITEMACTIVATED`
@@ -229,7 +230,7 @@ Showcasing a robust backend builds trust.
 ## 8. Implementation Progress
 
 **Framework:** Astro 7.2 with Tailwind CSS v4  
-**Status:** Core marketing site scaffolded, build verified, APIs functional, Dodo Payments + Mollie + PayNow checkout + webhooks working in production, SEO structured data and announcements system live
+**Status:** Core marketing site scaffolded, build verified, APIs functional, Dodo Payments + Mollie + PayNow checkout + webhooks working in production, SEO structured data and announcements system live, dark mode implemented, design unified across all dashboard pages
 
 ### Completed Components
 
@@ -334,6 +335,13 @@ Showcasing a robust backend builds trust.
 | FAQPage JSON-LD | `src/pages/faq.astro` | ✅ Done |
 | Robots Meta Tags | `src/layouts/Layout.astro` | ✅ Done |
 | Dodo Webhook Signature Fix | `src/pages/api/webhooks/dodopayments.ts` | ✅ Done (id.timestamp.payload HMAC) |
+| Dark Mode Full Implementation | All dashboard pages | ✅ Done |
+| Empty States for All Pages | alerts, monitoring, compliance, users, announcements | ✅ Done |
+| Design Unification | tables, cards, badges, buttons | ✅ Done |
+| Bug Fixes | string interpolation in class attributes | ✅ Done |
+| PayNow Storefront API Migration | unique customer binding | ✅ Done |
+| Admin Dashboard Enhancements | plan distribution, expiring soon, revenue by month | ✅ Done |
+| Dashboard Overview Enhancements | renewal countdown, instances preview, billing snapshot, activity feed | ✅ Done |
 
 ### Compliance Checklist
 
@@ -457,6 +465,13 @@ Showcasing a robust backend builds trust.
 - [x] FAQPage JSON-LD structured data on FAQ page
 - [x] Robots meta tags on all pages via Layout
 - [x] Dodo Payments webhook signature verification fixed (id.timestamp.payload HMAC-SHA256)
+- [x] Dark mode full implementation across all dashboard pages
+- [x] Empty states for all pages (alerts, monitoring, compliance, users, announcements)
+- [x] Design unification (tables, cards, badges, buttons)
+- [x] Bug fixes (string interpolation in class attributes)
+- [x] PayNow Storefront API migration (unique customer binding)
+- [x] Admin dashboard enhancements (plan distribution, expiring soon, revenue by month)
+- [x] Dashboard overview enhancements (renewal countdown, instances preview, billing snapshot, activity feed)
 
 ### Next Steps
 
@@ -517,3 +532,10 @@ Showcasing a robust backend builds trust.
 55. ~~Fix deploy script with build verification~~ ✅ Completed
 56. ~~Stabilize asset filenames to prevent cache invalidation~~ ✅ Completed
 57. ~~Add PayNow payment gateway integration~~ ✅ Completed
+58. ~~Migrate PayNow to Storefront API for unique customer binding~~ ✅ Completed
+59. ~~Implement dark mode across all dashboard pages~~ ✅ Completed
+60. ~~Add empty states for all pages~~ ✅ Completed
+61. ~~Unify design (tables, cards, badges, buttons)~~ ✅ Completed
+62. ~~Fix string interpolation bugs in class attributes~~ ✅ Completed
+63. ~~Enhance admin dashboard (plan distribution, expiring soon, revenue by month)~~ ✅ Completed
+64. ~~Enhance dashboard overview (renewal countdown, instances preview, billing snapshot, activity feed)~~ ✅ Completed

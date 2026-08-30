@@ -115,6 +115,18 @@ const serializedMetrics = JSON.stringify(Array.from(metricsMap.entries()));
         </div>
       );
     })}
+
+    {instances.length === 0 && (
+      <div class="bg-white dark:bg-navy-light rounded-xl border border-slate-200 dark:border-slate-700 p-8 text-center">
+        <div class="w-16 h-16 bg-navy/5 dark:bg-navy/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-navy dark:text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-navy dark:text-slate-100 mb-2">No Instances to Monitor</h3>
+        <p class="text-sm text-slate dark:text-slate-400">Create an instance to start monitoring its performance.</p>
+      </div>
+    )}
   </div>
 
   <script>
