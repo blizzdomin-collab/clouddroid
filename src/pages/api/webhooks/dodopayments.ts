@@ -2,15 +2,50 @@ import type { APIRoute } from 'astro';
 import { getCheckoutSessionBySessionId, updateCheckoutSession, getUserByEmail, createUser, createSubscription, updateSubscription, createInvoice, createAuditLog, provisionInstancesForUser, getSubscriptionByUserId } from '../../../lib/database';
 import crypto from 'crypto';
 
-function verifyDodoSignature(payload: string, signatureHeader: string, timestamp: string, secret: string): boolean {
-  const signature = signatureHeader.replace(/^v1,/, '');
-  const secretBytes = Buffer.from(secret.replace(/^whsec_/, ''), 'base64');
+function tryVerify(payload: string, signature: string, timestamp: string, secretBytes: Buffer): boolean {
   const expected = crypto.createHmac('sha256', secretBytes).update(`${timestamp}.${payload}`).digest('base64');
-  if (signature.length !== expected.length) {
-    console.error('Dodo signature length mismatch:', signature.length, 'vs', expected.length);
+  if (signature.length !== expected.length) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+  } catch {
     return false;
   }
-  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+}
+
+function verifyDodoSignature(payload: string, signatureHeader: string, timestamp: string, secret: string): boolean {
+  const signature = signatureHeader.replace(/^v1,/, '');
+  
+  const secretStripped = secret.replace(/^whsec_/, '');
+  const secretVariants: { name: string; bytes: Buffer }[] = [
+    { name: 'stripped+base64', bytes: Buffer.from(secretStripped, 'base64') },
+    { name: 'stripped+raw', bytes: Buffer.from(secretStripped, 'utf8') },
+    { name: 'full+base64', bytes: Buffer.from(secret, 'base64') },
+    { name: 'full+raw', bytes: Buffer.from(secret, 'utf8') },
+  ];
+
+  console.log('Dodo verify debug:', {
+    signature: signature.slice(0, 20),
+    signatureLen: signature.length,
+    secretStrippedLen: secretStripped.length,
+    payloadLen: payload.length,
+    payloadHash: crypto.createHash('sha256').update(payload).digest('hex').slice(0, 16),
+    timestamp,
+  });
+
+  for (const variant of secretVariants) {
+    if (tryVerify(payload, signature, timestamp, variant.bytes)) {
+      console.log('Dodo signature matched with variant:', variant.name);
+      return true;
+    }
+    const expectedNoTs = crypto.createHmac('sha256', variant.bytes).update(payload).digest('base64');
+    if (signature.length === expectedNoTs.length && crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedNoTs))) {
+      console.log('Dodo signature matched (no timestamp) with variant:', variant.name);
+      return true;
+    }
+  }
+
+  console.error('Dodo signature verification failed for all variants');
+  return false;
 }
 
 export const POST: APIRoute = async ({ request }) => {
@@ -25,7 +60,10 @@ export const POST: APIRoute = async ({ request }) => {
     }
     console.log('Dodo webhook secret length:', dodoWebhookSecret.length);
 
-    const payload = await request.text();
+    const payloadBuffer = await request.arrayBuffer();
+    const payload = Buffer.from(payloadBuffer).toString('utf8');
+    console.log('Dodo webhook payload length:', payload.length);
+    console.log('Dodo webhook payload first 200 chars:', payload.slice(0, 200));
     const signatureHeader = request.headers.get('webhook-signature') || '';
     const timestamp = request.headers.get('webhook-timestamp') || '';
     const allHeaders: Record<string, string> = {};
