@@ -4,7 +4,12 @@ import crypto from 'crypto';
 
 function verifyDodoSignature(payload: string, signature: string, secret: string): boolean {
   const expected = crypto.createHmac('sha256', secret).update(payload).digest('hex');
-  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+  const normalizedSignature = signature.replace(/^sha256=/, '');
+  if (normalizedSignature.length !== expected.length) {
+    console.error('Dodo signature length mismatch:', normalizedSignature.length, 'vs', expected.length);
+    return false;
+  }
+  return crypto.timingSafeEqual(Buffer.from(normalizedSignature), Buffer.from(expected));
 }
 
 export const POST: APIRoute = async ({ request }) => {
