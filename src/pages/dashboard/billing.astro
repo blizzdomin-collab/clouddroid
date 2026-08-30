@@ -157,7 +157,7 @@ if (sessionCookie) {
                 {instances.slice(0, 5).map((inst: any) => (
                   <div class="flex items-center justify-between text-sm">
                     <div class="flex items-center gap-2">
-                      <span class="w-2 h-2 rounded-full {inst.status === 'running' ? 'bg-green-500' : inst.status === 'warning' ? 'bg-yellow-500' : 'bg-slate-400'}"></span>
+                      <span class={`inline-flex items-center ${inst.status === 'running' ? 'bg-green-500' : inst.status === 'warning' ? 'bg-yellow-500' : 'bg-slate-400'} rounded-full`}></span>
                       <span class="text-navy font-medium">{inst.name}</span>
                     </div>
                     <span class="text-slate">{inst.platform} • {inst.ram} GB</span>

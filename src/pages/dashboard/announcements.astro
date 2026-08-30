@@ -29,7 +29,7 @@ if (sessionCookie) {
   <div class="p-8">
     {isAdmin ? (
       error ? (
-        <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">{error}</div>
+        <div class="bg-red-50 border border-red-200 rounded-xl p-6 text-red-800">{error}</div>
       ) : (
         <div class="space-y-6">
           <div class="flex items-center justify-between">
@@ -76,10 +76,10 @@ if (sessionCookie) {
                         <td class="px-6 py-4 text-sm text-slate">{new Date(announcement.created_at).toLocaleDateString()}</td>
                         <td class="px-6 py-4">
                           <div class="flex items-center gap-2">
-                            <button data-action="edit" data-id={announcement.id} data-title={announcement.title} data-message={announcement.message} data-type={announcement.type} data-status={announcement.status} class="text-xs bg-slate-50 text-slate-700 px-3 py-1.5 rounded hover:bg-slate-100 transition-colors">
+                            <button data-action="edit" data-id={announcement.id} data-title={announcement.title} data-message={announcement.message} data-type={announcement.type} data-status={announcement.status} class="text-xs bg-slate-50 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-100 transition-colors">
                               Edit
                             </button>
-                            <button data-action="delete" data-id={announcement.id} class="text-xs bg-red-50 text-red-700 px-3 py-1.5 rounded hover:bg-red-100 transition-colors">
+                            <button data-action="delete" data-id={announcement.id} class="text-xs bg-red-50 text-red-700 px-4 py-2 rounded-lg hover:bg-red-100 transition-colors">
                               Delete
                             </button>
                           </div>
