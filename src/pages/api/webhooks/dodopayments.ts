@@ -71,6 +71,7 @@ export const POST: APIRoute = async ({ request }) => {
     fs.writeFileSync('/tmp/dodo_last_payload.json', payload);
     fs.writeFileSync('/tmp/dodo_last_sig.txt', signatureHeader);
     fs.writeFileSync('/tmp/dodo_last_ts.txt', timestamp);
+    fs.writeFileSync('/tmp/dodo_last_id.txt', request.headers.get('webhook-id') || '');
     const allHeaders: Record<string, string> = {};
     request.headers.forEach((value, key) => {
       allHeaders[key] = value;
