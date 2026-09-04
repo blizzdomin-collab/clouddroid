@@ -1,0 +1,19 @@
+{
+  "name": "Clouddroid FinOps Consulting",
+  "short_name": "Clouddroid",
+  "description": "Enterprise Cloud Financial Management, FinOps Audits, and IT Budget Optimisation consulting services.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#102a43",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["business", "finance", "productivity"]
+}

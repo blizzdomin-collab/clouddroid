@@ -23,11 +23,12 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# local database
+# local database files (in workspace root, not in subprojects)
 *.db
 *.sqlite
 *.sqlite3
-*.json
+clouddroid.json
+package-lock.json
 
 # local data directory
 .data/
