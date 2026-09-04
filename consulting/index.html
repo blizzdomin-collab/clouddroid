@@ -308,7 +308,7 @@
                         <li class="flex items-start"><span class="text-green-600 mr-2">&#10003;</span>Executive summary</li>
                         <li class="flex items-start"><span class="text-green-600 mr-2">&#10003;</span>1-hour debrief call</li>
                     </ul>
-                    <button onclick="startCheckout('starter')" class="block w-full text-center py-3 px-6 bg-navy-900 text-white font-semibold rounded-lg hover:bg-navy-800 transition-colors btn-primary">
+                    <button onclick="startCheckout('starter', event)" class="block w-full text-center py-3 px-6 bg-navy-900 text-white font-semibold rounded-lg hover:bg-navy-800 transition-colors btn-primary">
                         Purchase Package
                     </button>
                     <p class="text-xs text-navy-500 text-center mt-3">Delivered within 10 business days</p>
@@ -328,7 +328,7 @@
                         <li class="flex items-start"><span class="text-green-600 mr-2">&#10003;</span>3-month follow-up review</li>
                         <li class="flex items-start"><span class="text-green-600 mr-2">&#10003;</span>Priority email support</li>
                     </ul>
-                    <button onclick="startCheckout('professional')" class="block w-full text-center py-3 px-6 bg-navy-900 text-white font-semibold rounded-lg hover:bg-navy-800 transition-colors btn-primary">
+                    <button onclick="startCheckout('professional', event)" class="block w-full text-center py-3 px-6 bg-navy-900 text-white font-semibold rounded-lg hover:bg-navy-800 transition-colors btn-primary">
                         Purchase Package
                     </button>
                     <p class="text-xs text-navy-500 text-center mt-3">Delivered within 20 business days</p>
@@ -347,7 +347,7 @@
                         <li class="flex items-start"><span class="text-green-600 mr-2">&#10003;</span>Team training workshop</li>
                         <li class="flex items-start"><span class="text-green-600 mr-2">&#10003;</span>6-month support package</li>
                     </ul>
-                    <button onclick="startCheckout('enterprise')" class="block w-full text-center py-3 px-6 bg-navy-900 text-white font-semibold rounded-lg hover:bg-navy-800 transition-colors btn-primary">
+                    <button onclick="startCheckout('enterprise', event)" class="block w-full text-center py-3 px-6 bg-navy-900 text-white font-semibold rounded-lg hover:bg-navy-800 transition-colors btn-primary">
                         Purchase Package
                     </button>
                     <p class="text-xs text-navy-500 text-center mt-3">Delivered within 45 business days</p>
@@ -593,8 +593,8 @@
             enterprise: 'price_enterprise_2499'
         };
 
-        async function startCheckout(packageId) {
-            const btn = event.target;
+        async function startCheckout(packageId, ev) {
+            const btn = ev.currentTarget || ev.target;
             const originalText = btn.textContent;
             btn.disabled = true;
             btn.classList.add('btn-loading');
@@ -608,17 +608,19 @@
                 });
 
                 if (!res.ok) {
-                    throw new Error('Checkout session creation failed');
+                    let msg = 'Checkout session creation failed';
+                    try { const j = await res.json(); if (j && j.error) msg = j.error; } catch {}
+                    throw new Error(msg);
                 }
 
-                const data = await res.json;
-                if (data.url) {
+                const data = await res.json();
+                if (data && data.url) {
                     window.location.href = data.url;
                 } else {
                     throw new Error('No checkout URL returned');
                 }
             } catch (err) {
-                alert('Sorry, we could not start the checkout. Please try again or email support@clouddroid.eu.');
+                alert('Sorry, we could not start the checkout: ' + (err && err.message ? err.message : 'Unknown error') + '. Please try again or email support@clouddroid.eu.');
                 btn.disabled = false;
                 btn.classList.remove('btn-loading');
                 btn.textContent = originalText;
