@@ -18,8 +18,13 @@
     "better-sqlite3": "^13.0.3",
     "chart.js": "^4.5.1",
     "ioredis": "^5.11.1",
+    "stripe": "^22.6.1",
     "tailwindcss": "^4.3.3",
     "ws": "^8.21.3",
     "zod": "^4.4.3"
+  },
+  "allowScripts": {
+    "better-sqlite3@13.0.3": true,
+    "esbuild@0.28.2": true
   }
 }

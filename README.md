@@ -153,6 +153,10 @@ PAYNOW_API_KEY=your-paynow-api-key
 PAYNOW_WEBHOOK_KEY=your-paynow-webhook-secret
 PAYNOW_ENVIRONMENT=live
 PAYNOW_RETURN_URL=https://clouddroid.eu/checkout/success
+STRIPE_SECRET_KEY=sk_live_your-stripe-secret
+STRIPE_WEBHOOK_SECRET=whsec_your-webhook-signing-secret
+CONSULTING_SUCCESS_URL=https://consulting.clouddroid.eu/success.html
+CONSULTING_CANCEL_URL=https://consulting.clouddroid.eu/cancel.html
 REDIS_URL=redis://localhost:6379
 WS_PORT=4322
 ```

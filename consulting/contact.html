@@ -73,7 +73,8 @@
                         <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-navy-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                             <a href="terms.html" class="block px-4 py-2 text-navy-700 hover:bg-navy-50 rounded-t-lg">Terms & Conditions</a>
                             <a href="privacy.html" class="block px-4 py-2 text-navy-700 hover:bg-navy-50">Privacy Policy</a>
-                            <a href="refund.html" class="block px-4 py-2 text-navy-700 hover:bg-navy-50 rounded-b-lg">Refund Policy</a>
+                            <a href="refund.html" class="block px-4 py-2 text-navy-700 hover:bg-navy-50">Refund Policy</a>
+                            <a href="subprocessors.html" class="block px-4 py-2 text-navy-700 hover:bg-navy-50 rounded-b-lg">Subprocessors</a>
                         </div>
                     </div>
                 </nav>
@@ -98,7 +99,7 @@
                             </div>
                             <div>
                                 <h3 class="text-lg font-semibold text-navy-900 mb-1">Registered Office</h3>
-                                <p class="text-navy-600">TOWER 42 INTERNATIONAL FINANCIAL CENTRE<br>25 OLD BROAD STREET, LONDON, ENGLAND EC2N 1HΝ</p>
+                                <p class="text-navy-600">TOWER 42 INTERNATIONAL FINANCIAL CENTRE<br>25 OLD BROAD STREET, LONDON<br>ENGLAND EC2N 1HN</p>
                             </div>
                         </div>
                         <div class="flex items-start">
@@ -134,8 +135,17 @@
                             </div>
                             <div>
                                 <h3 class="text-lg font-semibold text-navy-900 mb-1">Company Details</h3>
-                                <p class="text-navy-600">PRIME CONSULTING GROUP LTD<br>Company No. 16993940<br>England and Wales</p>
-                                <a href="https://find-and-update.company-information.service.gov.uk/company/16993940" target="_blank" rel="noopener" class="text-navy-900 underline text-sm mt-1 inline-block">View on Companies House</a>
+                                <p class="text-navy-600">PRIME CONSULTING GROUP LTD<br>Company Number 16993940<br>Registered in England and Wales<br>Not VAT registered</p>
+                                <a href="https://find-and-update.company-information.service.gov.uk/company/16993940" target="_blank" rel="noopener" class="text-navy-900 underline text-sm mt-2 inline-block">View on Companies House &rarr;</a>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-navy-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                                <svg class="w-6 h-6 text-navy-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-navy-900 mb-1">Data Protection Officer</h3>
+                                <p class="text-navy-600"><a href="mailto:dpo@clouddroid.eu" class="hover:text-navy-900 underline">dpo@clouddroid.eu</a></p>
                             </div>
                         </div>
                     </div>
@@ -148,27 +158,36 @@
                                 <input type="text" id="name" name="name" required class="w-full px-4 py-2.5 border border-navy-200 rounded-lg focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none transition-all">
                             </div>
                             <div>
-                                <label for="email" class="block text-sm font-medium text-navy-700 mb-1">Email Address *</label>
+                                <label for="email" class="block text-sm font-medium text-navy-700 mb-1">Business Email *</label>
                                 <input type="email" id="email" name="email" required class="w-full px-4 py-2.5 border border-navy-200 rounded-lg focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none transition-all">
                             </div>
                         </div>
                         <div class="mb-4">
-                            <label for="company" class="block text-sm font-medium text-navy-700 mb-1">Company Name</label>
-                            <input type="text" id="company" name="company" class="w-full px-4 py-2.5 border border-navy-200 rounded-lg focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none transition-all">
+                            <label for="company" class="block text-sm font-medium text-navy-700 mb-1">Company Name *</label>
+                            <input type="text" id="company" name="company" required class="w-full px-4 py-2.5 border border-navy-200 rounded-lg focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none transition-all">
+                            <p class="mt-1 text-xs text-navy-500">Our services are offered on a business-to-business basis.</p>
                         </div>
                         <div class="mb-4">
                             <label for="service" class="block text-sm font-medium text-navy-700 mb-1">Service Interest</label>
                             <select id="service" name="service" class="w-full px-4 py-2.5 border border-navy-200 rounded-lg focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none transition-all bg-white">
                                 <option value="">Select a service...</option>
-                                <option value="audit">Infrastructure Cost Audit</option>
+                                <option value="audit">Infrastructure Cost Audit (£499)</option>
                                 <option value="strategy">IT Budget Strategy</option>
+                                <option value="professional">Professional Engagement (£999)</option>
                                 <option value="finops">FinOps Implementation</option>
+                                <option value="enterprise">Enterprise Programme (£2,499)</option>
                                 <option value="other">Other / General Enquiry</option>
                             </select>
                         </div>
                         <div class="mb-6">
                             <label for="message" class="block text-sm font-medium text-navy-700 mb-1">Message *</label>
                             <textarea id="message" name="message" rows="5" required class="w-full px-4 py-2.5 border border-navy-200 rounded-lg focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none transition-all resize-none"></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="flex items-start text-sm text-navy-700">
+                                <input type="checkbox" required class="mt-1 mr-2">
+                                <span>I confirm I am acting in the course of business and agree to the <a href="terms.html" class="underline text-navy-900">Terms & Conditions</a> and <a href="privacy.html" class="underline text-navy-900">Privacy Policy</a>.</span>
+                            </label>
                         </div>
                         <button type="submit" class="w-full py-3 px-6 bg-navy-900 text-white font-semibold rounded-lg hover:bg-navy-800 transition-colors">
                             Send Enquiry
@@ -183,7 +202,7 @@
     <!-- Footer -->
     <footer class="bg-navy-900 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-3 gap-8 mb-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
                 <div>
                     <div class="flex items-center space-x-2 mb-4">
                         <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
@@ -202,9 +221,15 @@
                         <li><a href="index.html#services" class="hover:text-white transition-colors">Services</a></li>
                         <li><a href="index.html#pricing" class="hover:text-white transition-colors">Pricing</a></li>
                         <li><a href="contact.html" class="hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-sm text-navy-300">
                         <li><a href="terms.html" class="hover:text-white transition-colors">Terms & Conditions</a></li>
                         <li><a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a></li>
                         <li><a href="refund.html" class="hover:text-white transition-colors">Refund Policy</a></li>
+                        <li><a href="subprocessors.html" class="hover:text-white transition-colors">Subprocessors</a></li>
                     </ul>
                 </div>
                 <div>
@@ -212,7 +237,7 @@
                     <ul class="space-y-2 text-sm text-navy-300">
                         <li>TOWER 42 INTERNATIONAL FINANCIAL CENTRE</li>
                         <li>25 OLD BROAD STREET, LONDON</li>
-                        <li>ENGLAND EC2N 1HΝ</li>
+                        <li>ENGLAND EC2N 1HN</li>
                         <li class="pt-2"><a href="tel:+420734210456" class="hover:text-white transition-colors">+420 734 210 456</a></li>
                         <li><a href="mailto:support@clouddroid.eu" class="hover:text-white transition-colors">support@clouddroid.eu</a></li>
                         <li class="pt-1"><a href="https://find-and-update.company-information.service.gov.uk/company/16993940" target="_blank" rel="noopener" class="hover:text-white transition-colors">Companies House (No. 16993940)</a></li>
@@ -221,9 +246,12 @@
             </div>
             <div class="border-t border-navy-800 pt-8">
                 <p class="text-center text-sm text-navy-300 leading-relaxed">
-                    Operated and owned by PRIME CONSULTING GROUP LTD, Company No. 16993940. Registered address: TOWER 42 INTERNATIONAL FINANCIAL CENTRE 25 OLD BROAD STREET, LONDON, ENGLAND EC2N 1HΝ.
+                    Operated and owned by PRIME CONSULTING GROUP LTD, Company No. 16993940, registered in England and Wales. Registered address: TOWER 42 INTERNATIONAL FINANCIAL CENTRE, 25 OLD BROAD STREET, LONDON, ENGLAND EC2N 1HN. Not VAT registered.
                 </p>
-                <p class="text-center text-xs text-navy-400 mt-2">
+                <p class="text-center text-sm text-navy-300 leading-relaxed mt-2">
+                    Payments are securely processed by <strong>Stripe Payments Europe Ltd.</strong>, an authorised payment institution regulated by the Central Bank of Ireland. PRIME CONSULTING GROUP LTD does not store or process full card details.
+                </p>
+                <p class="text-center text-xs text-navy-400 mt-3">
                     © <span id="current-year"></span> PRIME CONSULTING GROUP LTD. All rights reserved. | UK SIC Code 70221 — Financial Management
                 </p>
             </div>
@@ -232,14 +260,14 @@
 
     <script src="js/main.js"></script>
 
-    <!-- Cookie Consent Banner -->
+    <!-- Cookie Notice -->
     <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 bg-navy-900 text-white py-4 px-4 sm:px-6 z-50 hidden">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <p class="text-sm text-navy-200 text-center sm:text-left">
-                We use essential cookies to ensure the website functions correctly. By continuing to use this site, you agree to our <a href="privacy.html" class="underline hover:text-white">Privacy Policy</a>.
+                This site uses only essential cookies required for the website to function. No tracking or analytics cookies are set without your consent. See our <a href="privacy.html" class="underline hover:text-white">Privacy Policy</a>.
             </p>
             <button id="cookie-accept" class="flex-shrink-0 px-6 py-2 bg-white text-navy-900 font-semibold rounded-lg hover:bg-navy-50 transition-colors text-sm">
-                Accept
+                Got it
             </button>
         </div>
     </div>
