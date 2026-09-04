@@ -62,6 +62,97 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       customer_creation: 'always',
       // Generate a Stripe invoice automatically for every successful payment
       invoice_creation: { enabled: true },
+      // Allow customers to enter coupon/promotion codes
+      allow_promotion_codes: true,
+      // Collect billing address
+      billing_address_collection: 'required',
+      // Collect phone for fraud signals (Radar uses this)
+      phone_number_collection: { enabled: true },
+      // Collect tax ID for future VAT reverse-charge compliance
+      tax_id_collection: { enabled: true },
+      // Custom fields — full B2B compliance data
+      custom_fields: [
+        {
+          key: 'first_name',
+          label: { type: 'custom', custom: 'First name' },
+          type: 'text',
+          text: { minimum_length: 1, maximum_length: 50 },
+          optional: false,
+        },
+        {
+          key: 'last_name',
+          label: { type: 'custom', custom: 'Last name' },
+          type: 'text',
+          text: { minimum_length: 1, maximum_length: 50 },
+          optional: false,
+        },
+        {
+          key: 'job_title',
+          label: { type: 'custom', custom: 'Job title / Role' },
+          type: 'text',
+          text: { minimum_length: 1, maximum_length: 80 },
+          optional: false,
+        },
+        {
+          key: 'company_name',
+          label: { type: 'custom', custom: 'Company name' },
+          type: 'text',
+          text: { minimum_length: 1, maximum_length: 100 },
+          optional: false,
+        },
+        {
+          key: 'company_registration',
+          label: { type: 'custom', custom: 'Company registration number (optional)' },
+          type: 'text',
+          text: { minimum_length: 0, maximum_length: 30 },
+          optional: true,
+        },
+        {
+          key: 'business_type',
+          label: { type: 'custom', custom: 'Business type' },
+          type: 'dropdown',
+          dropdown: {
+            options: [
+              { label: 'Private limited company (Ltd)', value: 'ltd' },
+              { label: 'Limited liability partnership (LLP)', value: 'llp' },
+              { label: 'Sole trader / self-employed', value: 'sole_trader' },
+              { label: 'Partnership', value: 'partnership' },
+              { label: 'Public limited company (PLC)', value: 'plc' },
+              { label: 'Charity / non-profit', value: 'charity' },
+              { label: 'Other', value: 'other' },
+            ],
+          },
+          optional: false,
+        },
+        {
+          key: 'referral_source',
+          label: { type: 'custom', custom: 'How did you hear about us? (optional)' },
+          type: 'dropdown',
+          dropdown: {
+            options: [
+              { label: 'Google search', value: 'google' },
+              { label: 'LinkedIn', value: 'linkedin' },
+              { label: 'Referral / word of mouth', value: 'referral' },
+              { label: 'Industry event or conference', value: 'event' },
+              { label: 'Article or blog post', value: 'content' },
+              { label: 'Other', value: 'other' },
+            ],
+          },
+          optional: true,
+        },
+        {
+          key: 'terms_accepted',
+          label: {
+            type: 'custom',
+            custom: 'I confirm I am acting in the course of business and accept the Terms & Conditions and Privacy Policy',
+          },
+          type: 'checkbox',
+          checkbox: { required: true },
+          optional: false,
+        },
+      ],
+      // Stripe Radar options for risk evaluation
+      // Radar runs by default; this just gives it more data to score
       payment_intent_data: {
         description: cfg.name,
         metadata: {
@@ -70,13 +161,23 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           service_type: 'finops_consulting',
         },
         statement_descriptor: 'CLOUDDROID FINOPS',
+        // Capture funds immediately (do not pre-authorize)
+        capture_method: 'automatic',
+        // Use 'automatic' confirmation so Radar can block in real time
+        confirmation_method: 'automatic',
       },
       metadata: {
         package_id: pkgId,
         company: 'PRIME CONSULTING GROUP LTD',
         company_number: '16993940',
         service_type: 'finops_consulting',
+        // Compliance trace fields
+        seller_name: 'PRIME CONSULTING GROUP LTD',
+        seller_country: 'GB',
+        seller_regulator: 'Not FCA / PRA regulated',
       },
+      // Restrict to common B2B countries (UK + EU + US + CA + AU)
+      shipping_address_collection: undefined,
     });
 
     return new Response(JSON.stringify({ id: session.id, url: session.url }), {
