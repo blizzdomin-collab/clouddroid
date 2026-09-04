@@ -311,6 +311,9 @@
                     <button onclick="startCheckout('trial', event)" class="block w-full text-center py-3 px-6 bg-navy-900 text-white font-semibold rounded-lg hover:bg-navy-800 transition-colors btn-primary">
                         Purchase Package
                     </button>
+                    <button onclick="startCheckoutWithPromo('trial', 'promo_1UC5bdBZpiruLhiIScN3ixgd', event)" class="block w-full text-center py-2 px-6 mt-2 bg-green-50 border border-green-200 text-green-800 font-semibold rounded-lg hover:bg-green-100 transition-colors text-sm btn-primary">
+                        Claim launch price →
+                    </button>
                     <p class="text-xs text-navy-500 text-center mt-3">Delivered within 5 business days</p>
                 </div>
                 <!-- Starter -->
@@ -611,7 +614,9 @@
             enterprise: 'price_enterprise_2499'
         };
 
-        async function startCheckout(packageId, ev) {
+        // Trigger a checkout with a pre-applied Stripe promotion code (e.g. launch discount)
+        async function startCheckoutWithPromo(packageId, promoId, ev) {
+            // Re-use the same flow but pre-fill promotion_code
             const btn = ev.currentTarget || ev.target;
             const originalText = btn.textContent;
             btn.disabled = true;
@@ -622,7 +627,51 @@
                 const res = await fetch('/api/consulting/checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ package: packageId })
+                    body: JSON.stringify({ package: packageId, promotion_code: promoId })
+                });
+
+                if (!res.ok) {
+                    let msg = 'Checkout session creation failed';
+                    try { const j = await res.json(); if (j && j.error) msg = j.error; } catch {}
+                    throw new Error(msg);
+                }
+
+                const data = await res.json();
+                if (data && data.url) {
+                    window.location.href = data.url;
+                } else {
+                    throw new Error('No checkout URL returned');
+                }
+            } catch (err) {
+                alert('Sorry, we could not start the checkout: ' + (err && err.message ? err.message : 'Unknown error') + '. Please try again or email support@clouddroid.eu.');
+                btn.disabled = false;
+                btn.classList.remove('btn-loading');
+                btn.textContent = originalText;
+            }
+        }
+
+        async function startCheckout(packageId, ev) {
+            const btn = ev.currentTarget || ev.target;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.classList.add('btn-loading');
+            btn.textContent = '';
+
+            try {
+                // Optional: pre-apply a promotion code via URL hash, e.g. #trial?promo=LAUNCH10
+                let body = { package: packageId };
+                const hash = window.location.hash;
+                const qIdx = hash.indexOf('?');
+                if (qIdx !== -1) {
+                    const params = new URLSearchParams(hash.slice(qIdx + 1));
+                    const promo = params.get('promo');
+                    if (promo) body.promotion_code = promo;
+                }
+
+                const res = await fetch('/api/consulting/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
                 });
 
                 if (!res.ok) {

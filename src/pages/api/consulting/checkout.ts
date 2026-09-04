@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import type Stripe from 'stripe';
 import {
   CONSULTING_PACKAGES,
   getStripe,
@@ -31,7 +32,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     });
   }
 
-  try {
     const body = await request.json().catch(() => ({}));
     const pkgId = String(body?.package || '');
     const cfg = CONSULTING_PACKAGES[pkgId];
@@ -42,8 +42,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       });
     }
 
+    // Optional promotion code from frontend (e.g. ?promo=LAUNCH10 or via direct POST)
+    // When pre-applied, the customer cannot remove it in Checkout UI.
+    const promotionCode = typeof body?.promotion_code === 'string' ? body.promotion_code.trim() : undefined;
+
+  try {
     const stripe = getStripe();
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: 'payment',
       payment_method_types: ['card'],
       currency: 'gbp',
@@ -60,17 +65,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       success_url: getConsultingSuccessUrl(),
       cancel_url: getConsultingCancelUrl(),
       customer_creation: 'always',
-      // Generate a Stripe invoice automatically for every successful payment
       invoice_creation: { enabled: true },
-      // Allow customers to enter coupon/promotion codes
+      // Customer can always enter a different code; we still pre-apply if provided
       allow_promotion_codes: true,
-      // Collect billing address
       billing_address_collection: 'required',
-      // Collect phone for fraud signals (Radar uses this)
       phone_number_collection: { enabled: true },
-      // Collect tax ID for future VAT reverse-charge compliance
       tax_id_collection: { enabled: true },
-      // Custom fields — full B2B compliance data
       custom_fields: [
         {
           key: 'first_name',
@@ -178,7 +178,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       },
       // Restrict to common B2B countries (UK + EU + US + CA + AU)
       shipping_address_collection: undefined,
-    });
+    };
+
+    // Pre-apply promotion code if provided (lock the customer into this discount)
+    if (promotionCode) {
+      sessionParams.discounts = [{ promotion_code: promotionCode }];
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return new Response(JSON.stringify({ id: session.id, url: session.url }), {
       status: 200,
