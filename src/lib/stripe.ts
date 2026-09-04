@@ -39,7 +39,7 @@ export function getConsultingCancelUrl(): string {
 
 export const CONSULTING_PACKAGES: Record<
   string,
-  { name: string; description: string; priceGbp: number; deliveryDays: number }
+  { name: string; description: string; priceGbp: number; deliveryDays: number; stripeProductId?: string }
 > = {
   starter: {
     name: 'Clouddroid FinOps — Starter Audit',
@@ -47,6 +47,7 @@ export const CONSULTING_PACKAGES: Record<
       'One-off fixed fee. Infrastructure spend review, cost optimisation report, executive summary, and a 1-hour debrief call.',
     priceGbp: 49900,
     deliveryDays: 10,
+    stripeProductId: process.env.STRIPE_PRODUCT_STARTER || 'prod_VCLGnjrclNXd66',
   },
   professional: {
     name: 'Clouddroid FinOps — Professional Engagement',
@@ -54,6 +55,7 @@ export const CONSULTING_PACKAGES: Record<
       'One-off fixed fee. Everything in Starter plus IT budget strategy session, vendor negotiation support, 3-month follow-up review, and priority email support.',
     priceGbp: 99900,
     deliveryDays: 20,
+    stripeProductId: process.env.STRIPE_PRODUCT_PROFESSIONAL || 'prod_VCLGJnoBN4qRpf',
   },
   enterprise: {
     name: 'Clouddroid FinOps — Enterprise Programme',
@@ -61,5 +63,6 @@ export const CONSULTING_PACKAGES: Record<
       'One-off fixed fee. Everything in Professional plus full FinOps implementation, governance framework design, team training workshop, and a 6-month support package.',
     priceGbp: 249900,
     deliveryDays: 45,
+    stripeProductId: process.env.STRIPE_PRODUCT_ENTERPRISE || 'prod_VCLHv5qJE1APfr',
   },
 };

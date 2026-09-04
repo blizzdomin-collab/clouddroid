@@ -12,26 +12,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        navy: {
-                            50: '#f0f4f8', 100: '#d9e2ec', 200: '#bcccdc', 300: '#9fb3c8',
-                            400: '#829ab1', 500: '#627d98', 600: '#486581', 700: '#334e68',
-                            800: '#243b53', 900: '#102a43', 950: '#0a192f',
-                        },
-                    },
-                    fontFamily: { inter: ['Inter', 'sans-serif'] },
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="font-inter bg-white text-navy-900 antialiased">
+
+    <a href="#main" class="skip-link">Skip to main content</a>
 
     <header class="bg-white/95 backdrop-blur-sm border-b border-navy-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -49,7 +34,7 @@
         </div>
     </header>
 
-    <main class="py-20 bg-white">
+    <main id="main" tabindex="-1" class="py-20 bg-white">
         <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -87,5 +72,6 @@
             <p class="text-xs text-navy-400 mt-2">Payments securely processed by Stripe Payments Europe Ltd.</p>
         </div>
     </footer>
+    <script src="js/disclaimer.js"></script>
 </body>
 </html>

@@ -106,4 +106,36 @@ document.addEventListener('DOMContentLoaded', function() {
             cookieBanner.classList.add('hidden');
         });
     }
+
+    // Privacy-friendly analytics (server-side, hashed IPs, no cookies)
+    function track(event, extra) {
+        try {
+            fetch('/api/analytics', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(Object.assign({
+                    event: event,
+                    path: window.location.pathname,
+                    referrer: document.referrer || null
+                }, extra || {})),
+                keepalive: true
+            }).catch(function() { /* silent */ });
+        } catch (e) { /* silent */ }
+    }
+
+    // Pageview
+    track('pageview');
+
+    // Service Worker registration for offline PWA support
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+        navigator.serviceWorker.register('/sw.js').catch(function() { /* silent */ });
+    }
+
+    // CTA button tracking
+    document.querySelectorAll('[onclick*="startCheckout"]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var m = (btn.getAttribute('onclick') || '').match(/startCheckout\('([^']+)'\)/);
+            track('checkout_started', { package_id: m ? m[1] : null });
+        });
+    });
 });

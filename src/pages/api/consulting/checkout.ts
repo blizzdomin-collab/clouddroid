@@ -52,10 +52,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           quantity: 1,
           price_data: {
             currency: 'gbp',
-            product_data: {
-              name: cfg.name,
-              description: cfg.description,
-            },
+            product: cfg.stripeProductId,
             unit_amount: cfg.priceGbp,
           },
         },
@@ -65,16 +62,28 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       automatic_tax: { enabled: false },
       billing_address_collection: 'required',
       customer_creation: 'always',
-      metadata: {
-        package_id: pkgId,
-        company: 'PRIME CONSULTING GROUP LTD',
-        company_number: '16993940',
-      },
+      tax_id_collection: { enabled: true },
       payment_intent_data: {
         description: cfg.name,
         metadata: {
           package_id: pkgId,
           company_number: '16993940',
+          service_type: 'finops_consulting',
+          regulatory_status: 'not_fca_authorized',
+        },
+        statement_descriptor: 'CLOUDDROID FINOPS',
+        statement_descriptor_suffix: cfg.name.split('—')[1]?.trim().slice(0, 10) || 'CONSULTING',
+      },
+      metadata: {
+        package_id: pkgId,
+        company: 'PRIME CONSULTING GROUP LTD',
+        company_number: '16993940',
+        service_type: 'finops_consulting',
+        regulatory_status: 'not_fca_authorized',
+      },
+      payment_method_options: {
+        card: {
+          request_three_d_secure: 'any',
         },
       },
     });

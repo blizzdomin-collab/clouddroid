@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /success.html
+Disallow: /cancel.html
+Disallow: /404.html
+Disallow: /500.html
+
+Sitemap: https://consulting.clouddroid.eu/sitemap.xml

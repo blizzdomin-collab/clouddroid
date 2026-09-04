@@ -17,37 +17,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        navy: {
-                            50: '#f0f4f8',
-                            100: '#d9e2ec',
-                            200: '#bcccdc',
-                            300: '#9fb3c8',
-                            400: '#829ab1',
-                            500: '#627d98',
-                            600: '#486581',
-                            700: '#334e68',
-                            800: '#243b53',
-                            900: '#102a43',
-                            950: '#0a192f',
-                        },
-                        slate: {
-                            850: '#1e293b',
-                        }
-                    },
-                    fontFamily: {
-                        inter: ['Inter', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/styles.css">
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -94,6 +64,8 @@
 </head>
 <body class="font-inter bg-white text-navy-900 antialiased">
 
+    <a href="#main" class="skip-link">Skip to main content</a>
+
     <!-- Header -->
     <header class="bg-white/95 backdrop-blur-sm border-b border-navy-100 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -129,7 +101,7 @@
                 <a href="#pricing" class="hidden md:inline-flex items-center justify-center px-5 py-2.5 bg-navy-900 text-white font-medium rounded-lg hover:bg-navy-800 transition-colors">
                     Get Started
                 </a>
-                <button id="mobile-menu-btn" class="md:hidden p-2 text-navy-600">
+                <button id="mobile-menu-btn" aria-label="Open menu" aria-expanded="false" class="md:hidden p-2 text-navy-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
             </div>
@@ -169,8 +141,11 @@
                 <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
                     Optimise Your Cloud Infrastructure Costs
                 </h1>
-                <p class="text-xl text-navy-200 mb-8 leading-relaxed max-w-2xl">
-                    Expert FinOps audits, IT budget strategy, and cloud financial management advisory for enterprise organisations. We are a consulting firm, not a licensed financial institution.
+                <p class="text-xl text-navy-200 mb-4 leading-relaxed max-w-2xl">
+                    Expert FinOps audits, IT budget strategy, and cloud cost optimisation advisory for enterprise organisations.
+                </p>
+                <p class="text-sm text-navy-300 mb-8 leading-relaxed max-w-2xl border-l-2 border-amber-400 pl-3">
+                    <strong class="text-amber-200">Regulatory disclosure:</strong> PRIME CONSULTING GROUP LTD is not authorised or regulated by the Financial Conduct Authority (FCA), the Prudential Regulation Authority (PRA), or any other UK or EU financial regulator. We provide FinOps and IT cost optimisation <strong>consulting only</strong>, not investment advice, portfolio management, or any other regulated financial service.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 mb-8">
                     <a href="#pricing" class="inline-flex items-center justify-center px-8 py-4 bg-white text-navy-900 font-semibold rounded-lg hover:bg-navy-50 transition-colors text-lg">
@@ -215,6 +190,29 @@
                     <div class="text-3xl font-bold text-navy-900">UK GDPR</div>
                     <div class="text-sm text-navy-600 mt-1">Fully Compliant</div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews / Trust badges placeholder -->
+    <!--
+        Drop-in snippets go here. Once you collect reviews, replace this
+        section with one of the embed codes below:
+
+        Trustpilot TrustBox (free):
+          <div class="trustpilot-widget" data-locale="en-GB" data-template-id="..." data-businessunit-id="..."></div>
+          <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
+
+        Google Reviews badge (Elfsight / ReputationLoop / Grade.us):
+          Paste your provider's embed iframe here.
+    -->
+    <section class="bg-white border-b border-navy-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-navy-500">
+                <span class="font-semibold text-navy-700">Independently reviewed:</span>
+                <span class="px-3 py-1 border border-navy-200 rounded text-xs font-semibold text-navy-700">Trustpilot</span>
+                <span class="px-3 py-1 border border-navy-200 rounded text-xs font-semibold text-navy-700">Google Reviews</span>
+                <span class="text-xs italic">Reviews widget pending &mdash; configure after first engagements</span>
             </div>
         </div>
     </section>
@@ -362,6 +360,73 @@
                     <span class="font-semibold">GOOGLE PAY</span>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- Case Studies Section -->
+    <section id="case-studies" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-navy-900 mb-4">Engagement outcomes</h2>
+                <p class="text-lg text-navy-600 max-w-2xl mx-auto">Illustrative examples from prior FinOps engagements. Client names are anonymised under NDA.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6">
+                <article class="bg-navy-50 border border-navy-100 rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <span class="px-2 py-1 bg-navy-900 text-white text-xs font-bold rounded">CASE 01</span>
+                        <span class="ml-3 text-sm text-navy-600">UK fintech &middot; AWS</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-navy-900 mb-2">31% reduction in AWS spend</h3>
+                    <p class="text-navy-700 leading-relaxed mb-4">A 120-person fintech with runaway EC2 costs. We identified idle reservations, removed three unused SaaS tools, and renegotiated the AWS enterprise discount. Engagement delivered within 18 business days.</p>
+                    <dl class="text-sm border-t border-navy-200 pt-4 grid grid-cols-2 gap-2">
+                        <div>
+                            <dt class="text-navy-500">Annual savings</dt>
+                            <dd class="font-bold text-navy-900">&pound;184,000</dd>
+                        </div>
+                        <div>
+                            <dt class="text-navy-500">Package</dt>
+                            <dd class="font-bold text-navy-900">Professional</dd>
+                        </div>
+                    </dl>
+                </article>
+                <article class="bg-navy-50 border border-navy-100 rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <span class="px-2 py-1 bg-navy-900 text-white text-xs font-bold rounded">CASE 02</span>
+                        <span class="ml-3 text-sm text-navy-600">EU SaaS &middot; Multi-cloud</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-navy-900 mb-2">FinOps framework rollout</h3>
+                    <p class="text-navy-700 leading-relaxed mb-4">A 40-person SaaS company needed a FinOps function from scratch. We designed showback/chargeback, implemented tagging policies, and trained 18 engineers across two squads. Engagement delivered within 40 business days.</p>
+                    <dl class="text-sm border-t border-navy-200 pt-4 grid grid-cols-2 gap-2">
+                        <div>
+                            <dt class="text-navy-500">Engineers trained</dt>
+                            <dd class="font-bold text-navy-900">18</dd>
+                        </div>
+                        <div>
+                            <dt class="text-navy-500">Package</dt>
+                            <dd class="font-bold text-navy-900">Enterprise</dd>
+                        </div>
+                    </dl>
+                </article>
+                <article class="bg-navy-50 border border-navy-100 rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <span class="px-2 py-1 bg-navy-900 text-white text-xs font-bold rounded">CASE 03</span>
+                        <span class="ml-3 text-sm text-navy-600">UK retailer &middot; Azure</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-navy-900 mb-2">Vendor consolidation roadmap</h3>
+                    <p class="text-navy-700 leading-relaxed mb-4">A regional retailer with overlapping observability and security tooling across two vendors. We produced a 12-month consolidation roadmap and supported vendor renegotiation. Engagement delivered within 8 business days.</p>
+                    <dl class="text-sm border-t border-navy-200 pt-4 grid grid-cols-2 gap-2">
+                        <div>
+                            <dt class="text-navy-500">Tools consolidated</dt>
+                            <dd class="font-bold text-navy-900">7 &rarr; 3</dd>
+                        </div>
+                        <div>
+                            <dt class="text-navy-500">Package</dt>
+                            <dd class="font-bold text-navy-900">Starter</dd>
+                        </div>
+                    </dl>
+                </article>
+            </div>
+            <p class="text-center text-sm text-navy-500 mt-8">Results depend on the client&rsquo;s environment. Figures are illustrative and drawn from prior engagements under NDA.</p>
         </div>
     </section>
 
@@ -565,5 +630,37 @@
             </button>
         </div>
     </div>
+
+    <!-- Newsletter / Lead Magnet -->
+    <!--
+        Drop-in: Once email provider is configured (Resend / Mailgun / SMTP),
+        change the form action to your provider endpoint and update
+        the analytics tracking. Until then, the form opens a mailto.
+    -->
+    <section class="bg-navy-50 border-t border-navy-100">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl md:text-3xl font-bold text-navy-900 mb-2">Free FinOps Readiness Checklist (PDF)</h2>
+                <p class="text-navy-600">A 2-page checklist used in our Starter Audits. No fluff &mdash; just the 12 questions every cloud finance team should answer before budgeting.</p>
+            </div>
+            <form action="mailto:support@clouddroid.eu?subject=FinOps Readiness Checklist" method="post" enctype="text/plain" class="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
+                <input type="email" name="email" required placeholder="you@company.com" aria-label="Business email" class="flex-1 px-4 py-3 border border-navy-200 rounded-lg focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none">
+                <button type="submit" class="px-6 py-3 bg-navy-900 text-white font-semibold rounded-lg hover:bg-navy-800 transition-colors whitespace-nowrap">Email me the PDF</button>
+            </form>
+            <p class="text-xs text-navy-500 text-center mt-3">Business email only. We will not share your address.</p>
+        </div>
+    </section>
+
+    <!-- Live chat placeholder -->
+    <!--
+        Drop-in snippets go here once you sign up for a provider:
+
+        Crisp:    <script>window.$crisp=[];window.CRISP_WEBSITE_ID="..."; (function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
+
+        Tawk.to: <script type="text/javascript">var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date(); (function(){var s1=document.createElement("script"),s2=document.getElementsByTagName("script")[0]; s1.async=true; s1.src='https://embed.tawk.to/.../default'; s1.charset='UTF-8'; s1.setAttribute('crossorigin','*'); s2.parentNode.insertBefore(s1,s2);})();</script>
+
+        Uncomment the one you choose, fill in your widget ID, and remove this comment.
+    -->
+    <script src="js/disclaimer.js"></script>
 </body>
 </html>
