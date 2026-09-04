@@ -41,6 +41,14 @@ export const CONSULTING_PACKAGES: Record<
   string,
   { name: string; description: string; priceGbp: number; deliveryDays: number; stripeProductId?: string }
 > = {
+  trial: {
+    name: 'Clouddroid FinOps — Trial Audit',
+    description:
+      'One-off fixed fee. High-level spend health check, top 3 cost-saving quick wins, concise summary report, and a 30-minute debrief call.',
+    priceGbp: 19900,
+    deliveryDays: 5,
+    stripeProductId: process.env.STRIPE_PRODUCT_TRIAL || 'prod_VCRumGdWO7wG9O',
+  },
   starter: {
     name: 'Clouddroid FinOps — Starter Audit',
     description:
