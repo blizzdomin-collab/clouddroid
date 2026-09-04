@@ -1,8 +1,8 @@
 // Clouddroid FinOps Consulting — Service Worker
-// Caches legal and FAQ pages for offline read access (B2B reference material).
+// Cache name includes the build-id so every deploy automatically
+// invalidates the old cache. Reads build-info.json on activation.
 
-const CACHE_NAME = 'cd-consulting-v1';
-const CACHE_PATHS = [
+const PRECACHE_PATHS = [
   '/',
   '/about.html',
   '/faq.html',
@@ -14,20 +14,29 @@ const CACHE_PATHS = [
   '/manifest.json',
   '/css/styles.css',
   '/js/main.js',
+  '/js/disclaimer.js',
+  '/js/cache-bust.js',
   '/favicon.svg',
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(CACHE_PATHS)).catch(() => null)
+    caches.open('cd-consulting-runtime').then((cache) =>
+      cache.addAll(PRECACHE_PATHS).catch(() => null)
+    )
   );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
+  // Bust ALL old caches regardless of name (every deploy creates a new one)
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+      Promise.all(
+        keys
+          .filter((k) => k !== 'cd-consulting-runtime')
+          .map((k) => caches.delete(k))
+      )
     )
   );
   self.clients.claim();
@@ -37,16 +46,16 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
-  // Never cache API or checkout
+  // Never cache API endpoints
   if (url.pathname.startsWith('/api/')) return;
-  if (url.pathname.startsWith('/api/consulting/')) return;
-  // Network-first for HTML, cache-first for assets
+  // Never cache versioned assets (?v=...)
+  // (browsers already handle those correctly)
   if (request.destination === 'document') {
     event.respondWith(
       fetch(request)
         .then((res) => {
           const copy = res.clone();
-          caches.open(CACHE_NAME).then((c) => c.put(request, copy)).catch(() => null);
+          caches.open('cd-consulting-runtime').then((c) => c.put(request, copy)).catch(() => null);
           return res;
         })
         .catch(() => caches.match(request).then((r) => r || caches.match('/')))
@@ -56,7 +65,7 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(request).then((cached) => cached || fetch(request).then((res) => {
       const copy = res.clone();
-      caches.open(CACHE_NAME).then((c) => c.put(request, copy)).catch(() => null);
+      caches.open('cd-consulting-runtime').then((c) => c.put(request, copy)).catch(() => null);
       return res;
     }))
   );
