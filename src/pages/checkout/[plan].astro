@@ -137,7 +137,7 @@ if (!selectedPlan) {
                   id="email"
                   name="email"
                   required
-                  class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none transition-all"
+                  class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent outline-none transition-all bg-white text-navy placeholder:text-slate-400"
                   placeholder="you@company.com"
                 />
                 <p class="text-xs text-slate mt-1">We'll send your receipt and dashboard access to this email.</p>
@@ -245,6 +245,24 @@ if (!selectedPlan) {
                 <div class="text-xs text-slate pt-3 border-t border-slate-200" id="summary-plan"></div>
               </div>
 
+              <div class="flex items-center justify-center gap-4 text-xs text-slate mb-4">
+                <div class="flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <span>SSL Encrypted</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                  <span>AES-256</span>
+                </div>
+              </div>
+              <p class="text-center text-xs text-slate mb-4">
+                Securely processed by <span class="font-semibold text-navy">Dodo Payments</span>, <span class="font-semibold text-navy">Mollie</span> &amp; <span class="font-semibold text-navy">PayNow</span>
+              </p>
+
               <button
                 type="submit"
                 class="w-full bg-navy text-white px-6 py-4 rounded-lg font-semibold hover:bg-navy-light transition-colors flex items-center justify-center gap-2"
@@ -252,31 +270,14 @@ if (!selectedPlan) {
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
-                Proceed to Secure Checkout
+                <span id="checkout-button-label">Proceed to Secure Checkout</span>
               </button>
             </form>
 
             <div class="mt-6 pt-6 border-t border-slate-200">
-              <div class="flex items-center justify-center gap-6 text-xs text-slate">
-                <div class="flex items-center gap-1.5">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                  <span>SSL Encrypted</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                  <span>AES-256</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
-                  <span>Dodo Payments</span>
-                </div>
-              </div>
+              <p class="text-center text-xs text-slate">
+                Your payment is processed securely via industry-standard encryption. We never store your card details.
+              </p>
             </div>
           </div>
         </div>
@@ -329,16 +330,26 @@ if (!selectedPlan) {
 
     form?.addEventListener('submit', async function(e) {
       e.preventDefault();
-      const email = form.email.value;
+      const email = form.email.value.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        const emailInput = document.getElementById('email');
+        emailInput?.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+        emailInput?.focus();
+        alert('Please enter a valid email address.');
+        return;
+      }
       const gateway = form.gateway ? form.gateway.value : '';
       const button = form?.querySelector('button[type="submit"]');
+      const buttonLabel = document.getElementById('checkout-button-label');
       if (!gateway) {
         alert('Please select a payment method before continuing.');
         return;
       }
       if (button) {
         button.disabled = true;
-        button.innerHTML = '<span class="inline-flex items-center gap-2"><svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Processing...</span>';
+        button.classList.add('opacity-75', 'cursor-not-allowed');
+        if (buttonLabel) buttonLabel.textContent = 'Redirecting to secure payment...';
       }
       try {
         const form = document.getElementById('checkout-form');
@@ -348,6 +359,15 @@ if (!selectedPlan) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ planId: planId || '', customerEmail: email, gateway }),
         });
+        if (response.status === 429) {
+          alert('Too many attempts. Please wait a minute before trying again.');
+          if (button) {
+            button.disabled = false;
+            button.classList.remove('opacity-75', 'cursor-not-allowed');
+            if (buttonLabel) buttonLabel.textContent = 'Proceed to Secure Checkout';
+          }
+          return;
+        }
         const data = await response.json();
         if (data.checkout_url) {
           window.location.href = data.checkout_url;
@@ -355,14 +375,16 @@ if (!selectedPlan) {
           alert(data.error || 'Failed to initiate checkout. Please try again.');
           if (button) {
             button.disabled = false;
-            button.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>Proceed to Secure Checkout';
+            button.classList.remove('opacity-75', 'cursor-not-allowed');
+            if (buttonLabel) buttonLabel.textContent = 'Proceed to Secure Checkout';
           }
         }
       } catch {
         alert('An error occurred. Please try again.');
         if (button) {
           button.disabled = false;
-          button.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>Proceed to Secure Checkout';
+          button.classList.remove('opacity-75', 'cursor-not-allowed');
+          if (buttonLabel) buttonLabel.textContent = 'Proceed to Secure Checkout';
         }
       }
     });

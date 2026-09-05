@@ -9,49 +9,46 @@ const legalLinks = [
 
 <footer class="bg-navy text-slate-300 py-16">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
-      <div class="col-span-1 md:col-span-2">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
+      <div class="col-span-2 md:col-span-1">
         <div class="flex items-center gap-2 mb-4">
           <div class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
             <span class="text-white font-bold text-sm">CD</span>
           </div>
           <span class="font-bold text-xl text-white">CloudDroid</span>
         </div>
-        <p class="text-slate-400 text-sm max-w-md mb-6">
+        <p class="text-slate-400 text-sm max-w-xs mb-6">
           Enterprise-grade cloud Android workspaces for QA automation, app testing, and secure remote productivity.
         </p>
-         <div class="text-sm text-slate-400 space-y-1">
-           <p>CloudDroid</p>
-           <p>RUNESTONE HANDLUNG s.r.o.</p>
-           <p>Soukenická 877/9</p>
-           <p>Ostrava, 702 00</p>
-           <p>Czech Republic</p>
-         <p>IČO: 23389702</p>
-         <p>support@clouddroid.eu</p>
-         <p>+420 734 210 456</p>
-         </div>
+        <div class="text-sm text-slate-400 space-y-0.5">
+          <p>RUNESTONE HANDLUNG s.r.o.</p>
+          <p>IČO: 23389702</p>
+          <p><a href="mailto:support@clouddroid.eu" class="hover:text-white transition-colors">support@clouddroid.eu</a></p>
+        </div>
       </div>
       <div>
-        <h3 class="text-white font-semibold mb-4">Product</h3>
+        <h3 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Product</h3>
         <ul class="space-y-2 text-sm">
           <li><a href="/#features" class="hover:text-white transition-colors">Features</a></li>
           <li><a href="/#use-cases" class="hover:text-white transition-colors">Use Cases</a></li>
           <li><a href="/pricing" class="hover:text-white transition-colors">Pricing</a></li>
-          <li><a href="/faq" class="hover:text-white transition-colors">FAQ</a></li>
-          <li><a href="/changelog" class="hover:text-white transition-colors">Changelog</a></li>
           <li><a href="/how-it-works" class="hover:text-white transition-colors">How It Works</a></li>
+          <li><a href="/changelog" class="hover:text-white transition-colors">Changelog</a></li>
           <li><a href="/api-docs" class="hover:text-white transition-colors">API Docs</a></li>
         </ul>
       </div>
       <div>
-        <h3 class="text-white font-semibold mb-4">Developers</h3>
+        <h3 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Company</h3>
         <ul class="space-y-2 text-sm">
-          <li><a href="/api-docs" class="hover:text-white transition-colors">API Reference</a></li>
-           <li><a href="/status" class="hover:text-white transition-colors">Status</a></li>
+          <li><a href="/about" class="hover:text-white transition-colors">About</a></li>
+          <li><a href="/security" class="hover:text-white transition-colors">Security</a></li>
+          <li><a href="/security-disclosure" class="hover:text-white transition-colors">Vulnerability Disclosure</a></li>
+          <li><a href="/status" class="hover:text-white transition-colors">Status</a></li>
+          <li><a href="/contact" class="hover:text-white transition-colors">Contact</a></li>
         </ul>
       </div>
       <div>
-        <h3 class="text-white font-semibold mb-4">Legal</h3>
+        <h3 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Legal</h3>
         <ul class="space-y-2 text-sm">
           <li><a href="/legal/terms" class="hover:text-white transition-colors">Terms of Service</a></li>
           <li><a href="/legal/privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
@@ -59,28 +56,21 @@ const legalLinks = [
           <li><a href="/legal/refund" class="hover:text-white transition-colors">Refund Policy</a></li>
           <li><a href="/legal/subprocessors" class="hover:text-white transition-colors">Subprocessors</a></li>
           <li><a href="/legal/aml" class="hover:text-white transition-colors">AML / CFT</a></li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="text-white font-semibold mb-4">Company</h3>
-        <ul class="space-y-2 text-sm">
-          <li><a href="/about" class="hover:text-white transition-colors">About</a></li>
-          <li><a href="/security" class="hover:text-white transition-colors">Security</a></li>
-          <li><a href="/security-disclosure" class="hover:text-white transition-colors">Vulnerability Disclosure</a></li>
-          <li><a href="/sla" class="hover:text-white transition-colors">SLA</a></li>
-          <li><a href="/dpa" class="hover:text-white transition-colors">DPA</a></li>
-          <li><a href="/business" class="hover:text-white transition-colors">Business Information</a></li>
-          <li><a href="/status" class="hover:text-white transition-colors">Status</a></li>
-          <li><a href="/contact" class="hover:text-white transition-colors">Contact</a></li>
+          <li class="pt-2 mt-2 border-t border-slate-700"><a href="/business" class="hover:text-white transition-colors">Business Information</a></li>
         </ul>
       </div>
     </div>
-    <div class="border-t border-slate-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-      <p class="text-sm text-slate-400">
-        &copy; {new Date().getFullYear()} CloudDroid. All rights reserved.
-      </p>
-      <p class="text-xs text-slate-500">
-        Payments securely processed by Dodo Payments and Mollie. CloudDroid is not a financial institution.
+    <div class="border-t border-slate-700 mt-12 pt-8">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+        <p class="text-sm text-slate-400">
+          &copy; {new Date().getFullYear()} CloudDroid. All rights reserved.
+        </p>
+        <p class="text-xs text-slate-500">
+          Payments securely processed by Dodo Payments, Mollie, and PayNow. CloudDroid is not a financial institution.
+        </p>
+      </div>
+      <p class="text-xs text-slate-500 text-center md:text-left">
+        CloudDroid is a product of RUNESTONE HANDLUNG s.r.o., Soukenická 877/9, Ostrava, 702 00, Czech Republic
       </p>
     </div>
   </div>

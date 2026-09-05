@@ -235,66 +235,56 @@ if (sessionId) {
   <div class="min-h-screen bg-slate-light flex items-center justify-center py-16">
     <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
-        {paymentSuccess && userCreated ? (
+        {paymentSuccess && (userCreated || isRenewal) ? (
           <>
             <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h1 class="text-2xl font-bold text-navy mb-4">Welcome to CloudDroid!</h1>
+            <h1 class="text-2xl font-bold text-navy mb-4">
+              {isRenewal && !userCreated ? 'Access Extended' : 'Welcome to CloudDroid!'}
+            </h1>
             <p class="text-slate mb-6">
-              Your <span class="font-semibold text-navy">{planName}</span> plan is now active. Your dashboard account has been created and your cloud Android workspaces are being provisioned.
+              Your <span class="font-semibold text-navy">{planName}</span> plan is now active.
+              {userCreated && ' Your dashboard account has been created and your cloud Android workspaces are being provisioned.'}
             </p>
-            <div class="bg-slate-50 rounded-lg p-4 mb-6 text-left">
+
+            <div class="bg-slate-50 rounded-lg p-4 mb-4 text-left">
               <p class="text-sm font-medium text-navy mb-2">Payment details</p>
               <p class="text-sm text-slate mb-1"><span class="font-medium">Amount:</span> {paidCurrency === 'EUR' ? '€' : '$'}{paidAmount.toFixed(2)}</p>
-               <p class="text-sm text-slate mb-1"><span class="font-medium">Method:</span> {gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : 'Dodo Payments'}</p>
+              <p class="text-sm text-slate mb-1"><span class="font-medium">Method:</span> {gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : 'Dodo Payments'}</p>
               <p class="text-sm text-slate mb-1"><span class="font-medium">Email:</span> {userEmail}</p>
             </div>
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
-              <p class="text-sm font-medium text-navy mb-2">What's next</p>
-              <ul class="text-sm text-slate space-y-1 list-disc list-inside">
-                <li>You're signed in automatically — no need to log in.</li>
-                <li>Set a permanent password on the next screen to secure your account.</li>
-                <li>Your cloud Android workspaces are ready in the dashboard.</li>
-              </ul>
-            </div>
+
+            {userCreated && (
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="animate-spin h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <p class="text-sm font-medium text-navy">Provisioning your workspaces…</p>
+                </div>
+                <ul class="text-sm text-slate space-y-1 list-disc list-inside">
+                  <li>You're signed in automatically — no need to log in.</li>
+                  <li>Set a permanent password to secure your account.</li>
+                  <li>Your cloud Android workspaces will be ready in your dashboard in a moment.</li>
+                </ul>
+              </div>
+            )}
+
             <a
               href="/dashboard"
               class="inline-flex items-center justify-center bg-navy text-white px-6 py-3 rounded-lg font-semibold hover:bg-navy-light transition-colors"
             >
-              Go to Dashboard
-            </a>
-          </>
-        ) : paymentSuccess && isRenewal ? (
-          <>
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h1 class="text-2xl font-bold text-navy mb-4">Access Extended</h1>
-            <p class="text-slate mb-6">
-              Your <span class="font-semibold text-navy">{planName}</span> plan has been extended. You can continue using your existing account.
-            </p>
-            <div class="bg-slate-50 rounded-lg p-4 mb-6 text-left">
-              <p class="text-sm font-medium text-navy mb-2">Payment details</p>
-              <p class="text-sm text-slate mb-1"><span class="font-medium">Amount:</span> {paidCurrency === 'EUR' ? '€' : '$'}{paidAmount.toFixed(2)}</p>
-               <p class="text-sm text-slate mb-1"><span class="font-medium">Method:</span> {gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : 'Dodo Payments'}</p>
-              <p class="text-sm text-slate mb-1"><span class="font-medium">Email:</span> {userEmail}</p>
-            </div>
-            <a
-              href="/dashboard"
-              class="inline-flex items-center justify-center bg-navy text-white px-6 py-3 rounded-lg font-semibold hover:bg-navy-light transition-colors"
-            >
-              Go to Dashboard
+              {userCreated ? 'Set Password & Continue' : 'Go to Dashboard'}
             </a>
           </>
         ) : (
           <>
             <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-8 h-8 text-blue-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
@@ -315,14 +305,14 @@ if (sessionId) {
           </>
         )}
       </div>
+    </div>
   </div>
-</div>
 
-{!paymentSuccess && (
-  <script>
-    setTimeout(() => {
-      window.location.reload();
-    }, 3000);
-  </script>
-)}
+  {!paymentSuccess && (
+    <script>
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    </script>
+  )}
 </Layout>

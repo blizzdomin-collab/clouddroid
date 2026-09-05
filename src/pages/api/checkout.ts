@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { createCheckoutSession } from '../../lib/database';
+import { checkRateLimit } from '../../lib/rateLimit';
 import crypto from 'crypto';
 
 function generateEasyTransacSignature(params: Record<string, string | number>, apiKey: string): string {
@@ -13,6 +14,19 @@ function generateEasyTransacSignature(params: Record<string, string | number>, a
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
+    const ipAddress = clientAddress || 'unknown';
+
+    const allowed = await checkRateLimit(`checkout:${ipAddress}`, 5, 60_000);
+    if (!allowed) {
+      return new Response(JSON.stringify({ error: 'Too many checkout attempts. Please try again in a minute.' }), {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'Retry-After': '60',
+        },
+      });
+    }
+
     const { planId, customerEmail, gateway = 'dodo' } = await request.json();
 
     if (!customerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
@@ -22,7 +36,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       });
     }
 
-    const ipAddress = clientAddress || null;
     const userAgent = request.headers.get('user-agent') || null;
 
     const planConfig: Record<string, { name: string; productId: string; mollieAmount: string; paynowProductId: string }> = {
@@ -143,7 +156,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           },
           description: `CloudDroid ${selectedPlan.name} Plan`,
           redirectUrl: import.meta.env.MOLLIE_RETURN_URL || 'https://clouddroid.eu/checkout/success',
-          webhookUrl: 'https://clouddroid.eu/api/webhooks/mollie',
+          webhookUrl: import.meta.env.MOLLIE_WEBHOOK_URL || 'https://clouddroid.eu/api/webhooks/mollie',
           metadata: {
             plan: selectedPlan.name,
             email: customerEmail,
@@ -300,6 +313,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           email: customerEmail,
         },
         return_url: import.meta.env.DODO_PAYMENTS_RETURN_URL || 'https://clouddroid.eu/checkout/success',
+        force_3ds: false,
       }),
     });
 
