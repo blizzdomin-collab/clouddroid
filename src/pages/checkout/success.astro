@@ -31,7 +31,7 @@ let tempPassword = '';
 let planName = '';
 let errorMessage = '';
 let paymentSuccess = false;
-let gateway: 'dodo' | 'mollie' | 'paynow' | 'easytransac' = 'dodo';
+let gateway: 'dodo' | 'mollie' | 'paynow' | 'easytransac' | 'creem' = 'dodo';
 let isRenewal = false;
 let paidAmount = 0;
 let paidCurrency = 'USD';
@@ -39,7 +39,7 @@ let paidCurrency = 'USD';
 if (sessionId) {
   const checkoutSession = getCheckoutSessionBySessionId(sessionId);
   if (checkoutSession) {
-    gateway = checkoutSession.payment_gateway === 'mollie' ? 'mollie' : checkoutSession.payment_gateway === 'paynow' ? 'paynow' : checkoutSession.payment_gateway === 'easytransac' ? 'easytransac' : 'dodo';
+    gateway = checkoutSession.payment_gateway === 'mollie' ? 'mollie' : checkoutSession.payment_gateway === 'paynow' ? 'paynow' : checkoutSession.payment_gateway === 'easytransac' ? 'easytransac' : checkoutSession.payment_gateway === 'creem' ? 'creem' : 'dodo';
   }
 
   if (checkoutSession && checkoutSession.status === 'pending') {
@@ -49,7 +49,27 @@ if (sessionId) {
       let currency = 'USD';
       let customerId: string | null = null;
 
-      if (gateway === 'mollie') {
+      if (gateway === 'creem') {
+        const creemApiKey = import.meta.env.CREEM_API_KEY;
+        if (creemApiKey) {
+          const environment = import.meta.env.CREEM_ENVIRONMENT || 'live';
+          const baseUrl = environment === 'test' ? 'https://test-api.creem.io/v1' : 'https://api.creem.io/v1';
+          const checkoutRes = await fetch(`${baseUrl}/checkouts/${sessionId}`, {
+            headers: {
+              'x-api-key': creemApiKey,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (checkoutRes.ok) {
+            const checkoutData = await checkoutRes.json();
+            paymentStatus = checkoutData.status === 'completed' ? 'paid' : checkoutData.status;
+            amount = (checkoutData.order?.amount || 0) / 100;
+            currency = checkoutData.order?.currency || 'USD';
+            customerId = checkoutData.customer?.id || null;
+          }
+        }
+      } else if (gateway === 'mollie') {
         const mollieApiKey = import.meta.env.MOLLIE_API_KEY;
         if (mollieApiKey) {
           const environment = import.meta.env.MOLLIE_ENVIRONMENT || 'live';
@@ -253,7 +273,7 @@ if (sessionId) {
             <div class="bg-slate-50 rounded-lg p-4 mb-4 text-left">
               <p class="text-sm font-medium text-navy mb-2">Payment details</p>
               <p class="text-sm text-slate mb-1"><span class="font-medium">Amount:</span> {paidCurrency === 'EUR' ? '€' : '$'}{paidAmount.toFixed(2)}</p>
-              <p class="text-sm text-slate mb-1"><span class="font-medium">Method:</span> {gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : 'Dodo Payments'}</p>
+              <p class="text-sm text-slate mb-1"><span class="font-medium">Method:</span> {gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : gateway === 'creem' ? 'Creem' : 'Dodo Payments'}</p>
               <p class="text-sm text-slate mb-1"><span class="font-medium">Email:</span> {userEmail}</p>
             </div>
 
@@ -294,7 +314,7 @@ if (sessionId) {
             </p>
             {errorMessage && <p class="text-sm text-red-600 mb-4">{errorMessage}</p>}
             <p class="text-sm text-slate mb-8">
-              Securely processed by {gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : 'Dodo Payments'}.
+              Securely processed by {gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : gateway === 'creem' ? 'Creem' : 'Dodo Payments'}.
             </p>
             <a
               href="/"

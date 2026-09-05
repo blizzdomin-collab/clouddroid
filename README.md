@@ -8,7 +8,7 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 - **Styling:** Tailwind CSS v4
 - **Database:** SQLite via `better-sqlite3` (`.data/clouddroid.db`)
 - **Cache/Realtime:** Redis (`ioredis`) + WebSocket server (`ws`)
-- **Payments:** Dodo Payments + Mollie + PayNow
+- **Payments:** Dodo Payments + Mollie + PayNow + Creem + EasyTransac
 - **Deployment:** PM2 + Nginx + Let's Encrypt SSL
 - **Auto-deploy:** GitHub Actions on push to `main`
 
@@ -65,10 +65,10 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 │   │   │   └── aml.astro
 │   │   └── api/                  # API routes
 │   │       ├── auth/             # Login, logout, register, password reset, 2FA, activity, sessions
-│   │       ├── checkout.ts       # Dodo Payments + Mollie + PayNow checkout session
+│   │       ├── checkout.ts       # Dodo Payments + Mollie + PayNow + Creem + EasyTransac checkout session
 │   │       ├── contact.ts        # Contact form submission
 │   │       ├── announcements.ts  # Public announcements feed
-│   │       ├── webhooks/         # Dodo Payments + Mollie + PayNow webhooks
+│   │       ├── webhooks/         # Dodo Payments + Mollie + PayNow + Creem + EasyTransac webhooks
 │   │       ├── instances/        # Instance CRUD + actions + detail
 │   │       ├── monitoring/       # Metrics, collect, charts
 │   │       ├── audit/            # Logs, export CSV
@@ -214,6 +214,17 @@ Static B2B consulting site hosted on `consulting.clouddroid.eu`:
 - Webhook signature: HMAC SHA256 with timestamp tolerance 5 minutes
 - Test customer ID: `596957825259806720`
 - Webhook events verified: `ON_ORDER_COMPLETED`, `ONDELIVERYITEMADDED`, `ONDELIVERYITEMACTIVATED`
+
+### Creem
+- Webhook endpoint: `/api/webhooks/creem`
+- Environment variables: `CREEM_API_KEY`, `CREEM_WEBHOOK_SECRET`, `CREEM_ENVIRONMENT=live`, `CREEM_RETURN_URL=https://clouddroid.eu/checkout/success`
+- Checkout endpoint: `POST https://api.creem.io/v1/checkouts` (test: `https://test-api.creem.io/v1/checkouts`)
+- Auth: `x-api-key` header
+- Product IDs: developer `prod_RI7KMJ2qwawQVhP2NzGJf`, professional `prod_76ohlfCZSqbhwpuhRPIBW7`, team `prod_1P7uHkFDLk6RnuHUqcZmMf`
+- Webhook signature: HMAC-SHA256 of raw payload, header `creem-signature`
+- Subscribed events: `checkout.completed`, `subscription.active`, `subscription.paid`, `subscription.canceled`, `refund.created`, `dispute.created`
+- Success redirect: `?checkout_id=...&order_id=...&customer_id=...&product_id=...`
+- Merchant of Record (handles global tax compliance in 190+ countries)
 
 ## 📄 License
 

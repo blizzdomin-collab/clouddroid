@@ -209,6 +209,26 @@ if (!selectedPlan) {
                     </div>
                   </label>
                   <label class="cursor-pointer relative">
+                    <input type="radio" name="gateway" value="creem" class="sr-only peer" />
+                    <div class="border-2 border-slate-200 rounded-xl p-5 peer-checked:border-navy peer-checked:bg-navy/5 transition-all hover:border-slate-300">
+                      <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-navy/5 rounded-lg flex items-center justify-center">
+                          <svg class="w-6 h-6 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <div class="text-sm font-semibold text-navy">Creem</div>
+                          <div class="text-xs text-slate">Card, Apple Pay, Google Pay</div>
+                        </div>
+                      </div>
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium text-slate">USD/EUR pricing</span>
+                        <span class="text-xs font-medium text-navy">${selectedPlan.price}</span>
+                      </div>
+                    </div>
+                  </label>
+                  <label class="cursor-pointer relative">
                     <input type="radio" name="gateway" value="easytransac" class="sr-only peer" />
                     <div class="border-2 border-slate-200 rounded-xl p-5 peer-checked:border-navy peer-checked:bg-navy/5 transition-all hover:border-slate-300">
                       <div class="flex items-center gap-3 mb-3">
@@ -299,9 +319,9 @@ if (!selectedPlan) {
         const gateway = input.value;
         const planId = form?.getAttribute('data-plan');
         const planConfig = {
-          developer: { name: 'Developer', price: 49, molliePrice: '49.00', paynowPrice: '49.00', easytransacPrice: '49.00', specs: ['4 GB RAM', '32 GB Storage', '1 Instance'] },
-          professional: { name: 'Professional', price: 149, molliePrice: '149.00', paynowPrice: '149.00', easytransacPrice: '149.00', specs: ['8 GB RAM', '64 GB Storage', '4 Instances'] },
-          team: { name: 'Team', price: 399, molliePrice: '399.00', paynowPrice: '399.00', easytransacPrice: '399.00', specs: ['16 GB RAM', '128 GB Storage', '12 Instances'] },
+          developer: { name: 'Developer', price: 49, molliePrice: '49.00', paynowPrice: '49.00', easytransacPrice: '49.00', creemPrice: 49, specs: ['4 GB RAM', '32 GB Storage', '1 Instance'] },
+          professional: { name: 'Professional', price: 149, molliePrice: '149.00', paynowPrice: '149.00', easytransacPrice: '149.00', creemPrice: 149, specs: ['8 GB RAM', '64 GB Storage', '4 Instances'] },
+          team: { name: 'Team', price: 399, molliePrice: '399.00', paynowPrice: '399.00', easytransacPrice: '399.00', creemPrice: 399, specs: ['16 GB RAM', '128 GB Storage', '12 Instances'] },
         };
         const selectedPlan = planId ? planConfig[planId] : null;
         if (selectedPlan) {
@@ -318,6 +338,10 @@ if (!selectedPlan) {
             summaryGateway.textContent = 'EasyTransac';
             summaryPrice.textContent = '€' + selectedPlan.easytransacPrice;
             summaryCurrency.textContent = 'EUR';
+          } else if (gateway === 'creem') {
+            summaryGateway.textContent = 'Creem';
+            summaryPrice.textContent = '$' + selectedPlan.creemPrice;
+            summaryCurrency.textContent = 'USD';
           } else {
             summaryGateway.textContent = 'Dodo Payments';
             summaryPrice.textContent = '$' + selectedPlan.price;

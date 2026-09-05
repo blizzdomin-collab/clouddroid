@@ -38,10 +38,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     const userAgent = request.headers.get('user-agent') || null;
 
-    const planConfig: Record<string, { name: string; productId: string; mollieAmount: string; paynowProductId: string }> = {
-      developer: { name: 'Developer', productId: 'pdt_0NlcRNFMskyRt5vwC8roH', mollieAmount: '49.00', paynowProductId: '596937594697154560' },
-      professional: { name: 'Professional', productId: 'pdt_0NlxI8ewOVrMkKN3SNXvY', mollieAmount: '149.00', paynowProductId: '596937714155134976' },
-      team: { name: 'Team', productId: 'pdt_0Nlqwcv5UpGxDeEtIEt6X', mollieAmount: '399.00', paynowProductId: '596937843687821312' },
+    const planConfig: Record<string, { name: string; productId: string; mollieAmount: string; paynowProductId: string; creemProductId: string }> = {
+      developer: { name: 'Developer', productId: 'pdt_0NlcRNFMskyRt5vwC8roH', mollieAmount: '49.00', paynowProductId: '596937594697154560', creemProductId: 'prod_RI7KMJ2qwawQVhP2NzGJf' },
+      professional: { name: 'Professional', productId: 'pdt_0NlxI8ewOVrMkKN3SNXvY', mollieAmount: '149.00', paynowProductId: '596937714155134976', creemProductId: 'prod_76ohlfCZSqbhwpuhRPIBW7' },
+      team: { name: 'Team', productId: 'pdt_0Nlqwcv5UpGxDeEtIEt6X', mollieAmount: '399.00', paynowProductId: '596937843687821312', creemProductId: 'prod_1P7uHkFDLk6RnuHUqcZmMf' },
     };
 
     const selectedPlan = planConfig[planId];
@@ -126,6 +126,65 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       });
 
       return new Response(JSON.stringify({ checkout_url: result.PageUrl, sessionId: result.RequestId || orderId, gateway: 'easytransac' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (gateway === 'creem') {
+      const creemApiKey = import.meta.env.CREEM_API_KEY;
+      if (!creemApiKey) {
+        return new Response(JSON.stringify({ error: 'Payment configuration error' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      const environment = import.meta.env.CREEM_ENVIRONMENT || 'live';
+      const baseUrl = environment === 'test' ? 'https://test-api.creem.io/v1' : 'https://api.creem.io/v1';
+      const requestId = `clouddroid_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+
+      const response = await fetch(`${baseUrl}/checkouts`, {
+        method: 'POST',
+        headers: {
+          'x-api-key': creemApiKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          product_id: selectedPlan.creemProductId,
+          request_id: requestId,
+          success_url: import.meta.env.CREEM_RETURN_URL || 'https://clouddroid.eu/checkout/success',
+          metadata: {
+            plan: selectedPlan.name,
+            email: customerEmail,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Creem checkout failed:', response.status, errorText);
+        return new Response(JSON.stringify({ error: 'Failed to create Creem checkout', details: errorText }), {
+          status: response.status,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      const session = await response.json();
+      const tempPassword = crypto.randomBytes(12).toString('hex');
+
+      createCheckoutSession({
+        session_id: session.id,
+        email: customerEmail,
+        plan: selectedPlan.name,
+        status: 'pending',
+        temp_password: tempPassword,
+        ip_address: ipAddress,
+        user_agent: userAgent,
+        payment_gateway: 'creem',
+      });
+
+      return new Response(JSON.stringify({ checkout_url: session.checkout_url, sessionId: session.id, gateway: 'creem' }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });

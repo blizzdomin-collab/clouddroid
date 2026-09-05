@@ -225,6 +225,20 @@ Showcasing a robust backend builds trust.
 - Test customer ID: `596957825259806720`
 - Webhook events verified: `ON_ORDER_COMPLETED`, `ONDELIVERYITEMADDED`, `ONDELIVERYITEMACTIVATED`
 
+## Creem Setup
+
+- Webhook endpoint: `/api/webhooks/creem`
+- Environment variables: `CREEM_API_KEY`, `CREEM_WEBHOOK_SECRET`, `CREEM_ENVIRONMENT=live`, `CREEM_RETURN_URL=https://clouddroid.eu/checkout/success`
+- Base URL: `https://api.creem.io/v1` (production) / `https://test-api.creem.io/v1` (test)
+- Auth: `x-api-key` header
+- Checkout endpoint: `POST /v1/checkouts` with `product_id`, `request_id`, `success_url`, `metadata`
+- Product IDs: developer `prod_RI7KMJ2qwawQVhP2NzGJf`, professional `prod_76ohlfCZSqbhwpuhRPIBW7`, team `prod_1P7uHkFDLk6RnuHUqcZmMf`
+- Webhook signature: HMAC-SHA256 of raw payload, header `creem-signature`
+- Webhook events verified: `checkout.completed`, `subscription.active`, `subscription.paid`, `subscription.canceled`, `refund.created`, `dispute.created`
+- Customer portal: `POST /v1/customers/billing` (returns `customer_portal_link` with magic-link authentication)
+- **Merchant of Record** — handles global tax compliance (VAT/GST) in 190+ countries
+- MoR acknowledgment: "Securely processed by Dodo Payments, Mollie, PayNow & Creem"
+
 ---
 
 ## 8. Implementation Progress
@@ -260,10 +274,11 @@ Showcasing a robust backend builds trust.
 | Subprocessors List | `src/pages/legal/subprocessors.astro` | ✅ Done |
 | AML/CFT Policy | `src/pages/legal/aml.astro` | ✅ Done |
 | Checkout Flow | `src/pages/checkout/[plan].astro` | ✅ Done |
-| Checkout API | `src/pages/api/checkout.ts` | ✅ Done (Dodo + Mollie + PayNow) |
+| Checkout API | `src/pages/api/checkout.ts` | ✅ Done (Dodo + Mollie + PayNow + Creem + EasyTransac) |
 | Webhook Handler | `src/pages/api/webhooks/dodopayments.ts` | ✅ Done |
 | Mollie Webhook Handler | `src/pages/api/webhooks/mollie.ts` | ✅ Done |
 | PayNow Webhook Handler | `src/pages/api/webhooks/paynow.ts` | ✅ Done |
+| Creem Webhook Handler | `src/pages/api/webhooks/creem.ts` | ✅ Done |
 | Customer Portal | `src/pages/api/customer-portal.ts` | ✅ Done |
 | Monitoring Dashboard | `src/pages/monitoring/index.astro` | ✅ Done |
 | Monitoring API | `src/pages/api/monitoring/instances.ts` | ✅ Done |
@@ -437,6 +452,7 @@ Showcasing a robust backend builds trust.
 - [x] Dodo Payments checkout working in production (`POST /checkouts`)
 - [x] Mollie checkout working in production (`POST /v2/payments`)
 - [x] PayNow checkout working in production (`POST /v1/stores/{storeId}/checkouts`)
+- [x] Creem checkout working in production (`POST /v1/checkouts`)
 - [x] Login history/activity page with paginated auth events
 - [x] Session management with active sessions list and revoke
 - [x] Instance detail page with metrics chart and action buttons
@@ -539,3 +555,4 @@ Showcasing a robust backend builds trust.
 62. ~~Fix string interpolation bugs in class attributes~~ ✅ Completed
 63. ~~Enhance admin dashboard (plan distribution, expiring soon, revenue by month)~~ ✅ Completed
 64. ~~Enhance dashboard overview (renewal countdown, instances preview, billing snapshot, activity feed)~~ ✅ Completed
+65. Add Creem payment gateway integration ✅ Completed (Merchant of Record, USD/EUR)
