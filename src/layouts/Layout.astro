@@ -51,8 +51,6 @@ const {
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-5PFFX5S7');</script>
     <!-- End Google Tag Manager -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8441247317236603"
-         crossorigin="anonymous"></script>
     <script type="application/ld+json" set:html={JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'Organization',
@@ -89,8 +87,7 @@ const {
     <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 bg-navy text-white p-4 shadow-lg transform translate-y-full transition-transform duration-300 z-50" role="dialog" aria-label="Cookie consent">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         <p class="text-sm text-slate-300">
-          This site uses essential cookies to operate. We do not use tracking cookies for advertising without your consent.
-          <a href="/legal/privacy" class="underline text-white">Learn more</a>
+          This site uses essential cookies to operate and Google AdSense for advertising. By clicking "Accept", you consent to advertising cookies. You can learn more in our <a href="/legal/privacy" class="underline text-white">Privacy Policy</a>.
         </p>
         <button id="cookie-accept" class="bg-white text-navy px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-100 transition-colors whitespace-nowrap">
           Accept
@@ -110,8 +107,17 @@ const {
         const acceptBtn = document.getElementById('cookie-accept');
         if (!banner || !acceptBtn) return;
 
+        function loadAdSense() {
+          const script = document.createElement('script');
+          script.async = true;
+          script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8441247317236603';
+          script.crossOrigin = 'anonymous';
+          document.head.appendChild(script);
+        }
+
         if (localStorage.getItem('cookie-consent') === 'accepted') {
           banner.remove();
+          loadAdSense();
           return;
         }
 
@@ -122,7 +128,10 @@ const {
         acceptBtn.addEventListener('click', () => {
           localStorage.setItem('cookie-consent', 'accepted');
           banner.classList.add('translate-y-full');
-          setTimeout(() => banner.remove(), 300);
+          setTimeout(() => {
+            banner.remove();
+            loadAdSense();
+          }, 300);
         });
       })();
     </script>
