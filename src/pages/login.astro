@@ -1,5 +1,28 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const sessionCookie = Astro.cookies.get('session');
+let isAuthenticated = false;
+let mustChangePassword = false;
+
+if (sessionCookie) {
+  try {
+    const session = JSON.parse(sessionCookie.value);
+    if (session.authenticated === true && session.email) {
+      isAuthenticated = true;
+      mustChangePassword = session.must_change_password === true;
+    }
+  } catch {
+    isAuthenticated = false;
+  }
+}
+
+if (isAuthenticated) {
+  if (mustChangePassword) {
+    throw Astro.redirect('/change-password');
+  }
+  throw Astro.redirect('/dashboard');
+}
 ---
 
 <Layout title="Login - CloudDroid" description="Login to CloudDroid Dashboard">

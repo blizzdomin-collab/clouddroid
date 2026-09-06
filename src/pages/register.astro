@@ -1,5 +1,32 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getUserByEmail } from '../lib/database';
+
+const sessionCookie = Astro.cookies.get('session');
+let isAuthenticated = false;
+let mustChangePassword = false;
+
+if (sessionCookie) {
+  try {
+    const session = JSON.parse(sessionCookie.value);
+    if (session.authenticated === true && session.email) {
+      const user = getUserByEmail(session.email);
+      if (user) {
+        isAuthenticated = true;
+        mustChangePassword = session.must_change_password === true || user.must_change_password === true;
+      }
+    }
+  } catch {
+    isAuthenticated = false;
+  }
+}
+
+if (isAuthenticated) {
+  if (mustChangePassword) {
+    throw Astro.redirect('/change-password');
+  }
+  throw Astro.redirect('/dashboard');
+}
 ---
 
 <Layout title="Register - CloudDroid" description="Create a CloudDroid account">
