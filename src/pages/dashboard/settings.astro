@@ -2,13 +2,13 @@
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
 
 const sessionCookie = Astro.cookies.get('session');
-let currentUser: { email: string; name: string; role: string } | null = null;
+let currentUser: { email: string; name: string; role: string; must_change_password: boolean } | null = null;
 
 if (sessionCookie) {
   try {
     const session = JSON.parse(sessionCookie.value);
     if (session.authenticated === true && session.email) {
-      currentUser = { email: session.email, name: session.name || 'User', role: session.role || 'user' };
+      currentUser = { email: session.email, name: session.name || 'User', role: session.role || 'user', must_change_password: session.must_change_password || false };
     }
   } catch {
     currentUser = null;
@@ -43,6 +43,35 @@ if (sessionCookie) {
           </div>
         </div>
       </div>
+
+      {currentUser?.must_change_password && (
+        <div class="card overflow-hidden border-yellow-800">
+          <div class="px-6 py-4 border-b border-slate-700 bg-yellow-900/20">
+            <h2 class="text-lg font-semibold text-yellow-400">Action Required</h2>
+          </div>
+          <div class="p-6">
+            <p class="text-sm text-slate text-slate-400 mb-4">Your account was created with a temporary password. Please change it now to secure your account.</p>
+            <form id="temp-password-form" class="space-y-4">
+              <div>
+                <label for="temp-password" class="block text-sm font-medium text-slate-100 mb-1">Temporary Password</label>
+                <input type="text" id="temp-password" name="tempPassword" readonly class="input bg-slate-800 font-mono" />
+                <p class="text-xs text-slate text-slate-400 mt-1">This is your temporary password. Copy it and use it as your current password below.</p>
+              </div>
+              <div>
+                <label for="new-password" class="block text-sm font-medium text-slate-100 mb-1">New Password</label>
+                <input type="password" id="new-password" name="newPassword" required minlength="8" class="input" />
+              </div>
+              <div>
+                <label for="confirm-password" class="block text-sm font-medium text-slate-100 mb-1">Confirm New Password</label>
+                <input type="password" id="confirm-password" name="confirmPassword" required minlength="8" class="input" />
+              </div>
+              <div id="temp-password-error" class="hidden p-3 bg-red-900/30 border border-red-800 rounded-lg text-sm text-red-400"></div>
+              <div id="temp-password-success" class="hidden p-3 bg-green-900/30 border border-green-800 rounded-lg text-sm text-green-400"></div>
+              <button type="submit" class="btn btn-accent">Set Permanent Password</button>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div class="card overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-700">
@@ -233,6 +262,62 @@ if (sessionCookie) {
         if (errorEl) {
           errorEl.textContent = data.error || 'Failed to update password';
           errorEl.classList.remove('hidden');
+        }
+      }
+    });
+
+    const tempForm = document.getElementById('temp-password-form');
+    const tempErrorEl = document.getElementById('temp-password-error');
+    const tempSuccessEl = document.getElementById('temp-password-success');
+    const tempPasswordInput = document.getElementById('temp-password') as HTMLInputElement | null;
+
+    if (tempPasswordInput && !tempPasswordInput.value) {
+      tempPasswordInput.value = 'Temporary password was shown on the checkout success page';
+    }
+
+    tempForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (tempErrorEl) tempErrorEl.classList.add('hidden');
+      if (tempSuccessEl) tempSuccessEl.classList.add('hidden');
+
+      const tempPassword = tempPasswordInput?.value || '';
+      const newPassword = (tempForm as HTMLFormElement).newPassword.value;
+      const confirmPassword = (tempForm as HTMLFormElement).confirmPassword.value;
+
+      if (!tempPassword || tempPassword === 'Temporary password was shown on the checkout success page') {
+        if (tempErrorEl) {
+          tempErrorEl.textContent = 'Please enter your temporary password';
+          tempErrorEl.classList.remove('hidden');
+        }
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        if (tempErrorEl) {
+          tempErrorEl.textContent = 'New passwords do not match';
+          tempErrorEl.classList.remove('hidden');
+        }
+        return;
+      }
+
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword: tempPassword, newPassword }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        if (tempSuccessEl) {
+          tempSuccessEl.textContent = 'Password set successfully';
+          tempSuccessEl.classList.remove('hidden');
+        }
+        (tempForm as HTMLFormElement).reset();
+        if (tempPasswordInput) tempPasswordInput.value = '';
+      } else {
+        if (tempErrorEl) {
+          tempErrorEl.textContent = data.error || 'Failed to set password';
+          tempErrorEl.classList.remove('hidden');
         }
       }
     });

@@ -400,12 +400,14 @@ if (!selectedPlan) {
         if (buttonLabel) buttonLabel.textContent = 'Redirecting to secure payment...';
       }
       try {
+        const csrfRes = await fetch('/api/csrf');
+        const csrfData = await csrfRes.json();
         const form = document.getElementById('checkout-form');
         const planId = form?.getAttribute('data-plan');
         const response = await fetch('/api/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ planId: planId || '', customerEmail: email, gateway }),
+          body: JSON.stringify({ planId: planId || '', customerEmail: email, gateway, csrf: csrfData.csrfToken }),
         });
         if (response.status === 429) {
           alert('Too many attempts. Please wait a minute before trying again.');

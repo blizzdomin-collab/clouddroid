@@ -16,8 +16,12 @@ if (sessionCookie) {
       if (user && user.role === 'admin') {
         isAdmin = true;
         const [statsRes, healthRes] = await Promise.all([
-          fetch(`${Astro.url.origin}/api/admin/stats`),
-          fetch(`${Astro.url.origin}/api/admin/health`),
+          fetch(`${Astro.url.origin}/api/admin/stats`, {
+            headers: { Cookie: `session=${sessionCookie.value}` },
+          }),
+          fetch(`${Astro.url.origin}/api/admin/health`, {
+            headers: { Cookie: `session=${sessionCookie.value}` },
+          }),
         ]);
         if (statsRes.ok) {
           stats = await statsRes.json();

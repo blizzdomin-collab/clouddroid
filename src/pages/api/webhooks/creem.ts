@@ -90,7 +90,6 @@ export const POST: APIRoute = async ({ request }) => {
         amount: isNaN(amount) ? 0 : amount,
         currency: String(currency).toUpperCase(),
         gateway: 'creem',
-        tempPassword: checkoutSession.temp_password || undefined,
         customerId: customerId || undefined,
         checkoutSessionId: checkoutSession.session_id,
       });

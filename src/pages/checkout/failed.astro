@@ -2,32 +2,40 @@
 import Layout from '../../layouts/Layout.astro';
 
 export const prerender = false;
+
+const sessionId = Astro.url.searchParams.get('session_id');
+const errorMessage = Astro.url.searchParams.get('error') || 'Your payment could not be processed.';
 ---
 
-<Layout title="Checkout Canceled - CloudDroid" description="Your checkout was canceled">
+<Layout title="Payment Failed - CloudDroid" description="Your payment failed">
   <div class="min-h-screen bg-slate-light flex items-center justify-center py-16">
     <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
-        <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
-        <h1 class="text-2xl font-bold text-navy mb-4">Checkout Canceled</h1>
+        <h1 class="text-2xl font-bold text-navy mb-4">Payment Failed</h1>
         <p class="text-slate mb-6">
-          Your payment was canceled. No charges were made to your account.
+          {errorMessage}
         </p>
         <div class="bg-slate-50 rounded-lg p-4 mb-6 text-left">
           <p class="text-sm text-slate mb-2">
-            If you experienced any issues during checkout, please try again or contact our support team.
+            Please check your payment details and try again. If the problem persists, contact your bank or try a different payment method.
           </p>
+          {sessionId && (
+            <p class="text-xs text-slate mt-2">
+              Reference: {sessionId}
+            </p>
+          )}
         </div>
         <div class="flex flex-col gap-3">
           <a
             href="/#pricing"
             class="inline-flex items-center justify-center bg-navy text-white px-6 py-3 rounded-lg font-semibold hover:bg-navy-light transition-colors"
           >
-            Return to Pricing
+            Try Again
           </a>
           <a
             href="/"

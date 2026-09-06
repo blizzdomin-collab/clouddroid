@@ -1,0 +1,123 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+
+const sessionCookie = Astro.cookies.get('session');
+let isAdmin = false;
+let subscriptions: any[] = [];
+let error: string | null = null;
+
+if (sessionCookie) {
+  try {
+    const session = JSON.parse(sessionCookie.value);
+    if (session.authenticated === true && session.role === 'admin') {
+      isAdmin = true;
+      const res = await fetch(`${Astro.url.origin}/api/admin/subscriptions`, {
+        headers: { Cookie: `session=${sessionCookie.value}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        subscriptions = data.subscriptions || [];
+      } else {
+        error = 'Failed to load subscriptions';
+      }
+    }
+  } catch {
+    isAdmin = false;
+  }
+}
+---
+
+<DashboardLayout title="Subscriptions - CloudDroid">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-100 mb-1">Subscriptions</h1>
+    <p class="text-slate text-slate-400">Manage user subscriptions and access periods</p>
+  </div>
+
+  {error && <div class="mb-6 bg-red-900/30 border border-red-800 rounded-xl p-4 text-red-400">{error}</div>}
+
+  <div class="card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-slate-800">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">User</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Plan</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Period</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Amount</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-700">
+          {subscriptions.length === 0 ? (
+            <tr>
+              <td colspan="6" class="px-6 py-8 text-center text-sm text-slate text-slate-400">No subscriptions found.</td>
+            </tr>
+          ) : (
+            subscriptions.map((sub) => (
+              <tr>
+                <td class="px-6 py-4">
+                  <div class="text-sm font-medium text-slate-100">{sub.user?.name || 'Unknown'}</div>
+                  <div class="text-xs text-slate text-slate-400">{sub.user?.email || 'unknown'}</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-100">{sub.plan}</td>
+                <td class="px-6 py-4">
+                  <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${sub.status === 'active' ? 'text-green-400 bg-green-900/30' : sub.status === 'canceled' ? 'text-red-400 bg-red-900/30' : 'text-yellow-400 bg-yellow-900/30'}`}>
+                    {sub.status}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-xs text-slate text-slate-400">
+                  {new Date(sub.current_period_start).toLocaleDateString()} - {new Date(sub.current_period_end).toLocaleDateString()}
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-100">${sub.amount} {sub.currency}</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <button onclick="extendSubscription('{sub.id}', 30)" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-100 px-3 py-1.5 rounded-lg transition-colors">
+                      Extend 30d
+                    </button>
+                    {sub.status !== 'canceled' && (
+                      <button onclick="cancelSubscription('{sub.id}')" class="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-400 px-3 py-1.5 rounded-lg transition-colors">
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function cancelSubscription(id) {
+      if (!confirm('Are you sure you want to cancel this subscription?')) return;
+      const res = await fetch('/api/admin/subscriptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription_id: id, action: 'cancel' }),
+      });
+      if (res.ok) {
+        window.showToast('Subscription canceled successfully', 'success');
+        location.reload();
+      } else {
+        window.showToast('Failed to cancel subscription', 'error');
+      }
+    }
+
+    async function extendSubscription(id, days) {
+      const res = await fetch('/api/admin/subscriptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription_id: id, action: 'extend', days }),
+      });
+      if (res.ok) {
+        window.showToast(`Subscription extended by ${days} days`, 'success');
+        location.reload();
+      } else {
+        window.showToast('Failed to extend subscription', 'error');
+      }
+    }
+  </script>
+</DashboardLayout>

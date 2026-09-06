@@ -123,13 +123,13 @@ export const POST: APIRoute = async ({ request }) => {
       const plan = checkoutSession.plan;
       const amountValue = amount || parseFloat(checkoutSession.amount || '0');
       const currencyValue = currency || 'EUR';
-      const tempPassword = checkoutSession.temp_password || crypto.randomBytes(12).toString('hex');
 
       let user = getUserByEmail(email);
       if (!user) {
+        const tempPassword = crypto.randomBytes(12).toString('hex');
         user = createUser({
           email,
-          password_hash: crypto.createHash('sha256').update(tempPassword).digest('hex'),
+          password_hash: hashPassword(tempPassword),
           name: email.split('@')[0],
           role: 'user',
           reset_token: null,

@@ -12,8 +12,19 @@ function generateEasyTransacSignature(params: Record<string, string | number>, a
   return crypto.createHash('sha1').update(`${chain}$${apiKey}`).digest('hex');
 }
 
-export const POST: APIRoute = async ({ request, clientAddress }) => {
+export const POST: APIRoute = async ({ request, clientAddress, cookies }) => {
   try {
+    const csrfToken = cookies.get('csrf_token')?.value;
+    const requestBody = await request.json();
+    const { csrf, planId, customerEmail, gateway = 'dodo' } = requestBody as any;
+
+    if (!csrf || !csrfToken || csrf !== csrfToken) {
+      return new Response(JSON.stringify({ error: 'Invalid CSRF token' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const ipAddress = clientAddress || 'unknown';
 
     const allowed = await checkRateLimit(`checkout:${ipAddress}`, 5, 60_000);
@@ -26,8 +37,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         },
       });
     }
-
-    const { planId, customerEmail, gateway = 'dodo' } = await request.json();
 
     if (!customerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
       return new Response(JSON.stringify({ error: 'Valid email is required' }), {
@@ -111,14 +120,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       }
 
       const result = paymentResult.Result || {};
-      const tempPassword = crypto.randomBytes(12).toString('hex');
 
       createCheckoutSession({
         session_id: result.RequestId || orderId,
         email: customerEmail,
         plan: selectedPlan.name,
         status: 'pending',
-        temp_password: tempPassword,
         ip_address: ipAddress,
         user_agent: userAgent,
         payment_gateway: 'easytransac',
@@ -171,14 +178,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       }
 
       const session = await response.json();
-      const tempPassword = crypto.randomBytes(12).toString('hex');
 
       createCheckoutSession({
         session_id: session.id,
         email: customerEmail,
         plan: selectedPlan.name,
         status: 'pending',
-        temp_password: tempPassword,
         ip_address: ipAddress,
         user_agent: userAgent,
         payment_gateway: 'creem',
@@ -232,14 +237,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       }
 
       const payment = await response.json();
-      const tempPassword = crypto.randomBytes(12).toString('hex');
 
       createCheckoutSession({
         session_id: payment.id,
         email: customerEmail,
         plan: selectedPlan.name,
         status: 'pending',
-        temp_password: tempPassword,
         ip_address: ipAddress,
         user_agent: userAgent,
         payment_gateway: 'mollie',
@@ -323,14 +326,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       }
 
       const session = await response.json();
-      const tempPassword = crypto.randomBytes(12).toString('hex');
 
       createCheckoutSession({
         session_id: session.id,
         email: customerEmail,
         plan: selectedPlan.name,
         status: 'pending',
-        temp_password: tempPassword,
         ip_address: ipAddress,
         user_agent: userAgent,
         payment_gateway: 'paynow',
@@ -382,14 +383,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       }
 
       const session = await response.json();
-      const tempPassword = crypto.randomBytes(12).toString('hex');
 
       createCheckoutSession({
         session_id: session.id,
         email: customerEmail,
         plan: selectedPlan.name,
         status: 'pending',
-        temp_password: tempPassword,
         ip_address: ipAddress,
         user_agent: userAgent,
         payment_gateway: 'whop',
@@ -443,14 +442,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     }
 
     const session = await response.json();
-    const tempPassword = crypto.randomBytes(12).toString('hex');
 
     createCheckoutSession({
       session_id: session.session_id,
       email: customerEmail,
       plan: selectedPlan.name,
       status: 'pending',
-      temp_password: tempPassword,
       ip_address: ipAddress,
       user_agent: userAgent,
       payment_gateway: 'dodo',

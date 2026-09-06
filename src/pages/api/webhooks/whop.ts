@@ -112,7 +112,7 @@ export const POST: APIRoute = async ({ request }) => {
 
       if (isNewUser) {
         const tempPassword = crypto.randomBytes(12).toString('hex');
-        createUser({
+        const newUser = createUser({
           email: customerEmail,
           password_hash: hashPassword(tempPassword),
           name: customerEmail.split('@')[0],
@@ -125,7 +125,7 @@ export const POST: APIRoute = async ({ request }) => {
         });
 
         const subscription = createSubscription({
-          user_id: existingUser ? existingUser.id : 'user_unknown',
+          user_id: newUser.id,
           plan,
           status: 'active',
           amount,
@@ -136,7 +136,7 @@ export const POST: APIRoute = async ({ request }) => {
         });
 
         createInvoice({
-          user_id: existingUser ? existingUser.id : 'user_unknown',
+          user_id: newUser.id,
           subscription_id: subscription.id,
           amount,
           currency,
@@ -149,15 +149,12 @@ export const POST: APIRoute = async ({ request }) => {
           event: 'User Created via WHOP Checkout',
           severity: 'info',
           instance_id: null,
-          user_id: existingUser ? existingUser.id : 'user_unknown',
+          user_id: newUser.id,
           details: `User account created for ${customerEmail} after successful ${plan} purchase via WHOP`,
           action: 'user_create',
         });
 
-        const user = getUserByEmail(customerEmail);
-        if (user) {
-          provisionInstancesForUser(user.id, plan);
-        }
+        provisionInstancesForUser(newUser.id, plan);
       } else {
         const existingSubscription = getSubscriptionByUserId(existingUser.id);
         const now = new Date().toISOString();

@@ -131,6 +131,8 @@ db.exec(`
     paynow_customer_id TEXT,
     easytransac_tid TEXT,
     whop_request_id TEXT,
+    expires_at TEXT NOT NULL,
+    completed_at TEXT,
     created_at TEXT NOT NULL
   );
 
@@ -495,6 +497,20 @@ export function createInvoice(data: Omit<any, 'id' | 'created_at'>) {
   return db.prepare('SELECT * FROM invoices WHERE id = ?').get(id) as any;
 }
 
+export function updateInvoice(id: string, updates: Partial<any>) {
+  const fields: string[] = [];
+  const values: any[] = [];
+  if (updates.status !== undefined) { fields.push('status = ?'); values.push(updates.status); }
+  if (updates.paid_at !== undefined) { fields.push('paid_at = ?'); values.push(updates.paid_at); }
+  if (updates.amount !== undefined) { fields.push('amount = ?'); values.push(updates.amount); }
+  if (updates.currency !== undefined) { fields.push('currency = ?'); values.push(updates.currency); }
+  if (updates.due_date !== undefined) { fields.push('due_date = ?'); values.push(updates.due_date); }
+  if (!fields.length) return null;
+  values.push(id);
+  db.prepare(`UPDATE invoices SET ${fields.join(', ')} WHERE id = ?`).run(...values);
+  return db.prepare('SELECT * FROM invoices WHERE id = ?').get(id) as any;
+}
+
 export function getMetricsHistory(instanceId?: string) {
   if (instanceId) return db.prepare('SELECT * FROM metrics_history WHERE instance_id = ?').all(instanceId) as any[];
   return db.prepare('SELECT * FROM metrics_history').all() as any[];
@@ -585,8 +601,9 @@ export function createAlert(data: Omit<any, 'id' | 'timestamp'>) {
 export function createCheckoutSession(data: Omit<any, 'id' | 'created_at'>) {
   const now = new Date().toISOString();
   const id = `cs_${String(Date.now()).slice(-3)}`;
-  db.prepare(`INSERT INTO checkout_sessions (id, session_id, email, plan, status, temp_password, ip_address, user_agent, payment_gateway, mollie_payment_id, paynow_payment_id, paynow_customer_id, easytransac_tid, whop_request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-    id, data.session_id, data.email, data.plan, data.status || 'pending', data.temp_password || null, data.ip_address || null, data.user_agent || null, data.payment_gateway || 'dodo', data.mollie_payment_id || null, data.paynow_payment_id || null, data.paynow_customer_id || null, data.easytransac_tid || null, data.whop_request_id || null, now
+  const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
+  db.prepare(`INSERT INTO checkout_sessions (id, session_id, email, plan, status, temp_password, ip_address, user_agent, payment_gateway, mollie_payment_id, paynow_payment_id, paynow_customer_id, easytransac_tid, whop_request_id, expires_at, completed_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    id, data.session_id, data.email, data.plan, data.status || 'pending', data.temp_password || null, data.ip_address || null, data.user_agent || null, data.payment_gateway || 'dodo', data.mollie_payment_id || null, data.paynow_payment_id || null, data.paynow_customer_id || null, data.easytransac_tid || null, data.whop_request_id || null, expiresAt, null, now
   );
   return db.prepare('SELECT * FROM checkout_sessions WHERE id = ?').get(id) as any;
 }
@@ -623,6 +640,8 @@ export function updateCheckoutSession(id: string, updates: Partial<any>) {
   if (updates.paynow_customer_id !== undefined) { fields.push('paynow_customer_id = ?'); values.push(updates.paynow_customer_id); }
   if (updates.easytransac_tid !== undefined) { fields.push('easytransac_tid = ?'); values.push(updates.easytransac_tid); }
   if (updates.whop_request_id !== undefined) { fields.push('whop_request_id = ?'); values.push(updates.whop_request_id); }
+  if (updates.expires_at !== undefined) { fields.push('expires_at = ?'); values.push(updates.expires_at); }
+  if (updates.completed_at !== undefined) { fields.push('completed_at = ?'); values.push(updates.completed_at); }
   if (!fields.length) return null;
   values.push(id);
   db.prepare(`UPDATE checkout_sessions SET ${fields.join(', ')} WHERE id = ?`).run(...values);
@@ -631,6 +650,16 @@ export function updateCheckoutSession(id: string, updates: Partial<any>) {
 
 export function getCheckoutSessionByEmail(email: string) {
   return db.prepare('SELECT * FROM checkout_sessions WHERE email = ?').get(email) as any || null;
+}
+
+export function getExpiredCheckoutSessions() {
+  const now = new Date().toISOString();
+  return db.prepare('SELECT * FROM checkout_sessions WHERE status = ? AND expires_at < ?').all('pending', now) as any[];
+}
+
+export function updateExpiredCheckoutSessions() {
+  const now = new Date().toISOString();
+  db.prepare('UPDATE checkout_sessions SET status = ? WHERE status = ? AND expires_at < ?').run('expired', 'pending', now);
 }
 
 export function getNotificationChannels(userId: string) {
@@ -729,7 +758,7 @@ export function completeCheckout({
   plan: string;
   amount: number;
   currency: string;
-  gateway: 'dodo' | 'mollie' | 'paynow' | 'easytransac';
+  gateway: 'dodo' | 'mollie' | 'paynow' | 'easytransac' | 'creem' | 'whop';
   tempPassword?: string;
   customerId?: string;
   checkoutSessionId?: string;
@@ -756,6 +785,8 @@ export function completeCheckout({
       mollie_customer_id: gateway === 'mollie' ? customerId || null : null,
       paynow_customer_id: gateway === 'paynow' ? customerId || null : null,
       easytransac_client_id: gateway === 'easytransac' ? customerId || null : null,
+      creem_customer_id: gateway === 'creem' ? customerId || null : null,
+      whop_customer_id: gateway === 'whop' ? customerId || null : null,
     });
 
     const subscription = createSubscription({
@@ -784,12 +815,12 @@ export function completeCheckout({
       severity: 'info',
       instance_id: null,
       user_id: user.id,
-      details: `User account created for ${email} after successful ${plan} subscription via ${gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : 'Dodo Payments'}`,
+      details: `User account created for ${email} after successful ${plan} subscription via ${gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : gateway === 'creem' ? 'Creem' : gateway === 'whop' ? 'Whop' : 'Dodo Payments'}`,
       action: 'user_create',
     });
 
     provisionInstancesForUser(user.id, plan);
-    return { user, subscription, created: true };
+    return { user, subscription, created: true, tempPassword: finalPassword };
   }
 
   const existingSubscription = getSubscriptionByUserId(user.id);
@@ -833,11 +864,11 @@ export function completeCheckout({
     severity: 'info',
     instance_id: null,
     user_id: user.id,
-      details: `Subscription renewed for ${email} for ${plan} plan via ${gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : 'Dodo Payments'}`,
+      details: `Subscription renewed for ${email} for ${plan} plan via ${gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : gateway === 'creem' ? 'Creem' : gateway === 'whop' ? 'Whop' : 'Dodo Payments'}`,
     action: 'subscription_renew',
   });
 
-  return { user, subscription, created: false };
+  return { user, subscription, created: false, tempPassword: null };
 }
 
 export function deleteSessionsByUserId(userId: string) {

@@ -114,14 +114,13 @@ export const POST: APIRoute = async ({ request }) => {
       const email = customerEmail || checkoutSession.email;
       const plan = checkoutSession.plan;
       const amountValue = isNaN(amount) ? 0 : amount / 100;
-      const tempPassword = checkoutSession.temp_password || crypto.randomBytes(12).toString('hex');
 
       let user = getUserByEmail(email);
       if (!user) {
-        const finalPassword = checkoutSession.temp_password || crypto.randomBytes(12).toString('hex');
+        const tempPassword = crypto.randomBytes(12).toString('hex');
         user = createUser({
           email,
-          password_hash: hashPassword(finalPassword),
+          password_hash: hashPassword(tempPassword),
           name: email.split('@')[0],
           role: 'user',
           reset_token: null,

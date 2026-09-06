@@ -112,7 +112,6 @@ export const POST: APIRoute = async ({ request }) => {
         amount: isNaN(amount) ? 0 : amount,
         currency: finalCurrency,
         gateway: 'paynow',
-        tempPassword: checkoutSession.temp_password || undefined,
         customerId: paymentId || undefined,
         checkoutSessionId: checkoutSession.session_id,
       });

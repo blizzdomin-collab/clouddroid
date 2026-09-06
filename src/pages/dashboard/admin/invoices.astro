@@ -1,0 +1,170 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+
+const sessionCookie = Astro.cookies.get('session');
+let isAdmin = false;
+let invoices: any[] = [];
+let error: string | null = null;
+let statusFilter = '';
+
+if (sessionCookie) {
+  try {
+    const session = JSON.parse(sessionCookie.value);
+    if (session.authenticated === true && session.role === 'admin') {
+      isAdmin = true;
+      const res = await fetch(`${Astro.url.origin}/api/admin/invoices`, {
+        headers: { Cookie: `session=${sessionCookie.value}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        invoices = data.invoices || [];
+      } else {
+        error = 'Failed to load invoices';
+      }
+    }
+  } catch {
+    isAdmin = false;
+  }
+}
+---
+
+<DashboardLayout title="Invoices - CloudDroid">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-100 mb-1">Invoices</h1>
+    <p class="text-slate text-slate-400">Manage and track all invoices</p>
+  </div>
+
+  {error && <div class="mb-6 bg-red-900/30 border border-red-800 rounded-xl p-4 text-red-400">{error}</div>}
+
+  <div class="card overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <button onclick="filterInvoices('')" class="text-xs px-3 py-1.5 rounded-lg transition-colors {!statusFilter ? 'bg-accent text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-100'}">
+          All
+        </button>
+        <button onclick="filterInvoices('paid')" class="text-xs px-3 py-1.5 rounded-lg transition-colors {statusFilter === 'paid' ? 'bg-accent text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-100'}">
+          Paid
+        </button>
+        <button onclick="filterInvoices('pending')" class="text-xs px-3 py-1.5 rounded-lg transition-colors {statusFilter === 'pending' ? 'bg-accent text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-100'}">
+          Pending
+        </button>
+        <button onclick="filterInvoices('failed')" class="text-xs px-3 py-1.5 rounded-lg transition-colors {statusFilter === 'failed' ? 'bg-accent text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-100'}">
+          Failed
+        </button>
+      </div>
+      <button onclick="exportCSV()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-100 px-3 py-1.5 rounded-lg transition-colors">
+        Export CSV
+      </button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-slate-800">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Invoice ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">User</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Amount</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Date</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-slate text-slate-400 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-700">
+          {invoices.length === 0 ? (
+            <tr>
+              <td colspan="6" class="px-6 py-8 text-center text-sm text-slate text-slate-400">No invoices found.</td>
+            </tr>
+          ) : (
+            invoices.map((inv) => (
+              <tr>
+                <td class="px-6 py-4 text-sm font-medium text-slate-100">{inv.id}</td>
+                <td class="px-6 py-4">
+                  <div class="text-sm text-slate-100">{inv.user?.name || 'Unknown'}</div>
+                  <div class="text-xs text-slate text-slate-400">{inv.user?.email || 'unknown'}</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-100">${inv.amount} {inv.currency}</td>
+                <td class="px-6 py-4">
+                  <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${inv.status === 'paid' ? 'text-green-400 bg-green-900/30' : inv.status === 'pending' ? 'text-yellow-400 bg-yellow-900/30' : 'text-red-400 bg-red-900/30'}`}>
+                    {inv.status}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-xs text-slate text-slate-400">{new Date(inv.created_at).toLocaleDateString()}</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    {inv.status !== 'paid' && (
+                      <button onclick="markInvoice('{inv.id}', 'paid')" class="text-xs bg-green-900/30 hover:bg-green-900/50 text-green-400 px-3 py-1.5 rounded-lg transition-colors">
+                        Mark Paid
+                      </button>
+                    )}
+                    {inv.status !== 'pending' && (
+                      <button onclick="markInvoice('{inv.id}', 'pending')" class="text-xs bg-yellow-900/30 hover:bg-yellow-900/50 text-yellow-400 px-3 py-1.5 rounded-lg transition-colors">
+                        Pending
+                      </button>
+                    )}
+                    {inv.status !== 'failed' && (
+                      <button onclick="markInvoice('{inv.id}', 'failed')" class="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-400 px-3 py-1.5 rounded-lg transition-colors">
+                        Failed
+                      </button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function filterInvoices(status) {
+      const url = new URL(window.location.href);
+      if (status) {
+        url.searchParams.set('status', status);
+      } else {
+        url.searchParams.delete('status');
+      }
+      window.location.href = url.toString();
+    }
+
+    async function markInvoice(id, status) {
+      const res = await fetch('/api/admin/invoices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invoice_id: id, action: `mark-${status}` }),
+      });
+      if (res.ok) {
+        window.showToast(`Invoice marked as ${status}`, 'success');
+        location.reload();
+      } else {
+        window.showToast('Failed to update invoice', 'error');
+      }
+    }
+
+    function exportCSV() {
+      const rows = [
+        ['Invoice ID', 'User', 'Email', 'Amount', 'Currency', 'Status', 'Date'],
+        ...(document.querySelectorAll('tbody tr') || []).map((tr) => {
+          const cells = tr.querySelectorAll('td');
+          if (cells.length === 0) return null;
+          return [
+            cells[0]?.textContent?.trim() || '',
+            cells[1]?.querySelector('.text-slate-100')?.textContent?.trim() || '',
+            cells[1]?.querySelector('.text-xs')?.textContent?.trim() || '',
+            cells[2]?.textContent?.trim() || '',
+            cells[3]?.querySelector('span')?.textContent?.trim() || '',
+            cells[4]?.textContent?.trim() || '',
+          ];
+        }),
+      ].filter(Boolean);
+
+      const csv = rows.map((r) => r.map((c) => `"${c}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'invoices.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</DashboardLayout>

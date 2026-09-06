@@ -36,9 +36,46 @@ let isRenewal = false;
 let paidAmount = 0;
 let paidCurrency = 'USD';
 
-if (sessionId) {
-  const checkoutSession = getCheckoutSessionBySessionId(sessionId);
-  if (checkoutSession) {
+  if (sessionId) {
+    const checkoutSession = getCheckoutSessionBySessionId(sessionId);
+    if (checkoutSession && checkoutSession.status === 'expired') {
+      errorMessage = 'This checkout session has expired. Please start a new purchase.';
+    } else if (checkoutSession && checkoutSession.status === 'failed') {
+      errorMessage = 'This checkout session failed. Please try again.';
+    } else if (checkoutSession && checkoutSession.status === 'completed') {
+      userEmail = checkoutSession.email;
+      planName = checkoutSession.plan;
+      const user = getUserByEmail(userEmail);
+      if (user) {
+        paymentSuccess = true;
+        isRenewal = !user.must_change_password;
+        userCreated = user.must_change_password;
+
+        if (!alreadyAuthenticated) {
+          const sessionToken = crypto.randomBytes(32).toString('hex');
+          const sessionRecord = createSession({
+            user_id: user.id,
+            token: sessionToken,
+            ip_address: Astro.clientAddress || null,
+            user_agent: Astro.request.headers.get('user-agent') || null,
+          });
+          Astro.cookies.set('session', JSON.stringify({
+            email: user.email,
+            authenticated: true,
+            name: user.name,
+            role: user.role,
+            must_change_password: user.must_change_password,
+            sessionId: sessionRecord.id,
+          }), {
+            path: '/',
+            httpOnly: true,
+            secure: import.meta.env.PROD,
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 24 * 7,
+          });
+        }
+      }
+    } else if (checkoutSession && checkoutSession.status === 'pending') {
     gateway = checkoutSession.payment_gateway === 'mollie' ? 'mollie' : checkoutSession.payment_gateway === 'paynow' ? 'paynow' : checkoutSession.payment_gateway === 'easytransac' ? 'easytransac' : checkoutSession.payment_gateway === 'creem' ? 'creem' : checkoutSession.payment_gateway === 'whop' ? 'whop' : 'dodo';
   }
 
@@ -184,7 +221,6 @@ if (sessionId) {
         paidCurrency = currency;
         const customerEmail = checkoutSession.email;
         const plan = checkoutSession.plan;
-        tempPassword = checkoutSession.temp_password || '';
 
         const existingUser = getUserByEmail(customerEmail);
         isRenewal = !!existingUser;
@@ -195,7 +231,6 @@ if (sessionId) {
           amount,
           currency,
           gateway,
-          tempPassword,
           customerId,
           checkoutSessionId: checkoutSession.id,
         });
@@ -203,6 +238,7 @@ if (sessionId) {
         userCreated = result.created;
         userEmail = customerEmail;
         planName = plan;
+        tempPassword = result.tempPassword || '';
 
         if (!alreadyAuthenticated) {
           const sessionToken = crypto.randomBytes(32).toString('hex');
@@ -309,6 +345,13 @@ if (sessionId) {
                   <li>Set a permanent password to secure your account.</li>
                   <li>Your cloud Android workspaces will be ready in your dashboard in a moment.</li>
                 </ul>
+                {tempPassword && (
+                  <div class="mt-3 p-3 bg-white rounded border border-blue-200">
+                    <p class="text-xs font-medium text-navy mb-1">Temporary password</p>
+                    <p class="text-sm font-mono text-slate break-all">{tempPassword}</p>
+                    <p class="text-xs text-slate mt-1">Save this password. You'll need it to log in until you set a permanent one.</p>
+                  </div>
+                )}
               </div>
             )}
 

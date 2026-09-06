@@ -91,10 +91,10 @@ export const POST: APIRoute = async ({ request }) => {
       const customerEmail = event.data?.customer?.email || checkoutSession.email;
       const plan = checkoutSession.plan;
       const amount = (event.data?.amount_total || event.data?.items?.[0]?.price_data?.unit_amount || 0) / 100;
-      const tempPassword = checkoutSession.temp_password || crypto.randomBytes(12).toString('hex');
 
       let user = getUserByEmail(customerEmail);
       if (!user) {
+        const tempPassword = crypto.randomBytes(12).toString('hex');
         user = createUser({
           email: customerEmail,
           password_hash: hashPassword(tempPassword),
