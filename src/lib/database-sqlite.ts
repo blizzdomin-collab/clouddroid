@@ -130,6 +130,7 @@ db.exec(`
     paynow_payment_id TEXT,
     paynow_customer_id TEXT,
     easytransac_tid TEXT,
+    whop_request_id TEXT,
     created_at TEXT NOT NULL
   );
 
@@ -297,6 +298,11 @@ function migrateSchema() {
   const hasEasyTransacTid = checkoutColumns.some((col) => col.name === 'easytransac_tid');
   if (!hasEasyTransacTid) {
     db.exec("ALTER TABLE checkout_sessions ADD COLUMN easytransac_tid TEXT");
+  }
+
+  const hasWhopRequestId = checkoutColumns.some((col) => col.name === 'whop_request_id');
+  if (!hasWhopRequestId) {
+    db.exec("ALTER TABLE checkout_sessions ADD COLUMN whop_request_id TEXT");
   }
 
   const announcementColumns = db.prepare("PRAGMA table_info(announcements)").all() as any[];
@@ -579,8 +585,8 @@ export function createAlert(data: Omit<any, 'id' | 'timestamp'>) {
 export function createCheckoutSession(data: Omit<any, 'id' | 'created_at'>) {
   const now = new Date().toISOString();
   const id = `cs_${String(Date.now()).slice(-3)}`;
-  db.prepare(`INSERT INTO checkout_sessions (id, session_id, email, plan, status, temp_password, ip_address, user_agent, payment_gateway, mollie_payment_id, paynow_payment_id, paynow_customer_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-    id, data.session_id, data.email, data.plan, data.status || 'pending', data.temp_password || null, data.ip_address || null, data.user_agent || null, data.payment_gateway || 'dodo', data.mollie_payment_id || null, data.paynow_payment_id || null, data.paynow_customer_id || null, now
+  db.prepare(`INSERT INTO checkout_sessions (id, session_id, email, plan, status, temp_password, ip_address, user_agent, payment_gateway, mollie_payment_id, paynow_payment_id, paynow_customer_id, easytransac_tid, whop_request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    id, data.session_id, data.email, data.plan, data.status || 'pending', data.temp_password || null, data.ip_address || null, data.user_agent || null, data.payment_gateway || 'dodo', data.mollie_payment_id || null, data.paynow_payment_id || null, data.paynow_customer_id || null, data.easytransac_tid || null, data.whop_request_id || null, now
   );
   return db.prepare('SELECT * FROM checkout_sessions WHERE id = ?').get(id) as any;
 }
@@ -597,6 +603,10 @@ export function getCheckoutSessionByPaynowPaymentId(paymentId: string) {
   return db.prepare('SELECT * FROM checkout_sessions WHERE paynow_payment_id = ?').get(paymentId) as any || null;
 }
 
+export function getCheckoutSessionByWhopRequestId(requestId: string) {
+  return db.prepare('SELECT * FROM checkout_sessions WHERE whop_request_id = ?').get(requestId) as any || null;
+}
+
 export function updateCheckoutSession(id: string, updates: Partial<any>) {
   const fields: string[] = [];
   const values: any[] = [];
@@ -611,6 +621,8 @@ export function updateCheckoutSession(id: string, updates: Partial<any>) {
   if (updates.mollie_payment_id !== undefined) { fields.push('mollie_payment_id = ?'); values.push(updates.mollie_payment_id); }
   if (updates.paynow_payment_id !== undefined) { fields.push('paynow_payment_id = ?'); values.push(updates.paynow_payment_id); }
   if (updates.paynow_customer_id !== undefined) { fields.push('paynow_customer_id = ?'); values.push(updates.paynow_customer_id); }
+  if (updates.easytransac_tid !== undefined) { fields.push('easytransac_tid = ?'); values.push(updates.easytransac_tid); }
+  if (updates.whop_request_id !== undefined) { fields.push('whop_request_id = ?'); values.push(updates.whop_request_id); }
   if (!fields.length) return null;
   values.push(id);
   db.prepare(`UPDATE checkout_sessions SET ${fields.join(', ')} WHERE id = ?`).run(...values);

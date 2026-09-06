@@ -353,6 +353,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         });
       }
 
+      const requestId = `clouddroid_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
       const response = await fetch('https://api.whop.com/api/v1/checkout_configurations', {
         method: 'POST',
         headers: {
@@ -365,6 +366,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           metadata: {
             email: customerEmail,
             plan: selectedPlan.name,
+            gateway: 'whop',
+            request_id: requestId,
           },
         }),
       });
@@ -390,6 +393,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         ip_address: ipAddress,
         user_agent: userAgent,
         payment_gateway: 'whop',
+        whop_request_id: requestId,
       });
 
       return new Response(JSON.stringify({ checkout_url: session.purchase_url || session.url, sessionId: session.id, gateway: 'whop' }), {

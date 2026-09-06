@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
-import { getCheckoutSessionBySessionId, getUserByEmail, createUser, createSubscription, updateSubscription, createInvoice, createAuditLog, provisionInstancesForUser, getSubscriptionByUserId, hashPassword } from '../../../lib/database';
+import { getCheckoutSessionBySessionId, getCheckoutSessionByWhopRequestId, getUserByEmail, createUser, createSubscription, updateSubscription, createInvoice, createAuditLog, provisionInstancesForUser, getSubscriptionByUserId, hashPassword } from '../../../lib/database';
 import crypto from 'crypto';
+
+const processedWebhookIds = new Set<string>();
 
 function verifyWhopSignature(payload: string, signatureHeader: string, timestamp: string, webhookId: string, secret: string): boolean {
   const signature = signatureHeader.replace(/^v1,/, '');
@@ -47,6 +49,14 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
+    if (processedWebhookIds.has(webhookId)) {
+      console.log('WHOP webhook duplicate:', webhookId);
+      return new Response(JSON.stringify({ received: true, duplicate: true }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     let event: any;
     try {
       event = JSON.parse(payload);
@@ -66,6 +76,7 @@ export const POST: APIRoute = async ({ request }) => {
       const metadata = payment.metadata || {};
       const customerEmail = metadata.email;
       const plan = metadata.plan;
+      const requestId = metadata.request_id;
       const amount = payment.amount_after_fees || payment.amount || 0;
       const currency = payment.currency || 'USD';
       const membershipId = membership.id;
@@ -76,16 +87,32 @@ export const POST: APIRoute = async ({ request }) => {
           membershipId,
           metadata,
         });
+        processedWebhookIds.add(webhookId);
         return new Response(JSON.stringify({ received: true, skipped: true, reason: 'missing_metadata' }), {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
         });
       }
 
-      let user = getUserByEmail(customerEmail);
-      if (!user) {
+      let checkoutSession = null;
+      if (requestId) {
+        checkoutSession = getCheckoutSessionByWhopRequestId(requestId);
+      }
+      
+      if (!checkoutSession) {
+        checkoutSession = getCheckoutSessionBySessionId(payment.id);
+      }
+      
+      if (!checkoutSession) {
+        checkoutSession = getCheckoutSessionBySessionId(membershipId);
+      }
+
+      const existingUser = getUserByEmail(customerEmail);
+      const isNewUser = !existingUser;
+
+      if (isNewUser) {
         const tempPassword = crypto.randomBytes(12).toString('hex');
-        user = createUser({
+        createUser({
           email: customerEmail,
           password_hash: hashPassword(tempPassword),
           name: customerEmail.split('@')[0],
@@ -98,7 +125,7 @@ export const POST: APIRoute = async ({ request }) => {
         });
 
         const subscription = createSubscription({
-          user_id: user.id,
+          user_id: existingUser ? existingUser.id : 'user_unknown',
           plan,
           status: 'active',
           amount,
@@ -109,7 +136,7 @@ export const POST: APIRoute = async ({ request }) => {
         });
 
         createInvoice({
-          user_id: user.id,
+          user_id: existingUser ? existingUser.id : 'user_unknown',
           subscription_id: subscription.id,
           amount,
           currency,
@@ -122,14 +149,17 @@ export const POST: APIRoute = async ({ request }) => {
           event: 'User Created via WHOP Checkout',
           severity: 'info',
           instance_id: null,
-          user_id: user.id,
+          user_id: existingUser ? existingUser.id : 'user_unknown',
           details: `User account created for ${customerEmail} after successful ${plan} purchase via WHOP`,
           action: 'user_create',
         });
 
-        provisionInstancesForUser(user.id, plan);
+        const user = getUserByEmail(customerEmail);
+        if (user) {
+          provisionInstancesForUser(user.id, plan);
+        }
       } else {
-        const existingSubscription = getSubscriptionByUserId(user.id);
+        const existingSubscription = getSubscriptionByUserId(existingUser.id);
         const now = new Date().toISOString();
         const periodEnd = existingSubscription && new Date(existingSubscription.current_period_end) > new Date()
           ? new Date(new Date(existingSubscription.current_period_end).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString()
@@ -143,7 +173,7 @@ export const POST: APIRoute = async ({ request }) => {
           });
         } else {
           createSubscription({
-            user_id: user.id,
+            user_id: existingUser.id,
             plan,
             status: 'active',
             amount,
@@ -155,7 +185,7 @@ export const POST: APIRoute = async ({ request }) => {
         }
 
         createInvoice({
-          user_id: user.id,
+          user_id: existingUser.id,
           subscription_id: existingSubscription?.id || null,
           amount,
           currency,
@@ -168,13 +198,14 @@ export const POST: APIRoute = async ({ request }) => {
           event: 'Subscription Renewed via WHOP',
           severity: 'info',
           instance_id: null,
-          user_id: user.id,
+          user_id: existingUser.id,
           details: `Access extended for ${customerEmail} for ${plan} plan via WHOP`,
           action: 'subscription_renew',
         });
       }
 
-      return new Response(JSON.stringify({ received: true, userCreated: !getUserByEmail(customerEmail) }), {
+      processedWebhookIds.add(webhookId);
+      return new Response(JSON.stringify({ received: true, userCreated: isNewUser }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
@@ -199,6 +230,7 @@ export const POST: APIRoute = async ({ request }) => {
         }
       }
       
+      processedWebhookIds.add(webhookId);
       return new Response(JSON.stringify({ received: true }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
@@ -229,6 +261,7 @@ export const POST: APIRoute = async ({ request }) => {
         }
       }
       
+      processedWebhookIds.add(webhookId);
       return new Response(JSON.stringify({ received: true }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
@@ -256,12 +289,14 @@ export const POST: APIRoute = async ({ request }) => {
         }
       }
       
+      processedWebhookIds.add(webhookId);
       return new Response(JSON.stringify({ received: true }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
+    processedWebhookIds.add(webhookId);
     return new Response(JSON.stringify({ received: true }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

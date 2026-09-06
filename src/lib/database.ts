@@ -37,6 +37,7 @@ export {
   getCheckoutSessionBySessionId,
   getCheckoutSessionByMolliePaymentId,
   getCheckoutSessionByPaynowPaymentId,
+  getCheckoutSessionByWhopRequestId,
   updateCheckoutSession,
   getCheckoutSessionByEmail,
   getNotificationChannels,
