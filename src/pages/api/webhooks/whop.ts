@@ -71,9 +71,13 @@ export const POST: APIRoute = async ({ request }) => {
       const membershipId = membership.id;
 
       if (!customerEmail || !plan) {
-        console.error('WHOP payment.succeeded missing email or plan in metadata');
-        return new Response(JSON.stringify({ error: 'Missing required metadata' }), {
-          status: 400,
+        console.error('WHOP payment.succeeded missing email or plan in metadata', {
+          paymentId: payment.id,
+          membershipId,
+          metadata,
+        });
+        return new Response(JSON.stringify({ received: true, skipped: true, reason: 'missing_metadata' }), {
+          status: 200,
           headers: { 'Content-Type': 'application/json' },
         });
       }
