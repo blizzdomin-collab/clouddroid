@@ -31,7 +31,7 @@ let tempPassword = '';
 let planName = '';
 let errorMessage = '';
 let paymentSuccess = false;
-let gateway: 'dodo' | 'mollie' | 'paynow' | 'easytransac' | 'creem' = 'dodo';
+let gateway: 'dodo' | 'mollie' | 'paynow' | 'easytransac' | 'creem' | 'whop' = 'dodo';
 let isRenewal = false;
 let paidAmount = 0;
 let paidCurrency = 'USD';
@@ -39,7 +39,7 @@ let paidCurrency = 'USD';
 if (sessionId) {
   const checkoutSession = getCheckoutSessionBySessionId(sessionId);
   if (checkoutSession) {
-    gateway = checkoutSession.payment_gateway === 'mollie' ? 'mollie' : checkoutSession.payment_gateway === 'paynow' ? 'paynow' : checkoutSession.payment_gateway === 'easytransac' ? 'easytransac' : checkoutSession.payment_gateway === 'creem' ? 'creem' : 'dodo';
+    gateway = checkoutSession.payment_gateway === 'mollie' ? 'mollie' : checkoutSession.payment_gateway === 'paynow' ? 'paynow' : checkoutSession.payment_gateway === 'easytransac' ? 'easytransac' : checkoutSession.payment_gateway === 'creem' ? 'creem' : checkoutSession.payment_gateway === 'whop' ? 'whop' : 'dodo';
   }
 
   if (checkoutSession && checkoutSession.status === 'pending') {
@@ -138,6 +138,24 @@ if (sessionId) {
             amount = parseFloat(result.Amount || result.amount || '0');
             currency = result.Currency || result.currency || 'EUR';
             customerId = result.ClientId || result.clientId || null;
+          }
+        }
+      } else if (gateway === 'whop') {
+        const whopApiKey = import.meta.env.WHOP_API_KEY;
+        if (whopApiKey) {
+          const sessionRes = await fetch(`https://api.whop.com/api/v1/checkout_configurations/${sessionId}`, {
+            headers: {
+              'Authorization': `Bearer ${whopApiKey}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (sessionRes.ok) {
+            const sessionData = await sessionRes.json();
+            paymentStatus = sessionData.status === 'completed' ? 'paid' : sessionData.status;
+            amount = sessionData.plan?.initial_price || 0;
+            currency = sessionData.plan?.currency || 'USD';
+            customerId = sessionData.metadata?.email || null;
           }
         }
       } else {
@@ -273,7 +291,7 @@ if (sessionId) {
             <div class="bg-slate-50 rounded-lg p-4 mb-4 text-left">
               <p class="text-sm font-medium text-navy mb-2">Payment details</p>
               <p class="text-sm text-slate mb-1"><span class="font-medium">Amount:</span> {paidCurrency === 'EUR' ? '€' : '$'}{paidAmount.toFixed(2)}</p>
-              <p class="text-sm text-slate mb-1"><span class="font-medium">Method:</span> {gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : gateway === 'creem' ? 'Creem' : 'Dodo Payments'}</p>
+              <p class="text-sm text-slate mb-1"><span class="font-medium">Method:</span> {gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : gateway === 'creem' ? 'Creem' : gateway === 'whop' ? 'Whop' : 'Dodo Payments'}</p>
               <p class="text-sm text-slate mb-1"><span class="font-medium">Email:</span> {userEmail}</p>
             </div>
 
@@ -314,7 +332,7 @@ if (sessionId) {
             </p>
             {errorMessage && <p class="text-sm text-red-600 mb-4">{errorMessage}</p>}
             <p class="text-sm text-slate mb-8">
-              Securely processed by {gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : gateway === 'creem' ? 'Creem' : 'Dodo Payments'}.
+              Securely processed by {gateway === 'mollie' ? 'Mollie' : gateway === 'paynow' ? 'PayNow' : gateway === 'easytransac' ? 'EasyTransac' : gateway === 'creem' ? 'Creem' : gateway === 'whop' ? 'Whop' : 'Dodo Payments'}.
             </p>
             <a
               href="/"

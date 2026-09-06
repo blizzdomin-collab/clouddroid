@@ -38,10 +38,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     const userAgent = request.headers.get('user-agent') || null;
 
-    const planConfig: Record<string, { name: string; productId: string; mollieAmount: string; paynowProductId: string; creemProductId: string }> = {
-      developer: { name: 'Developer', productId: 'pdt_0NlcRNFMskyRt5vwC8roH', mollieAmount: '49.00', paynowProductId: '596937594697154560', creemProductId: 'prod_RI7KMJ2qwawQVhP2NzGJf' },
-      professional: { name: 'Professional', productId: 'pdt_0NlxI8ewOVrMkKN3SNXvY', mollieAmount: '149.00', paynowProductId: '596937714155134976', creemProductId: 'prod_76ohlfCZSqbhwpuhRPIBW7' },
-      team: { name: 'Team', productId: 'pdt_0Nlqwcv5UpGxDeEtIEt6X', mollieAmount: '399.00', paynowProductId: '596937843687821312', creemProductId: 'prod_1P7uHkFDLk6RnuHUqcZmMf' },
+    const planConfig: Record<string, { name: string; productId: string; mollieAmount: string; paynowProductId: string; creemProductId: string; whopPlanId: string }> = {
+      developer: { name: 'Developer', productId: 'pdt_0NlcRNFMskyRt5vwC8roH', mollieAmount: '49.00', paynowProductId: '596937594697154560', creemProductId: 'prod_RI7KMJ2qwawQVhP2NzGJf', whopPlanId: 'plan_M7MIQbkmmJ9sG' },
+      professional: { name: 'Professional', productId: 'pdt_0NlxI8ewOVrMkKN3SNXvY', mollieAmount: '149.00', paynowProductId: '596937714155134976', creemProductId: 'prod_76ohlfCZSqbhwpuhRPIBW7', whopPlanId: 'plan_57eigU5RBKKnh' },
+      team: { name: 'Team', productId: 'pdt_0Nlqwcv5UpGxDeEtIEt6X', mollieAmount: '399.00', paynowProductId: '596937843687821312', creemProductId: 'prod_1P7uHkFDLk6RnuHUqcZmMf', whopPlanId: 'plan_izLQVRgLhchum' },
     };
 
     const selectedPlan = planConfig[planId];
@@ -339,6 +339,60 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       });
 
       return new Response(JSON.stringify({ checkout_url: session.url, sessionId: session.id, gateway: 'paynow' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (gateway === 'whop') {
+      const whopApiKey = import.meta.env.WHOP_API_KEY;
+      if (!whopApiKey) {
+        return new Response(JSON.stringify({ error: 'Payment configuration error' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      const response = await fetch('https://api.whop.com/api/v1/checkout_configurations', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${whopApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          account_id: 'biz_g62GZ8L6ySr70m',
+          plan_id: selectedPlan.whopPlanId,
+          metadata: {
+            email: customerEmail,
+            plan: selectedPlan.name,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('WHOP checkout failed:', response.status, errorText);
+        return new Response(JSON.stringify({ error: 'Failed to create WHOP checkout', details: errorText }), {
+          status: response.status,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      const session = await response.json();
+      const tempPassword = crypto.randomBytes(12).toString('hex');
+
+      createCheckoutSession({
+        session_id: session.id,
+        email: customerEmail,
+        plan: selectedPlan.name,
+        status: 'pending',
+        temp_password: tempPassword,
+        ip_address: ipAddress,
+        user_agent: userAgent,
+        payment_gateway: 'whop',
+      });
+
+      return new Response(JSON.stringify({ checkout_url: session.purchase_url || session.url, sessionId: session.id, gateway: 'whop' }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });

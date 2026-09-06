@@ -248,6 +248,26 @@ if (!selectedPlan) {
                       </div>
                     </div>
                   </label>
+                  <label class="cursor-pointer relative">
+                    <input type="radio" name="gateway" value="whop" class="sr-only peer" />
+                    <div class="border-2 border-slate-200 rounded-xl p-5 peer-checked:border-navy peer-checked:bg-navy/5 transition-all hover:border-slate-300">
+                      <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-navy/5 rounded-lg flex items-center justify-center">
+                          <svg class="w-6 h-6 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <div class="text-sm font-semibold text-navy">Whop</div>
+                          <div class="text-xs text-slate">Card, Apple Pay, Google Pay</div>
+                        </div>
+                      </div>
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium text-slate">USD pricing</span>
+                        <span class="text-xs font-medium text-navy">${selectedPlan.price}</span>
+                      </div>
+                    </div>
+                  </label>
                 </div>
               </div>
 
@@ -280,7 +300,7 @@ if (!selectedPlan) {
                 </div>
               </div>
               <p class="text-center text-xs text-slate mb-4">
-                Securely processed by <span class="font-semibold text-navy">Dodo Payments</span>, <span class="font-semibold text-navy">Mollie</span> &amp; <span class="font-semibold text-navy">PayNow</span>
+                Securely processed by <span class="font-semibold text-navy">Dodo Payments</span>, <span class="font-semibold text-navy">Mollie</span>, <span class="font-semibold text-navy">PayNow</span>, <span class="font-semibold text-navy">Creem</span>, <span class="font-semibold text-navy">EasyTransac</span> &amp; <span class="font-semibold text-navy">Whop</span>
               </p>
 
               <button
@@ -341,6 +361,10 @@ if (!selectedPlan) {
           } else if (gateway === 'creem') {
             summaryGateway.textContent = 'Creem';
             summaryPrice.textContent = '$' + selectedPlan.creemPrice;
+            summaryCurrency.textContent = 'USD';
+          } else if (gateway === 'whop') {
+            summaryGateway.textContent = 'Whop';
+            summaryPrice.textContent = '$' + selectedPlan.price;
             summaryCurrency.textContent = 'USD';
           } else {
             summaryGateway.textContent = 'Dodo Payments';
