@@ -87,7 +87,7 @@ const planId = 'developer';
   <body>
     <div class="box">
       <h1>PayNow Checkout</h1>
-      <form id="paynow-form">
+      <form id="paynow-form" data-plan={planId}>
         <div class="field">
           <label for="email">Email</label>
           <input type="email" id="email" name="email" placeholder="you@example.com" required />
@@ -101,7 +101,6 @@ const planId = 'developer';
       const form = document.getElementById('paynow-form');
       const submitBtn = document.getElementById('submit-btn');
       const errorMsg = document.getElementById('error-msg');
-      const PLAN_ID = '{planId}';
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -120,12 +119,13 @@ const planId = 'developer';
         try {
           const csrfRes = await fetch('/api/csrf');
           const csrfData = await csrfRes.json();
+          const planId = form.getAttribute('data-plan');
 
           const response = await fetch('/api/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              planId: PLAN_ID,
+              planId: planId,
               customerEmail: email,
               gateway: 'paynow',
               csrf: csrfData.csrfToken,
