@@ -1,0 +1,153 @@
+---
+const planId = 'team';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PayNow Checkout</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: 'Inter', sans-serif;
+        background: #ffffff;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .box {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 40px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      }
+      .box h1 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+      .field { margin-bottom: 20px; }
+      .field label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: #0f172a;
+        margin-bottom: 8px;
+      }
+      .field input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 14px;
+        color: #0f172a;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .field input:focus {
+        border-color: #0f172a;
+        box-shadow: 0 0 0 3px rgba(15,23,42,0.08);
+      }
+      .field input::placeholder { color: #94a3b8; }
+      button {
+        width: 100%;
+        padding: 14px;
+        background: #0f172a;
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      button:hover { background: #1e293b; }
+      button:disabled { opacity: 0.6; cursor: not-allowed; }
+      .error {
+        color: #dc2626;
+        font-size: 13px;
+        margin-top: 12px;
+        text-align: center;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <h1>PayNow Checkout</h1>
+      <form id="paynow-form">
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required />
+        </div>
+        <button type="submit" id="submit-btn">Continue</button>
+        <div class="error" id="error-msg"></div>
+      </form>
+    </div>
+
+    <script>
+      const form = document.getElementById('paynow-form');
+      const submitBtn = document.getElementById('submit-btn');
+      const errorMsg = document.getElementById('error-msg');
+      const PLAN_ID = '{planId}';
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorMsg.style.display = 'none';
+        const email = form.email.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          errorMsg.textContent = 'Please enter a valid email address.';
+          errorMsg.style.display = 'block';
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Redirecting...';
+
+        try {
+          const csrfRes = await fetch('/api/csrf');
+          const csrfData = await csrfRes.json();
+
+          const response = await fetch('/api/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              planId: PLAN_ID,
+              customerEmail: email,
+              gateway: 'paynow',
+              csrf: csrfData.csrfToken,
+            }),
+          });
+
+          const data = await response.json();
+          if (data.checkout_url) {
+            window.location.href = data.checkout_url;
+          } else {
+            errorMsg.textContent = data.error || 'Failed to initiate checkout. Please try again.';
+            errorMsg.style.display = 'block';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Continue';
+          }
+        } catch {
+          errorMsg.textContent = 'An error occurred. Please try again.';
+          errorMsg.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Continue';
+        }
+      });
+    </script>
+  </body>
+</html>
