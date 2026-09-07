@@ -308,6 +308,16 @@ function migrateSchema() {
     db.exec("ALTER TABLE checkout_sessions ADD COLUMN whop_request_id TEXT");
   }
 
+  const hasExpiresAt = checkoutColumns.some((col) => col.name === 'expires_at');
+  if (!hasExpiresAt) {
+    db.exec("ALTER TABLE checkout_sessions ADD COLUMN expires_at TEXT NOT NULL DEFAULT ''");
+  }
+
+  const hasCompletedAt = checkoutColumns.some((col) => col.name === 'completed_at');
+  if (!hasCompletedAt) {
+    db.exec("ALTER TABLE checkout_sessions ADD COLUMN completed_at TEXT");
+  }
+
   const announcementColumns = db.prepare("PRAGMA table_info(announcements)").all() as any[];
   if (announcementColumns.length === 0) {
     db.exec(`CREATE TABLE announcements (
