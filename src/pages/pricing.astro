@@ -1,17 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Pricing from '../components/Pricing.astro';
-
-const annualPrices = {
-  developer: { monthly: 49, annual: 470, savings: 118 },
-  professional: { monthly: 149, annual: 1430, savings: 358 },
-  team: { monthly: 399, annual: 3830, savings: 958 },
-};
 ---
 
 <Layout
   title="Pricing - CloudDroid"
-  description="Simple, transparent pricing for CloudDroid cloud Android workspaces. Monthly and annual billing options."
+  description="Simple, transparent pricing for CloudDroid cloud Android workspaces. Monthly billing."
   jsonLd={{
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -20,7 +14,7 @@ const annualPrices = {
     brand: { '@type': 'Brand', name: 'CloudDroid' },
     offers: {
       '@type': 'Offer',
-      price: '49.00',
+      price: '1499.00',
       priceCurrency: 'USD',
       billingIncrement: 'P1M',
       availability: 'https://schema.org/InStock',
@@ -32,16 +26,11 @@ const annualPrices = {
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h1 class="text-4xl font-bold text-navy mb-4">Pricing</h1>
       <p class="text-lg text-slate mb-8">Simple, transparent pricing. No hidden fees. Cancel anytime.</p>
-
-      <div class="inline-flex items-center gap-3 bg-white rounded-xl border border-slate-200 p-1">
-        <button id="monthly-toggle" class="px-4 py-2 rounded-lg text-sm font-medium bg-navy text-white transition-colors">Monthly</button>
-        <button id="annual-toggle" class="px-4 py-2 rounded-lg text-sm font-medium text-slate hover:text-navy transition-colors">Annual <span class="text-xs text-green-600 font-semibold">Save 20%</span></button>
-      </div>
       <p class="text-xs text-slate mt-3">Prices exclude applicable taxes and VAT. VAT will be calculated and displayed at checkout where required by law.</p>
     </div>
   </div>
 
-  <div id="pricing-section" data-annual='{"developer":{"annual":470,"monthly":49},"professional":{"annual":1430,"monthly":149},"team":{"annual":3830,"monthly":399}}'>
+  <div id="pricing-section">
     <Pricing />
   </div>
 
@@ -178,50 +167,4 @@ const annualPrices = {
       </a>
     </div>
   </div>
-
-  <script>
-    const monthlyToggle = document.getElementById('monthly-toggle');
-    const annualToggle = document.getElementById('annual-toggle');
-    const pricingSection = document.getElementById('pricing-section');
-    const annualPrices = pricingSection ? JSON.parse(pricingSection.getAttribute('data-annual') || '{}') : {};
-
-    const updatePricing = function(isAnnual) {
-      if (!pricingSection) return;
-      const cards = pricingSection.querySelectorAll('[data-plan]');
-      cards.forEach(function(card) {
-        const plan = card.getAttribute('data-plan');
-        if (!plan || !annualPrices[plan]) return;
-
-        const priceEl = card.querySelector('.text-4xl');
-        const intervalEl = card.querySelector('.text-slate');
-        if (priceEl && intervalEl) {
-          priceEl.textContent = isAnnual ? '$' + annualPrices[plan].annual : '$' + annualPrices[plan].monthly;
-          intervalEl.textContent = isAnnual ? '/year' : '/month';
-        }
-
-        const ctaLink = card.querySelector('a[href^="/checkout/"]');
-        if (ctaLink) {
-          const currentHref = ctaLink.getAttribute('href') || '';
-          const planName = currentHref.split('/')[2];
-          ctaLink.setAttribute('href', isAnnual ? '/checkout/' + planName + '?annual=true' : '/checkout/' + planName);
-        }
-      });
-    };
-
-    monthlyToggle?.addEventListener('click', function() {
-      monthlyToggle.classList.add('bg-navy', 'text-white');
-      monthlyToggle.classList.remove('text-slate');
-      annualToggle?.classList.remove('bg-navy', 'text-white');
-      annualToggle?.classList.add('text-slate');
-      updatePricing(false);
-    });
-
-    annualToggle?.addEventListener('click', function() {
-      annualToggle.classList.add('bg-navy', 'text-white');
-      annualToggle.classList.remove('text-slate');
-      monthlyToggle?.classList.remove('bg-navy', 'text-white');
-      monthlyToggle?.classList.add('text-slate');
-      updatePricing(true);
-    });
-  </script>
 </Layout>
