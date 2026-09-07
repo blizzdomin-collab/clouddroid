@@ -136,7 +136,7 @@ const planId = 'team';
           if (data.checkout_url) {
             window.location.href = data.checkout_url;
           } else {
-            errorMsg.textContent = data.error || 'Failed to initiate checkout. Please try again.';
+            errorMsg.textContent = data.details || data.error || 'Failed to initiate checkout. Please try again.';
             errorMsg.style.display = 'block';
             submitBtn.disabled = false;
             submitBtn.textContent = 'Continue';
