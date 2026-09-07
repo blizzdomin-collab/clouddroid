@@ -1,11 +1,11 @@
 ---
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
 
-const logsRes = await fetch(`${Astro.url.origin}/api/audit/logs?limit=10&offset=0`);
-const logsData = await logsRes.json();
-const logs = logsData.logs || [];
-const summary = logsData.summary || {};
-const pagination = logsData.pagination || {};
+const logsRes = await fetch(`${Astro.url.origin}/api/audit/logs?limit=10&offset=0`).catch(() => null);
+const logsData = logsRes?.ok ? await logsRes.json() : null;
+const logs = logsData?.logs || [];
+const summary = logsData?.summary || {};
+const pagination = logsData?.pagination || {};
 const loading = false;
 ---
 

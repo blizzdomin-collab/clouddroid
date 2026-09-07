@@ -1,11 +1,11 @@
 ---
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
 
-const instancesRes = await fetch(`${Astro.url.origin}/api/monitoring/instances`);
-const instancesData = await instancesRes.json();
-const instances = instancesData.instances || [];
-const summary = instancesData.summary || {};
-const anomalies = instancesData.anomalies || [];
+const instancesRes = await fetch(`${Astro.url.origin}/api/monitoring/instances`).catch(() => null);
+const instancesData = instancesRes?.ok ? await instancesRes.json() : null;
+const instances = instancesData?.instances || [];
+const summary = instancesData?.summary || {};
+const anomalies = instancesData?.anomalies || [];
 const loading = false;
 
 const metricsPromises = instances.map((inst: any) =>
