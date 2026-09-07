@@ -14,11 +14,15 @@ function generateEasyTransacSignature(params: Record<string, string | number>, a
 
 export const POST: APIRoute = async ({ request, clientAddress, cookies }) => {
   try {
+    console.log('[checkout] Request started', { ip: clientAddress, method: request.method });
     const csrfToken = cookies.get('csrf_token')?.value;
+    console.log('[checkout] CSRF token present:', !!csrfToken);
     const requestBody = await request.json();
     const { csrf, planId, customerEmail, gateway = 'dodo' } = requestBody as any;
+    console.log('[checkout] Request body parsed', { planId, customerEmail, gateway });
 
     if (!csrf || !csrfToken || csrf !== csrfToken) {
+      console.log('[checkout] CSRF validation failed');
       return new Response(JSON.stringify({ error: 'Invalid CSRF token' }), {
         status: 403,
         headers: { 'Content-Type': 'application/json' },
@@ -26,8 +30,10 @@ export const POST: APIRoute = async ({ request, clientAddress, cookies }) => {
     }
 
     const ipAddress = clientAddress || 'unknown';
+    console.log('[checkout] IP address:', ipAddress);
 
     const allowed = await checkRateLimit(`checkout:${ipAddress}`, 5, 60_000);
+    console.log('[checkout] Rate limit check result:', allowed);
     if (!allowed) {
       return new Response(JSON.stringify({ error: 'Too many checkout attempts. Please try again in a minute.' }), {
         status: 429,
@@ -39,6 +45,7 @@ export const POST: APIRoute = async ({ request, clientAddress, cookies }) => {
     }
 
     if (!customerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
+      console.log('[checkout] Email validation failed:', customerEmail);
       return new Response(JSON.stringify({ error: 'Valid email is required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -46,6 +53,7 @@ export const POST: APIRoute = async ({ request, clientAddress, cookies }) => {
     }
 
     const userAgent = request.headers.get('user-agent') || null;
+    console.log('[checkout] User agent:', userAgent);
 
     const planConfig: Record<string, { name: string; productId: string; mollieAmount: string; paynowProductId: string; creemProductId: string; whopPlanId: string }> = {
       developer: { name: 'Developer', productId: 'pdt_0NlcRNFMskyRt5vwC8roH', mollieAmount: '49.00', paynowProductId: '596937594697154560', creemProductId: 'prod_RI7KMJ2qwawQVhP2NzGJf', whopPlanId: 'plan_M7MIQbkmmJ9sG' },
@@ -55,15 +63,20 @@ export const POST: APIRoute = async ({ request, clientAddress, cookies }) => {
 
     const selectedPlan = planConfig[planId];
     if (!selectedPlan) {
+      console.log('[checkout] Invalid plan:', planId);
       return new Response(JSON.stringify({ error: 'Invalid plan' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
+    console.log('[checkout] Selected plan:', selectedPlan.name, 'Gateway:', gateway);
+
     if (gateway === 'easytransac') {
+      console.log('[checkout] Processing easytransac gateway');
       const easytransacApiKey = import.meta.env.EASYTRANSAC_API_KEY;
       if (!easytransacApiKey) {
+        console.log('[checkout] EasyTransac API key missing');
         return new Response(JSON.stringify({ error: 'Payment configuration error' }), {
           status: 500,
           headers: { 'Content-Type': 'application/json' },
@@ -139,8 +152,10 @@ export const POST: APIRoute = async ({ request, clientAddress, cookies }) => {
     }
 
     if (gateway === 'creem') {
+      console.log('[checkout] Processing creem gateway');
       const creemApiKey = import.meta.env.CREEM_API_KEY;
       if (!creemApiKey) {
+        console.log('[checkout] Creem API key missing');
         return new Response(JSON.stringify({ error: 'Payment configuration error' }), {
           status: 500,
           headers: { 'Content-Type': 'application/json' },
@@ -196,8 +211,10 @@ export const POST: APIRoute = async ({ request, clientAddress, cookies }) => {
     }
 
     if (gateway === 'mollie') {
+      console.log('[checkout] Processing mollie gateway');
       const mollieApiKey = import.meta.env.MOLLIE_API_KEY;
       if (!mollieApiKey) {
+        console.log('[checkout] Mollie API key missing');
         return new Response(JSON.stringify({ error: 'Payment configuration error' }), {
           status: 500,
           headers: { 'Content-Type': 'application/json' },
@@ -256,8 +273,10 @@ export const POST: APIRoute = async ({ request, clientAddress, cookies }) => {
     }
 
     if (gateway === 'paynow') {
+      console.log('[checkout] Processing paynow gateway');
       const paynowApiKey = import.meta.env.PAYNOW_API_KEY;
       if (!paynowApiKey) {
+        console.log('[checkout] PayNow API key missing');
         return new Response(JSON.stringify({ error: 'Payment configuration error' }), {
           status: 500,
           headers: { 'Content-Type': 'application/json' },
@@ -346,8 +365,10 @@ export const POST: APIRoute = async ({ request, clientAddress, cookies }) => {
     }
 
     if (gateway === 'whop') {
+      console.log('[checkout] Processing whop gateway');
       const whopApiKey = import.meta.env.WHOP_API_KEY;
       if (!whopApiKey) {
+        console.log('[checkout] WHOP API key missing');
         return new Response(JSON.stringify({ error: 'Payment configuration error' }), {
           status: 500,
           headers: { 'Content-Type': 'application/json' },
@@ -401,8 +422,10 @@ export const POST: APIRoute = async ({ request, clientAddress, cookies }) => {
       });
     }
 
+    console.log('[checkout] Processing dodo gateway (default)');
     const dodoApiKey = import.meta.env.DODO_PAYMENTS_API_KEY;
     if (!dodoApiKey) {
+      console.log('[checkout] Dodo Payments API key missing');
       return new Response(JSON.stringify({ error: 'Payment configuration error' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
@@ -458,7 +481,7 @@ export const POST: APIRoute = async ({ request, clientAddress, cookies }) => {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Checkout error:', error);
+    console.error('[checkout] Unhandled error:', error);
     return new Response(JSON.stringify({ error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },

@@ -15,8 +15,8 @@ export async function checkRateLimit(key: string, maxAttempts: number, windowMs:
     rateLimitMap.set(key, { count: 1, resetTime: now + windowMs });
     try {
       await redis.setex(`ratelimit:${key}`, Math.ceil(windowMs / 1000), '1');
-    } catch {
-      // Redis unavailable, fallback to in-memory
+    } catch (err) {
+      console.error('[rateLimit] Redis setex failed:', err);
     }
     return true;
   }
@@ -28,8 +28,8 @@ export async function checkRateLimit(key: string, maxAttempts: number, windowMs:
   entry.count++;
   try {
     await redis.incr(`ratelimit:${key}`);
-  } catch {
-    // Redis unavailable, fallback to in-memory
+  } catch (err) {
+    console.error('[rateLimit] Redis incr failed:', err);
   }
   return true;
 }

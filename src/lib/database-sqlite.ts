@@ -14,6 +14,7 @@ if (!fs.existsSync(dbDir)) {
 
 const db = new Database(dbPath);
 export { db };
+console.log('[database] SQLite database initialized at:', dbPath);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
@@ -602,10 +603,17 @@ export function createCheckoutSession(data: Omit<any, 'id' | 'created_at'>) {
   const now = new Date().toISOString();
   const id = `cs_${String(Date.now()).slice(-3)}`;
   const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
-  db.prepare(`INSERT INTO checkout_sessions (id, session_id, email, plan, status, temp_password, ip_address, user_agent, payment_gateway, mollie_payment_id, paynow_payment_id, paynow_customer_id, easytransac_tid, whop_request_id, expires_at, completed_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-    id, data.session_id, data.email, data.plan, data.status || 'pending', data.temp_password || null, data.ip_address || null, data.user_agent || null, data.payment_gateway || 'dodo', data.mollie_payment_id || null, data.paynow_payment_id || null, data.paynow_customer_id || null, data.easytransac_tid || null, data.whop_request_id || null, expiresAt, null, now
-  );
-  return db.prepare('SELECT * FROM checkout_sessions WHERE id = ?').get(id) as any;
+  console.log('[database] Creating checkout session:', { id, session_id: data.session_id, email: data.email, plan: data.plan, gateway: data.payment_gateway });
+  try {
+    db.prepare(`INSERT INTO checkout_sessions (id, session_id, email, plan, status, temp_password, ip_address, user_agent, payment_gateway, mollie_payment_id, paynow_payment_id, paynow_customer_id, easytransac_tid, whop_request_id, expires_at, completed_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+      id, data.session_id, data.email, data.plan, data.status || 'pending', data.temp_password || null, data.ip_address || null, data.user_agent || null, data.payment_gateway || 'dodo', data.mollie_payment_id || null, data.paynow_payment_id || null, data.paynow_customer_id || null, data.easytransac_tid || null, data.whop_request_id || null, expiresAt, null, now
+    );
+    console.log('[database] Checkout session created successfully:', id);
+    return db.prepare('SELECT * FROM checkout_sessions WHERE id = ?').get(id) as any;
+  } catch (err) {
+    console.error('[database] Failed to create checkout session:', err);
+    throw err;
+  }
 }
 
 export function getCheckoutSessionBySessionId(sessionId: string) {

@@ -10,6 +10,18 @@ export const redis = new Redis(redisUrl, {
   },
 });
 
+redis.on('connect', () => {
+  console.log('[redis] Connected to Redis');
+});
+
+redis.on('error', (err) => {
+  console.error('[redis] Connection error:', err);
+});
+
+redis.on('reconnecting', () => {
+  console.log('[redis] Reconnecting to Redis...');
+});
+
 export async function getCached<T>(key: string, fetcher: () => Promise<T>, ttlSeconds = 60): Promise<T> {
   const cached = await redis.get(key);
   if (cached) {
