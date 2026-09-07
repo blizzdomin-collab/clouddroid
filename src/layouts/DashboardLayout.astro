@@ -19,10 +19,10 @@ let currentUser: { email: string; name: string; role: string } | null = null;
 let unreadAlerts = 0;
 let announcements: any[] = [];
 
-if (sessionCookie) {
+if (sessionCookie && sessionCookie.value) {
   try {
     const session = JSON.parse(sessionCookie.value);
-    if (session.authenticated === true && session.email) {
+    if (session && typeof session === 'object' && session.authenticated === true && session.email) {
       const user = getUserByEmail(session.email);
       if (user) {
         isAuthenticated = true;
@@ -30,8 +30,9 @@ if (sessionCookie) {
         currentUser = { email: user.email, name: user.name, role: user.role };
       }
     }
-  } catch {
+  } catch (e) {
     isAuthenticated = false;
+    mustChangePassword = false;
   }
 }
 

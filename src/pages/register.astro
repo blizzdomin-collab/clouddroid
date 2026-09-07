@@ -6,18 +6,19 @@ const sessionCookie = Astro.cookies.get('session');
 let isAuthenticated = false;
 let mustChangePassword = false;
 
-if (sessionCookie) {
+if (sessionCookie && sessionCookie.value) {
   try {
     const session = JSON.parse(sessionCookie.value);
-    if (session.authenticated === true && session.email) {
+    if (session && typeof session === 'object' && session.authenticated === true && session.email) {
       const user = getUserByEmail(session.email);
       if (user) {
         isAuthenticated = true;
         mustChangePassword = session.must_change_password === true || user.must_change_password === true;
       }
     }
-  } catch {
+  } catch (e) {
     isAuthenticated = false;
+    mustChangePassword = false;
   }
 }
 
