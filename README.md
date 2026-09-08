@@ -4,7 +4,7 @@ Enterprise-grade cloud Android workspaces for QA automation, app testing, and se
 
 ## 🚀 Tech Stack
 
-- **Framework:** Astro 7.2 with Node.js adapter
+- **Framework:** Astro 7.3 with Node.js adapter
 - **Styling:** Tailwind CSS v4
 - **Database:** SQLite via `better-sqlite3` (`.data/clouddroid.db`)
 - **Cache/Realtime:** Redis (`ioredis`) + WebSocket server (`ws`)
@@ -270,13 +270,101 @@ WS_PORT=4322
 ## 🚢 Deployment
 
 Production runs on VPS with:
-- Node.js 22+
-- PM2 process manager (2 processes: app + WebSocket server)
+- Node.js 26 LTS
+- PM2 process manager (1 process: Astro standalone server)
 - Nginx reverse proxy with WebSocket proxy
 - Redis for caching and pub/sub
 - Let's Encrypt SSL (`clouddroid.eu`)
 
 Auto-deploy via GitHub Actions on push to `main`.
+
+### VPS Setup (Ubuntu)
+
+```bash
+# 1. Create deploy user
+adduser deploy
+usermod -aG sudo deploy
+mkdir -p /home/deploy/.ssh
+chown -R deploy:deploy /home/deploy/.ssh
+chmod 700 /home/deploy/.ssh
+chmod 600 /home/deploy/.ssh/authorized_keys
+echo "deploy ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/deploy
+
+# 2. Install dependencies
+apt update && apt upgrade -y
+curl -fsSL https://deb.nodesource.com/setup_26.x | sudo -E bash -
+apt install -y nodejs nginx certbot python3-certbot-nginx redis-server
+npm install -g pm2
+systemctl enable redis-server && systemctl start redis-server
+
+# 3. Clone project
+su - deploy
+git clone https://github.com/blizzdomin-collab/clouddroid.git /var/www/clouddroid
+cd /var/www/clouddroid
+sudo chown -R $USER:$USER /var/www/clouddroid
+
+# 4. Configure .env
+nano .env
+
+# 5. Build and start
+npm install --production=false
+npm run build
+pm2 start dotenv --name "clouddroid" -- -e /var/www/clouddroid/.env node dist/server/entry.mjs
+pm2 save
+pm2 startup
+```
+
+### Nginx Config
+
+```nginx
+server {
+    listen 80;
+    server_name clouddroid.eu www.clouddroid.eu;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name clouddroid.eu www.clouddroid.eu;
+
+    ssl_certificate /etc/letsencrypt/live/clouddroid.eu/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/clouddroid.eu/privkey.pem;
+
+    client_max_body_size 50M;
+
+    location / {
+        proxy_pass http://127.0.0.1:4321;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    location /_astro/ {
+        alias /var/www/clouddroid/dist/client/_astro/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location /assets/ {
+        alias /var/www/clouddroid/dist/client/assets/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+```
+
+### SSL Certificate
+
+```bash
+sudo systemctl stop nginx
+sudo certbot certonly --standalone -d clouddroid.eu -d www.clouddroid.eu
+sudo systemctl start nginx
+```
 
 ## 🌐 Consulting Subdomain
 
@@ -297,6 +385,7 @@ Static B2B consulting site hosted on `consulting.clouddroid.eu`:
 - Subscribed events: checkout.session.completed, subscription.active, subscription.cancelled, subscription.renewed, payment.succeeded, payment.failed, refund.succeeded
 - Account status: Fully approved, live mode activated
 - **Webhook signature algorithm (IMPORTANT):** Dodo does NOT use the standard Svix format. The signed content is `webhook-id + "." + webhook-timestamp + "." + raw-payload-body`, HMAC-SHA256 with the base64-decoded secret (strip the `whsec_` prefix first). Signature header is `webhook-signature` with format `v1,<base64>`. Verify with `crypto.timingSafeEqual`.
+- **Checkout:** All available payment methods are enabled (cards, Apple Pay, Google Pay, etc.). Dodo Payments displays all active methods from the dashboard.
 
 ### Mollie
 - Webhook endpoint: `/api/webhooks/mollie`
@@ -342,8 +431,14 @@ Static B2B consulting site hosted on `consulting.clouddroid.eu`:
 
 Proprietary - All rights reserved
 
-## 🔄 Recent Updates (2026-09-07)
+## 🔄 Recent Updates (2026-09-08)
 
+- **New VPS deployment** — Fresh Ubuntu VPS setup with Node.js 26 LTS, PM2, Nginx, Redis, and Let's Encrypt SSL
+- **Rebranding banner** — Added dismissable announcement banner for CloudDroid → Liberty Assurance transition
+- **Pricing update** — Updated to new pricing: Developer $1,499, Professional $1,999, Team $2,499
+- **Annual pricing removed** — Removed annual pricing toggle and logic from pricing page
+- **IPv4/IPv6 fix** — Fixed nginx proxy_pass to use `127.0.0.1:4321` instead of `[::1]:4321`
+- **PM2 startup fix** — Fixed PM2 startup with `dotenv-cli` for proper `.env` loading
 - **Checkout fix** — Fixed `Internal server error` on checkout caused by missing `expires_at` / `completed_at` columns in `checkout_sessions` table. Added auto-migration in `src/lib/database-sqlite.ts` so existing SQLite databases upgrade safely on startup.
 - **Checkout logging** — Added structured `[checkout]` and `[database]` logs to `src/pages/api/checkout.ts`, `src/lib/rateLimit.ts`, `src/lib/redis.ts`, and `src/lib/database-sqlite.ts` for faster production diagnosis.
 - **Dark mode** — Full dark mode support across all dashboard pages with `dark:` Tailwind variants
